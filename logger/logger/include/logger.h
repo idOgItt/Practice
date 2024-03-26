@@ -57,4 +57,5 @@ protected:
 
 };
 
+
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_LOGGER_H

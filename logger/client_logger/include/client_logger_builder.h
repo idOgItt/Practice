@@ -2,10 +2,18 @@
 #define MATH_PRACTICE_AND_OPERATING_SYSTEMS_CLIENT_LOGGER_BUILDER_H
 
 #include <logger_builder.h>
+#include <unordered_map>
+#include <list>
+#include "client_logger.h"
 
 class client_logger_builder final:
     public logger_builder
 {
+private:
+
+    std::unordered_map<logger::severity ,std::pair<std::list<client_logger::refcounted_stream>, bool>> _output_streams;
+
+    std::string _format;
 
 public:
 
@@ -37,6 +45,8 @@ public:
     logger_builder* transform_with_configuration(
         std::string const &configuration_file_path,
         std::string const &configuration_path) override;
+
+    logger_builder *set_format(const std::string& format) override;
 
     logger_builder *clear() override;
 

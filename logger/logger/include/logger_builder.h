@@ -27,6 +27,8 @@ public:
 
     virtual logger *build() const = 0;
 
+    virtual logger_builder* set_format(const std::string& format) = 0;
+
 protected:
 
     static logger::severity string_to_severity(

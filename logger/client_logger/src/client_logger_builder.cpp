@@ -65,3 +65,8 @@ logger *client_logger_builder::build() const
 {
     throw not_implemented("logger *client_logger_builder::build() const", "your code should be here...");
 }
+
+logger_builder *client_logger_builder::set_format(const std::string &format)
+{
+    throw not_implemented("logger *client_logger_builder::set_format()", "your code should be here...");
+}
