@@ -1,57 +1,122 @@
-#include <not_implemented.h>
 #include <string>
-
+#include <sstream>
+#include <algorithm>
 #include "../include/client_logger.h"
 
-client_logger::client_logger(
-    client_logger const &other)
-{
-    throw not_implemented("client_logger::client_logger(client_logger const &other)", "your code should be here...");
-}
+std::unordered_map<std::string, std::pair<size_t, std::ofstream>> client_logger::_global_streams;
 
-client_logger &client_logger::operator=(
-    client_logger const &other)
-{
-    throw not_implemented("client_logger &client_logger::operator=(client_logger const &other)", "your code should be here...");
-}
-
-client_logger::client_logger(
-    client_logger &&other) noexcept
-{
-    throw not_implemented("client_logger::client_logger(client_logger &&other) noexcept", "your code should be here...");
-}
-
-client_logger &client_logger::operator=(
-    client_logger &&other) noexcept
-{
-    throw not_implemented("client_logger &client_logger::operator=(client_logger &&other) noexcept", "your code should be here...");
-}
-
-client_logger::~client_logger() noexcept
-{
-    throw not_implemented("client_logger::~client_logger() noexcept", "your code should be here...");
-}
+//client_logger::client_logger(
+//    client_logger const &other)
+//{
+//    throw not_implemented("client_logger::client_logger(client_logger const &other)", "your code should be here...");
+//}
+//
+//client_logger &client_logger::operator=(
+//    client_logger const &other)
+//{
+//    throw not_implemented("client_logger &client_logger::operator=(client_logger const &other)", "your code should be here...");
+//}
+//
+//client_logger::client_logger(
+//    client_logger &&other) noexcept
+//{
+//    throw not_implemented("client_logger::client_logger(client_logger &&other) noexcept", "your code should be here...");
+//}
+//
+//client_logger &client_logger::operator=(
+//    client_logger &&other) noexcept
+//{
+//    throw not_implemented("client_logger &client_logger::operator=(client_logger &&other) noexcept", "your code should be here...");
+//}
+//
+//client_logger::~client_logger() noexcept
+//{
+//    throw not_implemented("client_logger::~client_logger() noexcept", "your code should be here...");
+//}
 
 logger const *client_logger::log(
     const std::string &text,
-    logger::severity severity) const noexcept
+    logger::severity severity) const
 {
-    throw not_implemented("logger const *client_logger::log(const std::string &text, logger::severity severity) const noexcept", "your code should be here...");
+    std::string output = make_format(text, severity);
+
+    auto it = _output_streams.find(severity);
+
+    if (it == _output_streams.end())
+        return this;
+
+    if (it->second.second)
+    {
+        std::cout << output << std::endl;
+    }
+
+    std::ranges::for_each(it->second.first, [&output](std::ofstream* ofstr){
+        if (ofstr != nullptr)
+            *ofstr << output << std::endl;
+        }, [](const refcounted_stream& stream){ return stream._stream.second; });
+
+    return this;
+}
+
+std::string client_logger::make_format(const std::string &message, severity sev) const
+{
+    std::ostringstream res;
+
+    for(auto it = _format.begin(), end = _format.end(); it != end; ++it)
+    {
+        flag type = flag::NO_FLAG;
+        if (*it == '%')
+            type = char_to_flag(*(it + 1));
+
+        if (type != flag::NO_FLAG)
+        {
+            switch (type)
+            {
+                case flag::DATE:
+                    res << current_date_to_string();
+                    break;
+                case flag::TIME:
+                    res << current_time_to_string();
+                    break;
+                case flag::SEVERITY:
+                    res << severity_to_string(sev);
+                    break;
+                case flag::MESSAGE:
+                    res << message;
+                    break;
+            }
+            ++it;
+        } else
+        {
+            res << *it;
+        }
+    }
+
+    return res.str();
 }
 
 client_logger::client_logger(
-        std::unordered_map<logger::severity ,std::pair<std::list<refcounted_stream>, bool>> &streams,
-        std::string& format)
-{
+        const std::unordered_map<logger::severity, std::pair<std::forward_list<refcounted_stream>, bool>> &streams,
+        std::string format) : _output_streams(streams), _format(std::move(format)){}
 
+client_logger::flag client_logger::char_to_flag(char c) noexcept
+{
+    switch (c)
+    {
+        case 'd':
+            return flag::DATE;
+        case 't':
+            return flag::TIME;
+        case 's':
+            return flag::SEVERITY;
+        case 'm':
+            return flag::MESSAGE;
+        default:
+            return flag::NO_FLAG;
+    }
 }
 
-std::string client_logger::make_format(const std::string &message)
-{
-    return std::string();
-}
-
-client_logger::refcounted_stream::refcounted_stream(std::string &path) : _stream(std::make_pair(path, nullptr)) {}
+client_logger::refcounted_stream::refcounted_stream(const std::string &path) : _stream(std::make_pair(path, nullptr)) {}
 
 client_logger::refcounted_stream::refcounted_stream(const client_logger::refcounted_stream &oth) : _stream(std::make_pair(oth._stream.first,
                                                                                                                           nullptr))
@@ -72,7 +137,7 @@ client_logger::refcounted_stream::refcounted_stream(const client_logger::refcoun
             {
                 _global_streams.erase(inserted.first);
             }
-            throw std::runtime_error("File " + oth._stream.first + " could not be opened");
+            throw std::ios_base::failure("File " + oth._stream.first + " could not be opened");
         }
 
         _stream.second = &inserted.first->second.second;
@@ -132,7 +197,7 @@ client_logger::refcounted_stream &client_logger::refcounted_stream::operator=(cl
 
 client_logger::refcounted_stream::~refcounted_stream()
 {
-    if (_stream.second != NULL)
+    if (_stream.second != nullptr)
     {
         auto it = _global_streams.find(_stream.first);
 

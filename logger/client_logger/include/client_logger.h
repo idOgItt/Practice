@@ -4,7 +4,7 @@
 #include <logger.h>
 #include <array>
 #include <unordered_map>
-#include <list>
+#include <forward_list>
 #include <fstream>
 
 class client_logger_builder;
@@ -17,15 +17,16 @@ private:
 
     static std::unordered_map<std::string, std::pair<size_t, std::ofstream>> _global_streams;
 
-    friend client_logger_builder;
+    //region refcounted_stream
 
     class refcounted_stream final
     {
         std::pair<std::string, std::ofstream*> _stream;
-
+        friend client_logger;
+        friend client_logger_builder;
     public:
 
-        explicit refcounted_stream(std::string& path);
+        explicit refcounted_stream(const std::string& path);
 
         refcounted_stream(const refcounted_stream& oth);
 
@@ -38,37 +39,48 @@ private:
         ~refcounted_stream();
     };
 
-    std::unordered_map<logger::severity ,std::pair<std::list<refcounted_stream>, bool>> _output_streams;
+    //region refcounted_stream
 
-    std::string _format;
+    enum class flag
+    { DATE, TIME, SEVERITY, MESSAGE, NO_FLAG };
 
 private:
 
-    client_logger(std::unordered_map<logger::severity ,std::pair<std::list<refcounted_stream>, bool>>& streams, std::string& format);
+    std::unordered_map<logger::severity ,std::pair<std::forward_list<refcounted_stream>, bool>> _output_streams;
 
-    std::string make_format(const std::string& message);
+    std::string _format;
 
+
+private:
+
+    client_logger(const std::unordered_map<logger::severity ,std::pair<std::forward_list<refcounted_stream>, bool>>& streams, std::string format);
+
+    std::string make_format(const std::string& message, severity sev) const;
+
+    static flag char_to_flag(char c) noexcept;
+
+    friend client_logger_builder;
 public:
 
-    client_logger(
-        client_logger const &other);
-
-    client_logger &operator=(
-        client_logger const &other);
-
-    client_logger(
-        client_logger &&other) noexcept;
-
-    client_logger &operator=(
-        client_logger &&other) noexcept;
-
-    ~client_logger() noexcept final;
+//    client_logger(
+//        client_logger const &other);
+//
+//    client_logger &operator=(
+//        client_logger const &other);
+//
+//    client_logger(
+//        client_logger &&other) noexcept;
+//
+//    client_logger &operator=(
+//        client_logger &&other) noexcept;
+//
+//    ~client_logger() noexcept final;
 
 public:
 
     [[nodiscard]] logger const *log(
         const std::string &message,
-        logger::severity severity) const noexcept override;
+        logger::severity severity) const  override;
 
 };
 
