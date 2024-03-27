@@ -1,52 +1,35 @@
 #include <not_implemented.h>
-
 #include "../include/server_logger_builder.h"
-
-server_logger_builder::server_logger_builder()
-{
-    throw not_implemented("server_logger_builder::server_logger_builder()", "your code should be here...");
-}
-
-server_logger_builder::server_logger_builder(
-    server_logger_builder const &other)
-{
-    throw not_implemented("server_logger_builder::server_logger_builder(server_logger_builder const &other)", "your code should be here...");
-}
-
-server_logger_builder &server_logger_builder::operator=(
-    server_logger_builder const &other)
-{
-    throw not_implemented("server_logger_builder &server_logger_builder::operator=(server_logger_builder const &other)", "your code should be here...");
-}
-
-server_logger_builder::server_logger_builder(
-    server_logger_builder &&other) noexcept
-{
-    throw not_implemented("server_logger_builder::server_logger_builder(server_logger_builder &&other) noexcept", "your code should be here...");
-}
-
-server_logger_builder &server_logger_builder::operator=(
-    server_logger_builder &&other) noexcept
-{
-    throw not_implemented("server_logger_builder &server_logger_builder::operator=(server_logger_builder &&other) noexcept", "your code should be here...");
-}
-
-server_logger_builder::~server_logger_builder() noexcept
-{
-    throw not_implemented("server_logger_builder::~server_logger_builder() noexcept", "your code should be here...");
-}
 
 logger_builder *server_logger_builder::add_file_stream(
     std::string const &stream_file_path,
     logger::severity severity)
 {
-    throw not_implemented("logger_builder *server_logger_builder::add_file_stream(std::string const &stream_file_path, logger::severity severity)", "your code should be here...");
+    auto it = _output_streams.find(severity);
+
+    if (it == _output_streams.end())
+    {
+        it = _output_streams.emplace(severity, std::make_pair(std::string(), false)).first;
+    }
+
+    it->second.first = stream_file_path;
+
+    return this;
 }
 
 logger_builder *server_logger_builder::add_console_stream(
     logger::severity severity)
 {
-    throw not_implemented("logger_builder *server_logger_builder::add_console_stream(logger::severity severity)", "your code should be here...");
+    auto it = _output_streams.find(severity);
+
+    if (it == _output_streams.end())
+    {
+        it = _output_streams.emplace(severity, std::make_pair(std::string(), false)).first;
+    }
+
+    it->second.second = true;
+
+    return this;
 }
 
 logger_builder* server_logger_builder::transform_with_configuration(
@@ -58,10 +41,25 @@ logger_builder* server_logger_builder::transform_with_configuration(
 
 logger_builder *server_logger_builder::clear()
 {
-    throw not_implemented("logger_builder *server_logger_builder::clear()", "your code should be here...");
+    _output_streams.clear();
+    _destination = "http://127.0.0.1:9200";
+
+    return this;
 }
 
 logger *server_logger_builder::build() const
 {
-    throw not_implemented("logger *server_logger_builder::build() const", "your code should be here...");
+    return new server_logger(_destination, _output_streams);
+}
+
+logger_builder *server_logger_builder::set_destination(const std::string& dest)
+{
+    _destination = dest;
+
+    return this;
+}
+
+logger_builder *server_logger_builder::set_format(const std::string &format)
+{
+    throw not_implemented("logger *server_logger_builder::set_format() const", "invalid call");
 }

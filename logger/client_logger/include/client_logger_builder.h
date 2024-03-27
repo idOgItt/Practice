@@ -51,6 +51,8 @@ public:
 
     logger_builder *set_format(const std::string& format) override;
 
+    virtual logger_builder *set_destination(const std::string& format) override;
+
     logger_builder *clear() override;
 
     [[nodiscard]] logger *build() const override;

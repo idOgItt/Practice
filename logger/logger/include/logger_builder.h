@@ -25,11 +25,11 @@ public:
 
     virtual logger_builder *clear() = 0;
 
-    virtual logger *build() const = 0;
+    [[nodiscard]] virtual logger *build() const = 0;
 
-    virtual logger_builder* set_format(const std::string& format) = 0;
+    virtual logger_builder *set_format(const std::string& format) =0;
 
-protected:
+    virtual logger_builder *set_destination(const std::string& format) =0;
 
     static logger::severity string_to_severity(
         std::string const &severity_string);

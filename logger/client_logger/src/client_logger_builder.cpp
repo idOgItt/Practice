@@ -1,42 +1,9 @@
 #include <filesystem>
 #include <utility>
+#include <not_implemented.h>
 #include "../include/client_logger_builder.h"
 
 using namespace nlohmann;
-
-//client_logger_builder::client_logger_builder()
-//{
-//    throw not_implemented("client_logger_builder::client_logger_builder()", "your code should be here...");
-//}
-//
-//client_logger_builder::client_logger_builder(
-//    client_logger_builder const &other)
-//{
-//    throw not_implemented("client_logger_builder::client_logger_builder(client_logger_builder const &other)", "your code should be here...");
-//}
-//
-//client_logger_builder &client_logger_builder::operator=(
-//    client_logger_builder const &other)
-//{
-//    throw not_implemented("client_logger_builder &client_logger_builder::operator=(client_logger_builder const &other)", "your code should be here...");
-//}
-//
-//client_logger_builder::client_logger_builder(
-//    client_logger_builder &&other) noexcept
-//{
-//    throw not_implemented("client_logger_builder::client_logger_builder(client_logger_builder &&other) noexcept", "your code should be here...");
-//}
-//
-//client_logger_builder &client_logger_builder::operator=(
-//    client_logger_builder &&other) noexcept
-//{
-//    throw not_implemented("client_logger_builder &client_logger_builder::operator=(client_logger_builder &&other) noexcept", "your code should be here...");
-//}
-//
-//client_logger_builder::~client_logger_builder() noexcept
-//{
-//    throw not_implemented("client_logger_builder::~client_logger_builder() noexcept", "your code should be here...");
-//}
 
 logger_builder *client_logger_builder::add_file_stream(
     std::string const &stream_file_path,
@@ -160,4 +127,9 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
         }
         it->second.second = console->get<bool>();
     }
+}
+
+logger_builder *client_logger_builder::set_destination(const std::string &format)
+{
+    throw not_implemented("logger_builder *client_logger_builder::set_destination(const std::string &format)", "invalid call");
 }
