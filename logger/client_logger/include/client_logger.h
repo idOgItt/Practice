@@ -13,14 +13,12 @@ class client_logger final:
     public logger
 {
 private:
-
-
-    static std::unordered_map<std::string, std::pair<size_t, std::ofstream>> _global_streams;
-
     //region refcounted_stream
 
     class refcounted_stream final
     {
+        static std::unordered_map<std::string, std::pair<size_t, std::ofstream>> _global_streams;
+
         std::pair<std::string, std::ofstream*> _stream;
         friend client_logger;
         friend client_logger_builder;

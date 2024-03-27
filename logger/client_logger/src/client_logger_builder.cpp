@@ -49,7 +49,7 @@ logger_builder *client_logger_builder::add_file_stream(
         it = inserted.first;
     }
 
-    it->second.first.emplace_front(std::filesystem::absolute(stream_file_path).string());
+    it->second.first.emplace_front(std::filesystem::weakly_canonical(stream_file_path).string());
 
     return this;
 }
@@ -87,7 +87,6 @@ logger_builder* client_logger_builder::transform_with_configuration(
     if (it == data.end() || it->type() != json::value_t::object)
         return this;
 
-
     parse_severity(logger::severity::trace, it->operator[]("trace"));
     parse_severity(logger::severity::debug, it->operator[]("debug"));
     parse_severity(logger::severity::information, it->operator[]("information"));
@@ -97,7 +96,7 @@ logger_builder* client_logger_builder::transform_with_configuration(
 
     auto format = it->find("format");
 
-    if (format != it->end() && !format->empty())
+    if (format != it->end())
     {
         _format = format.value();
     }
@@ -108,7 +107,7 @@ logger_builder* client_logger_builder::transform_with_configuration(
 logger_builder *client_logger_builder::clear()
 {
     _output_streams.clear();
-    _format.clear();
+    _format = "%m";
 
     return this;
 }
@@ -144,13 +143,13 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
                                                                  false)).first;
             }
 
-            it->second.first.emplace_front(path);
+            it->second.first.emplace_front(std::filesystem::weakly_canonical(path).string());
         }
     }
 
     auto console = j.find("console");
 
-    if (console != j.end() && console->get<bool>())
+    if (console != j.end())
     {
         if (it == _output_streams.end())
         {

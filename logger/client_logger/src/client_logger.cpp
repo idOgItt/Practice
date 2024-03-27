@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "../include/client_logger.h"
 
-std::unordered_map<std::string, std::pair<size_t, std::ofstream>> client_logger::_global_streams;
+std::unordered_map<std::string, std::pair<size_t, std::ofstream>> client_logger::refcounted_stream::_global_streams;
 
 //client_logger::client_logger(
 //    client_logger const &other)
@@ -53,7 +53,9 @@ logger const *client_logger::log(
     std::ranges::for_each(it->second.first, [&output](std::ofstream* ofstr){
         if (ofstr != nullptr)
             *ofstr << output << std::endl;
-        }, [](const refcounted_stream& stream){ return stream._stream.second; });
+        }, [](const refcounted_stream& stream){
+        return stream._stream.second;
+    });
 
     return this;
 }
