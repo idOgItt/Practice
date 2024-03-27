@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <memory>
 #include "../include/client_logger.h"
 #include "../include/client_logger_builder.h"
 

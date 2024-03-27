@@ -125,7 +125,7 @@ logger_builder *client_logger_builder::set_format(const std::string &format)
 
 void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json& j)
 {
-    if (j.empty())
+    if (j.empty() || !j.is_object())
         return;
 
     auto it = _output_streams.find(sev);
@@ -135,8 +135,11 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
     {
         json data = *data_it;
 
-        for (const std::string &path: data)
+        for (const json& js: data)
         {
+            if (js.empty() || !js.is_string())
+                continue;
+            const std::string& path = js;
             if (it == _output_streams.end())
             {
                 it = _output_streams.emplace(sev, std::make_pair(std::forward_list<client_logger::refcounted_stream>(),

@@ -83,7 +83,7 @@ std::string client_logger::make_format(const std::string &message, severity sev)
                 case flag::SEVERITY:
                     res << severity_to_string(sev);
                     break;
-                case flag::MESSAGE:
+                default:
                     res << message;
                     break;
             }
