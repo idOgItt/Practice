@@ -16,7 +16,7 @@ class server_logger final:
 
     friend server_logger_builder;
 
-    static int _getpid();
+    static int inner_getpid();
 public:
 
     server_logger(

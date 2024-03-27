@@ -10,17 +10,17 @@
 
 server::server(uint16_t port)
 {
-    CROW_ROUTE(app, "/init").methods(crow::HTTPMethod::POST)([&](const crow::request &req){
+    CROW_ROUTE(app, "/init")([&](const crow::request &req){
         std::cout << req.raw_url << " body " << req.body << std::endl;
-//        std::string pid_str = req.url_params.get("pid");
-//        std::string sev_str = req.url_params.get("sev");
-//        std::string path_str = req.url_params.get("path");
-//        std::string console_str = req.url_params.get("console");
+        std::string pid_str = req.url_params.get("pid");
+        std::string sev_str = req.url_params.get("sev");
+        std::string path_str = req.url_params.get("path");
+        std::string console_str = req.url_params.get("console");
 
-        std::string pid_str("3");
-        std::string sev_str("TRACE");
-        std::string path_str("a.txt");
-        std::string console_str("1");
+//        std::string pid_str("3");
+//        std::string sev_str("TRACE");
+//        std::string path_str("a.txt");
+//        std::string console_str("1");
 
         std::cout << "INIT PID: " << pid_str << " SEVERITY: " << sev_str << " PATH: " << path_str << " CONSOLE: "
                   << console_str << std::endl;
@@ -54,7 +54,7 @@ server::server(uint16_t port)
         std::cout << req.url << std::endl;
         std::string pid_str = req.url_params.get("pid");
 
-        std::cout << "INIT PID: " << pid_str << std::endl;
+        std::cout << "DESTROY PID: " << pid_str << std::endl;
 
         int pid = std::stoi(pid_str);
 
@@ -70,7 +70,7 @@ server::server(uint16_t port)
         std::string sev_str = req.url_params.get("sev");
         std::string message = req.url_params.get("message");
 
-        std::cout << "INIT PID: " << pid_str << " SEVERITY: " << sev_str << " MESSAGE: " << message << std::endl;
+        std::cout << "LOG PID: " << pid_str << " SEVERITY: " << sev_str << " MESSAGE: " << message << std::endl;
 
         int pid = std::stoi(pid_str);
         logger::severity sev = logger_builder::string_to_severity(sev_str);
@@ -100,5 +100,5 @@ server::server(uint16_t port)
 
 
 
-    app.port(port).run();
+    app.port(port).multithreaded().run();
 }
