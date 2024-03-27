@@ -96,7 +96,7 @@ logger_builder* client_logger_builder::transform_with_configuration(
 
     auto format = it->find("format");
 
-    if (format != it->end())
+    if (format != it->end() && format->is_string())
     {
         _format = format.value();
     }
@@ -131,9 +131,9 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
     auto it = _output_streams.find(sev);
 
     auto data_it = j.find("paths");
-    if (data_it != j.end())
+    if (data_it != j.end() && data_it->is_array())
     {
-        json data = j["paths"];
+        json data = *data_it;
 
         for (const std::string &path: data)
         {
@@ -149,7 +149,7 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
 
     auto console = j.find("console");
 
-    if (console != j.end())
+    if (console != j.end() && console->is_boolean())
     {
         if (it == _output_streams.end())
         {
