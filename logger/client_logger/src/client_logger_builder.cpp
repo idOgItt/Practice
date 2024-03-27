@@ -84,7 +84,7 @@ logger_builder* client_logger_builder::transform_with_configuration(
 
     auto it = data.find(configuration_path);
 
-    if (it == data.end() || it->type() != json::value_t::object)
+    if (it == data.end() || !it->is_object())
         return this;
 
     parse_severity(logger::severity::trace, it->operator[]("trace"));
