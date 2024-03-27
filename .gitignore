@@ -3,6 +3,7 @@
 
 .idea
 cmake-*
+*.txt
 
 # Compiled Object files
 *.slo
