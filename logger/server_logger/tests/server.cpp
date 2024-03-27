@@ -45,6 +45,8 @@ server::server(uint16_t port)
         }
 
         inner_it->second.first = std::move(path_str);
+        if (!inner_it->second.first.empty())
+            std::ofstream tmp(inner_it->second.first);
         inner_it->second.second = console;
 
         return 0;
