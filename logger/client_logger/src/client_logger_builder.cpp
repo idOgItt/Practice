@@ -87,12 +87,12 @@ logger_builder* client_logger_builder::transform_with_configuration(
     if (it == data.end() || !it->is_object())
         return this;
 
-    parse_severity(logger::severity::trace, it->operator[]("trace"));
-    parse_severity(logger::severity::debug, it->operator[]("debug"));
-    parse_severity(logger::severity::information, it->operator[]("information"));
-    parse_severity(logger::severity::warning, it->operator[]("warning"));
-    parse_severity(logger::severity::error, it->operator[]("error"));
-    parse_severity(logger::severity::critical, it->operator[]("critical"));
+    parse_severity(logger::severity::trace, (*it)["trace"]);
+    parse_severity(logger::severity::debug, (*it)["debug"]);
+    parse_severity(logger::severity::information, (*it)["information"]);
+    parse_severity(logger::severity::warning, (*it)["warning"]);
+    parse_severity(logger::severity::error, (*it)["error"]);
+    parse_severity(logger::severity::critical, (*it)["critical"]);
 
     auto format = it->find("format");
 
