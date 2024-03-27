@@ -11,7 +11,6 @@
 server::server(uint16_t port)
 {
     CROW_ROUTE(app, "/init")([&](const crow::request &req){
-        std::cout << req.raw_url << " body " << req.body << std::endl;
         std::string pid_str = req.url_params.get("pid");
         std::string sev_str = req.url_params.get("sev");
         std::string path_str = req.url_params.get("path");
@@ -53,7 +52,6 @@ server::server(uint16_t port)
     });
 
     CROW_ROUTE(app, "/destroy")([&](const crow::request &req){
-        std::cout << req.url << std::endl;
         std::string pid_str = req.url_params.get("pid");
 
         std::cout << "DESTROY PID: " << pid_str << std::endl;
@@ -67,7 +65,6 @@ server::server(uint16_t port)
     });
 
     CROW_ROUTE(app, "/log")([&](const crow::request &req){
-        std::cout << req.url << std::endl;
         std::string pid_str = req.url_params.get("pid");
         std::string sev_str = req.url_params.get("sev");
         std::string message = req.url_params.get("message");
