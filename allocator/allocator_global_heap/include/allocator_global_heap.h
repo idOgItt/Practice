@@ -16,12 +16,14 @@ private:
     
     logger *_logger;
 
+    static constexpr const size_t size_t_size = sizeof(size_t);
+
 public:
     
     explicit allocator_global_heap(
         logger *logger = nullptr);
     
-    ~allocator_global_heap() override;
+    ~allocator_global_heap() override =default;
     
     allocator_global_heap(
         allocator_global_heap const &other) = delete;
@@ -30,10 +32,10 @@ public:
         allocator_global_heap const &other) = delete;
     
     allocator_global_heap(
-        allocator_global_heap &&other) noexcept;
+        allocator_global_heap &&other) noexcept =default;
     
     allocator_global_heap &operator=(
-        allocator_global_heap &&other) noexcept;
+        allocator_global_heap &&other) noexcept =default;
 
 public:
     
@@ -44,14 +46,15 @@ public:
     void deallocate(
         void *at) override;
 
-public:
-    
-    void foo()
-    {};
-
 private:
     
     inline logger *get_logger() const override;
+
+    std::string get_dump(char* data, size_t size);
+
+    static std::string dump_byte(char byte);
+
+    static char int_to_char(int val);
 
 private:
     
