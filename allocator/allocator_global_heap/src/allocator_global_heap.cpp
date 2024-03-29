@@ -49,7 +49,7 @@ inline logger *allocator_global_heap::get_logger() const
     return _logger;
 }
 
-inline std::string allocator_global_heap::get_typename() const noexcept
+inline std::string allocator_global_heap::get_typename() const
 {
     return "allocator_global_heap";
 }
@@ -83,7 +83,7 @@ std::string allocator_global_heap::dump_byte(char byte)
     constexpr const char left_mask = 0u | (1u << 7) | (1u << 6) | (1u << 5) | (1u << 4);
     constexpr const char right_mask = 0u | (1u << 3) | (1u << 2) | (1u << 1) | (1u);
 
-    res.push_back(int_to_char(byte & left_mask));
+    res.push_back(int_to_char((byte & left_mask) >> 4));
     res.push_back(int_to_char(byte & right_mask));
 
     return res;
@@ -95,4 +95,23 @@ char allocator_global_heap::int_to_char(int val)
         return '0' + val;
     else
         return 'A' + val;
+}
+
+allocator_global_heap::~allocator_global_heap()
+{
+    debug_with_guard("Global heap allocator destructor called");
+}
+
+allocator_global_heap::allocator_global_heap(allocator_global_heap &&other) noexcept : _logger(other._logger)
+{
+    debug_with_guard("Global heap allocator move constructor called");
+}
+
+allocator_global_heap &allocator_global_heap::operator=(allocator_global_heap &&other) noexcept
+{
+    debug_with_guard("Global heap allocator move assign called");
+
+    _logger = other._logger;
+
+    return *this;
 }
