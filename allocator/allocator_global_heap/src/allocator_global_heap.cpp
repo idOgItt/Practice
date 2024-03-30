@@ -1,5 +1,5 @@
 #include <not_implemented.h>
-
+#include <format>
 #include "../include/allocator_global_heap.h"
 
 allocator_global_heap::allocator_global_heap(
@@ -35,13 +35,14 @@ allocator_global_heap::allocator_global_heap(
 void allocator_global_heap::deallocate(
     void *at)
 {
-    debug_with_guard("Global heap allocator started deallocating " + std::to_string((unsigned long long)at));
+//    debug_with_guard("Global heap allocator started deallocating " + std::to_string((unsigned long long)at));
+    debug_with_guard("Global heap allocator started deallocating " + std::format("{}", at));
     std::string dump = get_dump(reinterpret_cast<char*>(at), *(reinterpret_cast<size_t*>(at) - 1));
 
     debug_with_guard(dump);
 
     ::delete (reinterpret_cast<size_t*>(at) - 1);
-    debug_with_guard("Global heap allocator finished deallocating " + std::to_string((unsigned long long)at));
+    debug_with_guard("Global heap allocator finished deallocating " + std::format("{}", at));
 }
 
 inline logger *allocator_global_heap::get_logger() const
