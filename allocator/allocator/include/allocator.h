@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <utility>
+#include <string>
 
 class allocator
 {
@@ -39,7 +40,14 @@ public:
     
     virtual void deallocate(
         void *at) = 0;
-    
+
+protected:
+
+    static std::string get_dump(char* data, size_t size);
+
+    static std::string dump_byte(char byte);
+
+    static char int_to_char(int val);
 };
 
 template<

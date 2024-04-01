@@ -55,49 +55,6 @@ inline std::string allocator_global_heap::get_typename() const
     return "allocator_global_heap";
 }
 
-std::string allocator_global_heap::get_dump(char *data, size_t size)
-{
-    trace_with_guard("Global heap allocator started get_dump");
-
-    std::string res;
-
-    if (size > 0)
-    {
-        res.reserve(size * 3);
-
-        res += dump_byte(data[0]);
-
-        for (size_t i = 1; i < size; ++i)
-        {
-            res += " " + dump_byte(data[i]);
-        }
-    }
-
-    trace_with_guard("Global heap allocator finished get_dump");
-    return res;
-}
-
-std::string allocator_global_heap::dump_byte(char byte)
-{
-    std::string res;
-
-    constexpr const char left_mask = 0u | (1u << 7) | (1u << 6) | (1u << 5) | (1u << 4);
-    constexpr const char right_mask = 0u | (1u << 3) | (1u << 2) | (1u << 1) | (1u);
-
-    res.push_back(int_to_char((byte & left_mask) >> 4));
-    res.push_back(int_to_char(byte & right_mask));
-
-    return res;
-}
-
-char allocator_global_heap::int_to_char(int val)
-{
-    if (val < 10)
-        return '0' + val;
-    else
-        return 'A' + val;
-}
-
 allocator_global_heap::~allocator_global_heap()
 {
     debug_with_guard("Global heap allocator destructor called");

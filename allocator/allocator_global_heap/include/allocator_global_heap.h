@@ -50,12 +50,6 @@ private:
     
     inline logger *get_logger() const override;
 
-    std::string get_dump(char* data, size_t size);
-
-    static std::string dump_byte(char byte);
-
-    static char int_to_char(int val);
-
 private:
     
     inline std::string get_typename() const override;
