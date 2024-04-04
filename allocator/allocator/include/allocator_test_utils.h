@@ -35,6 +35,8 @@ public:
 
 protected:
 
+    virtual std::vector<block_info> get_blocks_info_inner() const = 0;
+
     std::string print_blocks() const;
 };
 

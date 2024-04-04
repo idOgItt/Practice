@@ -6,6 +6,7 @@
 #include <allocator_with_fit_mode.h>
 #include <logger_guardant.h>
 #include <typename_holder.h>
+#include <iterator>
 #include <mutex>
 
 class allocator_boundary_tags final:
@@ -71,6 +72,8 @@ public:
 
 private:
 
+    std::vector<allocator_test_utils::block_info> get_blocks_info_inner() const override;
+
     inline allocator *get_allocator() const override;
     
     inline logger *get_logger() const override;
@@ -81,9 +84,7 @@ private:
 
     inline std::mutex& get_mutex() const noexcept;
 
-    inline size_t get_overall_size() const noexcept;
-
-    inline void** get_first_block_ptr() const noexcept;
+    static inline size_t get_overall_size(void* trusted_memory) noexcept;
 
     void* get_first(size_t size) const noexcept;
 
@@ -91,17 +92,64 @@ private:
 
     void* get_worst(size_t size) const noexcept;
 
-    inline size_t get_occupied_size(void* block_start) const noexcept;
+    static inline void** get_first_block_ptr(void* trusted_memory) noexcept;
 
-    inline void* get_previous_from_occupied(void* block_start) const noexcept;
+    static inline size_t get_occupied_size(void* block_start) noexcept;
 
-    inline void* get_next_from_occupied(void* block_start) const noexcept;
+    static inline void* get_previous_from_occupied(void* block_start) noexcept;
 
-    inline void* get_parent_from_occupied(void* block_start) const noexcept;
+    static inline void* get_next_from_occupied(void* block_start) noexcept;
 
-    inline size_t get_next_free_size(void* occupied_block_start) const noexcept;
+    static inline void* get_parent_from_occupied(void* block_start) noexcept;
+
+    static inline size_t get_next_free_size(void* occupied_block_start, void* trusted_memory) noexcept;
 
     size_t get_free_size() const noexcept;
+
+    class boundary_iterator
+    {
+        void* _occupied_ptr;
+        bool _occupied;
+        void* _trusted_memory;
+
+    public:
+
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = void*;
+        using reference = void*&;
+        using pointer = void**;
+        using difference_type = ptrdiff_t;
+
+        bool operator==(const boundary_iterator&) const noexcept;
+
+        bool operator!=(const boundary_iterator&) const noexcept;
+
+        boundary_iterator& operator++() noexcept;
+
+        boundary_iterator& operator--() noexcept;
+
+        boundary_iterator operator++(int n);
+
+        boundary_iterator operator--(int n);
+
+        size_t size() const noexcept;
+
+        bool occupied() const noexcept;
+
+        void* get() const noexcept;
+
+        void* get_ptr() const noexcept;
+
+        boundary_iterator();
+
+        boundary_iterator(void* trusted);
+    };
+
+    friend class boundary_iterator;
+
+    boundary_iterator begin() const noexcept;
+
+    boundary_iterator end() const noexcept;
 };
 
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_ALLOCATOR_ALLOCATOR_BOUNDARY_TAGS_H

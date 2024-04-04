@@ -17,17 +17,19 @@ bool allocator_test_utils::block_info::operator!=(
 
 std::string allocator_test_utils::print_blocks() const
 {
-    auto vec = get_blocks_info();
+    auto vec = get_blocks_info_inner();
 
     auto it = vec.begin();
 
     std::stringstream res;
 
-    res << (it->is_block_occupied ? "occup" : "avail") << std::to_string(it->block_size);
+    res << (it->is_block_occupied ? "occup" : "avail") << " " << std::to_string(it->block_size);
+
+    ++it;
 
     for(auto end = vec.end(); it != end; ++it)
     {
-        res << " | " << (it->is_block_occupied ? "occup" : "avail") << std::to_string(it->block_size);
+        res << " | " << (it->is_block_occupied ? "occup" : "avail") << " " << std::to_string(it->block_size);
     }
 
     return res.str();
