@@ -136,7 +136,7 @@ private:
 
         bool occupied() const noexcept;
 
-        void* get() const noexcept;
+        void* operator*() const noexcept;
 
         void* get_ptr() const noexcept;
 

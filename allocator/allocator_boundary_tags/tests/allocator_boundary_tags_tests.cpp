@@ -38,25 +38,25 @@ TEST(positiveTests, test1)
                 logger::severity::information
             }
         });
-    allocator *subject = new allocator_boundary_tags(sizeof(int) * 40, nullptr, logger, allocator_with_fit_mode::fit_mode::first_fit);
+    allocator *subject = new allocator_boundary_tags(sizeof(int) * 70, nullptr, logger, allocator_with_fit_mode::fit_mode::first_fit);
     
-    auto const *first_block = reinterpret_cast<int const *>(subject->allocate(sizeof(int), 10));
-    auto const *second_block = reinterpret_cast<int const *>(subject->allocate(sizeof(int), 10));
-    auto const *third_block = reinterpret_cast<int const *>(subject->allocate(sizeof(int), 10));
+    auto *first_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 10));
+    auto *second_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 10));
+    auto *third_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 10));
     
-    ASSERT_EQ(first_block + 10, second_block);
-    ASSERT_EQ(second_block + 10, third_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(first_block + 10) + sizeof(size_t) + sizeof(void*) * 3), second_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(second_block + 10) + sizeof(size_t) + sizeof(void*) * 3), third_block);
     
     subject->deallocate(const_cast<void *>(reinterpret_cast<void const *>(second_block)));
     
     auto *the_same_subject = dynamic_cast<allocator_with_fit_mode *>(subject);
     the_same_subject->set_fit_mode(allocator_with_fit_mode::fit_mode::the_worst_fit);
-    auto const *fourth_block = reinterpret_cast<int const *>(subject->allocate(sizeof(int), 1));
+    auto  *fourth_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 1));
     the_same_subject->set_fit_mode(allocator_with_fit_mode::fit_mode::the_best_fit);
-    auto const *fifth_block = reinterpret_cast<int const *>(subject->allocate(sizeof(int), 1));
+    auto *fifth_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 1));
     
-    ASSERT_EQ(first_block + 10, fifth_block);
-    ASSERT_EQ(third_block + 10, fourth_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(first_block + 10) + sizeof(size_t) + sizeof(void*) * 3), fifth_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(third_block + 10) + sizeof(size_t) + sizeof(void*) * 3), fourth_block);
     
     subject->deallocate(const_cast<void *>(reinterpret_cast<void const *>(first_block)));
     subject->deallocate(const_cast<void *>(reinterpret_cast<void const *>(third_block)));
@@ -85,9 +85,9 @@ TEST(positiveTests, test2)
     auto actual_blocks_state = dynamic_cast<allocator_test_utils *>(allocator_instance)->get_blocks_info();
     std::vector<allocator_test_utils::block_info> expected_blocks_state
         {
-            { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 2, .is_block_occupied = true },
-            { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 2, .is_block_occupied = true },
-            { .block_size = 3000 - (1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t)) * 2, .is_block_occupied = false }
+            { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3, .is_block_occupied = true },
+            { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3, .is_block_occupied = true },
+            { .block_size = 3000 - (1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3) * 2, .is_block_occupied = false }
         };
     
     ASSERT_EQ(actual_blocks_state.size(), expected_blocks_state.size());

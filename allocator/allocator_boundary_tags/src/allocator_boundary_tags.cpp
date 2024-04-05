@@ -271,7 +271,7 @@ void *allocator_boundary_tags::get_best(size_t size) const noexcept
         }
     }
 
-    return res.get();
+    return *res;
 }
 
 void *allocator_boundary_tags::get_worst(size_t size) const noexcept
@@ -286,7 +286,7 @@ void *allocator_boundary_tags::get_worst(size_t size) const noexcept
         }
     }
 
-    return res.get();
+    return *res;
 }
 
 size_t allocator_boundary_tags::get_occupied_size(void *block_start) noexcept
@@ -461,7 +461,7 @@ bool allocator_boundary_tags::boundary_iterator::occupied() const noexcept
     return _occupied;
 }
 
-void* allocator_boundary_tags::boundary_iterator::get() const noexcept
+void* allocator_boundary_tags::boundary_iterator::operator*() const noexcept
 {
     return _occupied ? _occupied_ptr : reinterpret_cast<std::byte*>(_occupied_ptr) + get_occupied_size(_occupied_ptr) + occupied_block_metadata_size;
 }
