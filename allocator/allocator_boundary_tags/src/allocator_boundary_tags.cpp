@@ -28,6 +28,11 @@ allocator_boundary_tags::allocator_boundary_tags(
     logger *logger,
     allocator_with_fit_mode::fit_mode allocate_fit_mode)
 {
+    if (space_size < occupied_block_metadata_size)
+    {
+        throw std::logic_error("To small space");
+    }
+
     size_t real_size = space_size + allocator_metadata_size;
 
     _trusted_memory = (parent_allocator == nullptr) ? ::operator new(real_size) : parent_allocator->allocate(real_size, 1);
