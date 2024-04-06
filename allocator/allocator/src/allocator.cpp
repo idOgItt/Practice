@@ -25,10 +25,9 @@ std::string allocator::dump_byte(char byte)
 {
     std::string res;
 
-    constexpr const char left_mask = 0u | (1u << 7) | (1u << 6) | (1u << 5) | (1u << 4);
     constexpr const char right_mask = 0u | (1u << 3) | (1u << 2) | (1u << 1) | (1u);
 
-    res.push_back(int_to_char((byte & left_mask) >> 4));
+    res.push_back(int_to_char((byte >> 4) & right_mask));
     res.push_back(int_to_char(byte & right_mask));
 
     return res;

@@ -55,8 +55,8 @@ TEST(positiveTests, test1)
     the_same_subject->set_fit_mode(allocator_with_fit_mode::fit_mode::the_best_fit);
     auto *fifth_block = reinterpret_cast<int *>(subject->allocate(sizeof(int), 1));
     
-    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(first_block + 10) + sizeof(size_t) + sizeof(void*) * 3), fifth_block);
-    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(third_block + 10) + sizeof(size_t) + sizeof(void*) * 3), fourth_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(first_block + 10) + sizeof(size_t) + sizeof(void*) * 3), fourth_block);
+    ASSERT_EQ(reinterpret_cast<int*>(reinterpret_cast<char*>(fourth_block + 1) + sizeof(size_t) + sizeof(void*) * 3), fifth_block);
     
     subject->deallocate(const_cast<void *>(reinterpret_cast<void const *>(first_block)));
     subject->deallocate(const_cast<void *>(reinterpret_cast<void const *>(third_block)));
@@ -86,8 +86,8 @@ TEST(positiveTests, test2)
     std::vector<allocator_test_utils::block_info> expected_blocks_state
         {
             { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3, .is_block_occupied = true },
-            { .block_size = 1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3, .is_block_occupied = true },
-            { .block_size = 3000 - (1000 + sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3) * 2, .is_block_occupied = false }
+            { .block_size = sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3, .is_block_occupied = true },
+            { .block_size = 3000 - (1000 + (sizeof(allocator::block_size_t) + sizeof(allocator::block_pointer_t) * 3) * 2), .is_block_occupied = false }
         };
     
     ASSERT_EQ(actual_blocks_state.size(), expected_blocks_state.size());

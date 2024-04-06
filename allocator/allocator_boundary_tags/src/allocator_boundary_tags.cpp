@@ -186,7 +186,7 @@ void allocator_boundary_tags::deallocate(
 
     if (next_block != nullptr)
     {
-        auto byte_ptr = reinterpret_cast<std::byte*>(prev_block) + sizeof(size_t);
+        auto byte_ptr = reinterpret_cast<std::byte*>(next_block) + sizeof(size_t);
         *reinterpret_cast<void**>(byte_ptr) = prev_block;
     }
 
@@ -265,13 +265,13 @@ void *allocator_boundary_tags::get_best(size_t size) const noexcept
 
     for(auto it = begin(), sent = end(); it != sent; ++it)
     {
-        if (!it.occupied() && it.size() >= size && it.size() < res.size())
+        if (!it.occupied() && it.size() >= size && (it.size() < res.size() || res.get_ptr() == nullptr))
         {
             res = it;
         }
     }
 
-    return *res;
+    return res.get_ptr();
 }
 
 void *allocator_boundary_tags::get_worst(size_t size) const noexcept
@@ -286,7 +286,7 @@ void *allocator_boundary_tags::get_worst(size_t size) const noexcept
         }
     }
 
-    return *res;
+    return res.get_ptr();
 }
 
 size_t allocator_boundary_tags::get_occupied_size(void *block_start) noexcept
