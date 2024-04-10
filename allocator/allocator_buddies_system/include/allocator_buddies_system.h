@@ -130,7 +130,7 @@ private:
     static inline size_t get_overall_size(void* trusted_memory) noexcept;
 
     void* get_first(size_t size) const noexcept;
-
+    
     void* get_best(size_t size) const noexcept;
 
     void* get_worst(size_t size) const noexcept;

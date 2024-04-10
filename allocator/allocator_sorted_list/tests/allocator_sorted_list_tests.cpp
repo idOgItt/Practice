@@ -214,9 +214,9 @@ TEST(allocatorSortedListPositiveTests, test5)
     first_block = reinterpret_cast<int *>(alloc->allocate(sizeof(char), 245));
     
     //TODO: logger
-    allocator *allocator = new allocator_sorted_list(5000, nullptr, nullptr, allocator_with_fit_mode::fit_mode::first_fit);
+    allocator *allocator = new allocator_sorted_list(7500, nullptr, nullptr, allocator_with_fit_mode::fit_mode::first_fit);
     auto *the_same_subject = static_cast<allocator_with_fit_mode *>(alloc);
-    int iterations_count = 100;
+    int iterations_count = 10000;
     
     std::list<void *> allocated_blocks;
     srand((unsigned)time(nullptr));
@@ -226,10 +226,9 @@ TEST(allocatorSortedListPositiveTests, test5)
         switch (rand() % 2)
         {
             case 0:
-            case 1:
                 try
                 {
-                    switch (rand() % 2)
+                    switch (rand() % 3)
                     {
                         case 0:
                             the_same_subject->set_fit_mode(allocator_with_fit_mode::fit_mode::first_fit);
@@ -247,7 +246,7 @@ TEST(allocatorSortedListPositiveTests, test5)
                     std::cout << ex.what() << std::endl;
                 }
                 break;
-            case 2:
+            case 1:
                 if (allocated_blocks.empty())
                 {
                     std::cout << "No blocks to deallocate" << std::endl;

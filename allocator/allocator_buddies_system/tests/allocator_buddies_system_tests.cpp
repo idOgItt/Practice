@@ -5,6 +5,7 @@
 #include <client_logger_builder.h>
 #include <logger.h>
 #include <logger_builder.h>
+#include <list>
 
 
 logger *create_logger(
