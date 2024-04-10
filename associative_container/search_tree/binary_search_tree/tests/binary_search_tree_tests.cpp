@@ -2,6 +2,7 @@
 #include <binary_search_tree.h>
 #include <logger_builder.h>
 #include <client_logger_builder.h>
+#include <allocator_sorted_list.h>
 #include <iostream>
 
 logger *create_logger(
@@ -10,7 +11,9 @@ logger *create_logger(
     logger::severity console_stream_severity = logger::severity::debug)
 {
     logger_builder *builder = new client_logger_builder();
-    
+
+    builder->set_format("[%d %t][%s] %m");
+
     if (use_console_stream)
     {
         builder->add_console_stream(console_stream_severity);
@@ -154,6 +157,53 @@ bool postfix_iterator_test(
     return true;
 }
 
+TEST(binarySearchTreePositiveTests, noIteratorTest)
+{
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                           {
+                                                   {
+                                                           "binary_search_tree_tests_logs.txt",
+                                                           logger::severity::trace
+                                                   }
+                                           }));
+    logger->trace("binarySearchTreePositiveTests.test1 started");
+
+    auto al = std::make_unique<allocator_sorted_list>(10000);
+
+    auto bst = std::make_unique<binary_search_tree<int, std::string>>(key_comparer(), al.get(), logger.get());
+//    auto bst = new binary_search_tree<int, std::string>(key_comparer(), al.get(), logger.get());
+
+    bst->insert(5, "a");
+    bst->insert(2, "b");
+    bst->insert(15, "c");
+    bst->insert(3, "d");
+    bst->insert(14, "e");
+    bst->insert(1, "l");
+
+    EXPECT_EQ("b", bst->obtain(2));
+    EXPECT_EQ("e", bst->obtain(14));
+    EXPECT_EQ("l", bst->obtain(1));
+
+    using insert_ex = binary_search_tree<int, std::string>::insertion_of_existent_key_attempt_exception;
+    using obtain_ex = binary_search_tree<int, std::string>::obtaining_of_nonexistent_key_attempt_exception;
+    using dispose_ex = binary_search_tree<int, std::string>::disposal_of_nonexistent_key_attempt_exception;
+    ASSERT_THROW(bst->insert(5, "t"), insert_ex);
+
+    bst->set_insertion_strategy(binary_search_tree<int, std::string>::insertion_of_existent_key_attempt_strategy::update_value);
+
+    bst->insert(5, "t");
+
+    EXPECT_EQ("t", bst->obtain(5));
+
+    ASSERT_THROW(bst->obtain(144), obtain_ex);
+
+    ASSERT_THROW(bst->dispose(144), dispose_ex);
+
+    EXPECT_EQ("t", bst->dispose(5));
+
+    ASSERT_THROW(bst->obtain(5), obtain_ex);
+}
+
 TEST(binarySearchTreePositiveTests, test1)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
@@ -164,7 +214,7 @@ TEST(binarySearchTreePositiveTests, test1)
             }
         });
     logger->trace("binarySearchTreePositiveTests.test1 started");
-    
+
     search_tree<int, std::string> *bst = new binary_search_tree<int, std::string>(key_comparer(), nullptr, logger);
     
     bst->insert(5, "a");

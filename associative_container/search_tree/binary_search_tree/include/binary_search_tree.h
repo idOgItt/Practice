@@ -43,7 +43,9 @@ protected:
         explicit node(
             tkey const &key,
             tvalue &&value);
-        
+
+
+        virtual ~node() =default;
     };
 
 public:
@@ -372,7 +374,7 @@ public:
     
     // endregion iterators definition
 
-protected:
+public:
     
     // region target operations strategies definition
     
@@ -594,7 +596,7 @@ protected:
 public:
     
     explicit binary_search_tree(
-        std::function<int(tkey const &, tkey const &)> comparer = std::less<tkey>(),
+        std::function<int(tkey const &, tkey const &)> comparer,
         allocator *allocator = nullptr,
         logger *logger = nullptr,
         typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
@@ -639,11 +641,9 @@ public:
     
 public:
     
-    void set_insertion_strategy(
-        typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy) noexcept;
+    void set_insertion_strategy(typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy) noexcept;
     
-    void set_removal_strategy(
-        typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) noexcept;
+    void set_removal_strategy(typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) noexcept;
 
 public:
     
@@ -703,13 +703,15 @@ protected:
 
     std::stack<node**> find_path(const tkey&);
 
-    template<typename value_t>
-    requires std::convertible_to<value_t, tvalue>
-    virtual void insert_inner(std::stack<node**> inserted_node_path, value_t&& val);
+    virtual void insert_inner(std::stack<node**> node_path, const tkey& key, tvalue&& val);
+
+    virtual void insert_inner(std::stack<node**> node_path, const tkey& key, const tvalue& val);
 
     virtual tvalue& obtain_inner(std::stack<node**> node_path);
 
     virtual tvalue dispose_inner(std::stack<node**> node_path);
+
+    void destroy_subtree(node* n) noexcept;
     
     // region subtree rotations definition
     
@@ -743,23 +745,109 @@ protected:
     
 };
 
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::destroy_subtree(binary_search_tree::node *n) noexcept
+{
+    if (n != nullptr)
+    {
+        destroy_subtree(n->left_subtree);
+        destroy_subtree(n->right_subtree);
+
+        allocator::destruct(n);
+        allocator_guardant::deallocate_with_guard(n);
+    }
+}
+
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **> node_path, const tkey &key, tvalue &&val)
+{
+    *node_path.top() = static_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
+    allocator::construct(*node_path.top(), key, std::move(val));
+}
+
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **> node_path, const tkey &key, const tvalue &val)
+{
+    *node_path.top() = static_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
+    allocator::construct(*node_path.top(), key, val);
+}
+
+template<typename tkey, typename tvalue>
+tvalue& binary_search_tree<tkey, tvalue>::obtain_inner(std::stack<node**> node_path)
+{
+    return (*node_path.top())->value;
+}
+
+template<typename tkey, typename tvalue>
+tvalue binary_search_tree<tkey, tvalue>::dispose_inner(std::stack<node**> node_path)
+{
+    tvalue res = (*node_path.top())->value;
+
+    node* current_node = *node_path.top();
+
+    if (current_node->right_subtree == nullptr && current_node->left_subtree == nullptr)
+    {
+        *node_path.top() = nullptr;
+    } else if (current_node->right_subtree == nullptr || current_node->left_subtree == nullptr)
+    {
+        node* node_of_interest = current_node->right_subtree == nullptr ? current_node->right_subtree : current_node->left_subtree;
+
+        *node_path.top() = node_of_interest;
+    } else
+    {
+        node** node_of_interest = &current_node->right_subtree;
+
+        while ((*node_of_interest)->left_subtree != nullptr)
+        {
+            node_of_interest = &((*node_of_interest)->left_subtree);
+        }
+
+        node* tmp = *node_of_interest;
+        *node_of_interest = (*node_of_interest)->right_subtree;
+        *node_path.top() = tmp;
+
+        tmp->left_subtree = current_node->left_subtree;
+        tmp->right_subtree = current_node->right_subtree;
+    }
+
+    allocator::destruct(current_node);
+    allocator_guardant::deallocate_with_guard(current_node);
+
+    return res;
+}
+
+template<typename tkey, typename tvalue>
+std::stack<typename binary_search_tree<tkey, tvalue>::node**> binary_search_tree<tkey, tvalue>::find_path(const tkey &key)
+{
+    std::stack<node**> result;
+
+    result.push(&_root);
+    node** current_node = &_root;
+
+    while(*current_node != nullptr)
+    {
+        int res = search_tree<tkey, tvalue>::_keys_comparer(key, (*current_node)->key);
+
+        if (res == 0)
+            break;
+        else if (res < 0)
+            current_node = &((*current_node)->left_subtree);
+        else
+            current_node = &((*current_node)->right_subtree);
+
+        result.push(current_node);
+    }
+
+    return result;
+}
+
 // region binary_search_tree<tkey, tvalue>::node methods implementation
 
 template<typename tkey, typename tvalue>
-binary_search_tree<tkey, tvalue>::node::node(tkey const &key, tvalue const &value)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::node::node(tkey const &, tvalue const &)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::node::node(tkey const &key_, tvalue const &value_) : key(key_), value(value_), left_subtree(nullptr), right_subtree(nullptr) {}
 
-template<
-    typename tkey,
-    typename tvalue>
-binary_search_tree<tkey, tvalue>::node::node(
-    tkey const &key,
-    tvalue &&value)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::node::node(tkey const &, tvalue &&)", "your code should be here...");
-}
+template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::node::node(tkey const &key_, tvalue &&value_) : key(key_), value(std::move(value_)), left_subtree(nullptr), right_subtree(nullptr) {}
 
 // endregion binary_search_tree<tkey, tvalue>::node methods implementation
 
@@ -1685,16 +1773,7 @@ binary_search_tree<tkey, tvalue>::binary_search_tree(
     logger *logger,
     typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy,
     typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy):
-    binary_search_tree(
-        new binary_search_tree<tkey, tvalue>::insertion_template_method(this, insertion_strategy),
-        new binary_search_tree<tkey, tvalue>::obtaining_template_method(this),
-        new binary_search_tree<tkey, tvalue>::disposal_template_method(this, disposal_strategy),
-        keys_comparer,
-        allocator,
-        logger)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::binary_search_tree(std::function<int(tkey const &, tkey const &)>, allocator *, logger *, typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy, typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy)", "your code should be here...");
-}
+        search_tree<tkey, tvalue>(keys_comparer, logger, allocator), _insertion_stratagy(insertion_strategy), _disposal_strategy(disposal_strategy), _root(nullptr) {}
 
 template<
     typename tkey,
@@ -1709,7 +1788,7 @@ template<
     typename tkey,
     typename tvalue>
 binary_search_tree<tkey, tvalue>::binary_search_tree(
-    binary_search_tree<tkey, tvalue> &&other) noexcept
+    binary_search_tree<tkey, tvalue> &&other) noexcept : search_tree<tkey, tvalue>(static_cast<const search_tree<tkey, tvalue>&>(other))
 {
     throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::binary_search_tree(binary_search_tree<tkey, tvalue> &&) noexcept", "your code should be here...");
 }
@@ -1732,30 +1811,24 @@ binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(
     throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(binary_search_tree<tkey, tvalue> &&) noexcept", "your code should be here...");
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 binary_search_tree<tkey, tvalue>::~binary_search_tree()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::~binary_search_tree()", "your code should be here...");
+    destroy_subtree(_root);
 }
 
 // endregion construction, assignment, destruction implementation
 
 // region associative_container<tkey, tvalue> contract implementation
 
-template<
-    typename tkey,
-    typename tvalue>
-void binary_search_tree<tkey, tvalue>::insert(
-    tkey const &key,
-    tvalue const &value)
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::insert(tkey const &key, tvalue const &value)
 {
     auto path = find_path(key);
 
     if (*path.top() != nullptr)
     {
-        if (_insertion_stratagy == insertion_of_existent_key_attempt_strategy::throw_exeption)
+        if (_insertion_stratagy == insertion_of_existent_key_attempt_strategy::throw_an_exception)
         {
             throw insertion_of_existent_key_attempt_exception(key);
         } else
@@ -1765,21 +1838,17 @@ void binary_search_tree<tkey, tvalue>::insert(
         return;
     }
 
-    insert_inner(path, value);
+    insert_inner(path, key, value);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-void binary_search_tree<tkey, tvalue>::insert(
-    tkey const &key,
-    tvalue &&value)
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::insert(tkey const &key, tvalue &&value)
 {
     auto path = find_path(key);
 
     if (*path.top() != nullptr)
     {
-        if (_insertion_stratagy == insertion_of_existent_key_attempt_strategy::throw_exeption)
+        if (_insertion_stratagy == insertion_of_existent_key_attempt_strategy::throw_an_exception)
         {
             throw insertion_of_existent_key_attempt_exception(key);
         } else
@@ -1789,14 +1858,11 @@ void binary_search_tree<tkey, tvalue>::insert(
         return;
     }
 
-    insert_inner(path, value);
+    insert_inner(path, key, std::move(value));
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-tvalue const &binary_search_tree<tkey, tvalue>::obtain(
-    tkey const &key)
+template<typename tkey, typename tvalue>
+tvalue const &binary_search_tree<tkey, tvalue>::obtain(tkey const &key)
 {
     auto path = find_path(key);
 
@@ -1830,10 +1896,13 @@ tvalue binary_search_tree<tkey, tvalue>::dispose(
 
     if(*path.top() == nullptr)
     {
-        if (_disposal_strategy == disposal_of_nonexistent_key_attempt_strategy::throw_exception)
+        if (_disposal_strategy == disposal_of_nonexistent_key_attempt_strategy::throw_an_exception)
             throw disposal_of_nonexistent_key_attempt_exception(key);
         else
-            return tvalue();
+            if constexpr (std::is_default_constructible<tvalue>::value)
+                return tvalue();
+            else
+                throw disposal_of_nonexistent_key_attempt_exception(key);
     }
 
     return dispose_inner(path);
@@ -1841,29 +1910,23 @@ tvalue binary_search_tree<tkey, tvalue>::dispose(
 
 // endregion associative_containers contract implementations
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 void binary_search_tree<tkey, tvalue>::set_insertion_strategy(
     typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy) noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> void binary_search_tree<tkey, tvalue>::set_insertion_strategy(typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_strategy) noexcept", "your code should be here...");
+    _insertion_stratagy = insertion_strategy;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 void binary_search_tree<tkey, tvalue>::set_removal_strategy(
     typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> void binary_search_tree<tkey, tvalue>::set_removal_strategy(typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_strategy) noexcept", "your code should be here...");
+    _disposal_strategy = disposal_strategy;
 }
 
 // region iterators requesting implementation
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_iterator binary_search_tree<tkey, tvalue>::begin_prefix() const noexcept
 {
     return binary_search_tree<tkey, tvalue>::prefix_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
