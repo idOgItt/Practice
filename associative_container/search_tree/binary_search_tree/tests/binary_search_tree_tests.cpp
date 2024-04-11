@@ -187,6 +187,7 @@ TEST(binarySearchTreePositiveTests, noIteratorTest)
     using insert_ex = binary_search_tree<int, std::string>::insertion_of_existent_key_attempt_exception;
     using obtain_ex = binary_search_tree<int, std::string>::obtaining_of_nonexistent_key_attempt_exception;
     using dispose_ex = binary_search_tree<int, std::string>::disposal_of_nonexistent_key_attempt_exception;
+
     ASSERT_THROW(bst->insert(5, "t"), insert_ex);
 
     bst->set_insertion_strategy(binary_search_tree<int, std::string>::insertion_of_existent_key_attempt_strategy::update_value);
@@ -202,6 +203,16 @@ TEST(binarySearchTreePositiveTests, noIteratorTest)
     EXPECT_EQ("t", bst->dispose(5));
 
     ASSERT_THROW(bst->obtain(5), obtain_ex);
+
+    auto between = bst->obtain_between(2, 15, false, false);
+
+    std::vector<associative_container<int, std::string>::key_value_pair> res = {
+//            {2, "b"},
+            {3, "d"},
+            {14, "e"}
+    };
+
+    EXPECT_EQ(res, between);
 }
 
 TEST(binarySearchTreePositiveTests, test1)

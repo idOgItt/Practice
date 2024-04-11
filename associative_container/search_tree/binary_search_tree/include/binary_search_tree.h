@@ -74,11 +74,13 @@ public:
     
     class prefix_iterator final
     {
-    
+
+        iterator_data _data;
+        std::stack<node**> _path;
+
     public:
         
-        explicit prefix_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit prefix_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -93,17 +95,18 @@ public:
         prefix_iterator const operator++(
             int not_used);
         
-        iterator_data *operator*() const;
+        iterator_data *operator*();
         
     };
     
     class prefix_const_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
+
     public:
         
-        explicit prefix_const_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit prefix_const_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -124,11 +127,11 @@ public:
     
     class prefix_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit prefix_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit prefix_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -149,11 +152,11 @@ public:
     
     class prefix_const_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit prefix_const_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit prefix_const_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -174,11 +177,12 @@ public:
     
     class infix_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
+
     public:
-        
-        explicit infix_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+
+        explicit infix_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -193,17 +197,18 @@ public:
         infix_iterator const operator++(
             int not_used);
         
-        iterator_data *operator*() const;
+        iterator_data *operator*();
         
     };
     
     class infix_const_iterator final
     {
+        iterator_data _data;
+        std::stack<node**> _path;
     
     public:
         
-        explicit infix_const_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit infix_const_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -224,11 +229,11 @@ public:
     
     class infix_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit infix_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit infix_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -249,11 +254,11 @@ public:
     
     class infix_const_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit infix_const_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit infix_const_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -274,11 +279,11 @@ public:
     
     class postfix_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit postfix_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit postfix_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -299,11 +304,11 @@ public:
     
     class postfix_const_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit postfix_const_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit postfix_const_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -324,11 +329,11 @@ public:
     
     class postfix_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit postfix_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit postfix_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -349,11 +354,11 @@ public:
     
     class postfix_const_reverse_iterator final
     {
-    
+        iterator_data _data;
+        std::stack<node**> _path;
     public:
         
-        explicit postfix_const_reverse_iterator(
-            typename binary_search_tree<tkey, tvalue>::node *subtree_root);
+        explicit postfix_const_reverse_iterator(const std::stack<node**>& path);
     
     public:
         
@@ -371,7 +376,22 @@ public:
         iterator_data const *operator*() const;
         
     };
-    
+
+    friend class prefix_iterator;
+    friend class prefix_const_iterator;
+    friend class prefix_reverse_iterator;
+    friend class prefix_const_reverse_iterator;
+
+    friend class postfix_iterator;
+    friend class postfix_const_iterator;
+    friend class postfix_reverse_iterator;
+    friend class postfix_const_reverse_iterator;
+
+    friend class infix_iterator;
+    friend class infix_const_iterator;
+    friend class infix_reverse_iterator;
+    friend class infix_const_reverse_iterator;
+
     // endregion iterators definition
 
 public:
@@ -577,7 +597,7 @@ public:
 
 private:
     
-    node *_root;
+    mutable node *_root;
     
     insertion_of_existent_key_attempt_strategy _insertion_stratagy;
     
@@ -703,15 +723,21 @@ protected:
 
     std::stack<node**> find_path(const tkey&);
 
-    virtual void insert_inner(std::stack<node**> node_path, const tkey& key, tvalue&& val);
+    virtual void insert_inner(std::stack<node**>& node_path, const tkey& key, tvalue&& val);
 
-    virtual void insert_inner(std::stack<node**> node_path, const tkey& key, const tvalue& val);
+    virtual void insert_inner(std::stack<node**>& node_path, const tkey& key, const tvalue& val);
 
-    virtual tvalue& obtain_inner(std::stack<node**> node_path);
+    virtual tvalue& obtain_inner(std::stack<node**>& node_path);
 
-    virtual tvalue dispose_inner(std::stack<node**> node_path);
+    virtual tvalue dispose_inner(std::stack<node**>& node_path);
 
     void destroy_subtree(node* n) noexcept;
+
+    virtual void copy_subtree(node** target, node* src);
+
+    static bool is_left_subtree(node* child, node* parent) noexcept;
+
+    virtual void actions_after_update_insert(std::stack<node**>& path);
     
     // region subtree rotations definition
     
@@ -746,6 +772,43 @@ protected:
 };
 
 template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::actions_after_update_insert(std::stack<node * *> &path){}
+
+template<typename tkey, typename tvalue>
+bool binary_search_tree<tkey, tvalue>::is_left_subtree(binary_search_tree::node *child,
+                                                       binary_search_tree::node *parent) noexcept
+{
+    return child == parent->left_subtree;
+}
+
+template<typename tkey, typename tvalue>
+void binary_search_tree<tkey, tvalue>::copy_subtree(binary_search_tree::node **target, binary_search_tree::node *src)
+{
+    if(src == nullptr)
+    {
+        *target = nullptr;
+        return;
+    }
+
+    *target = reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
+    try
+    {
+        allocator::construct(*target, *src);
+    } catch(...)
+    {
+        allocator_guardant::deallocate_with_guard(*target);
+        *target = nullptr;
+        throw;
+    }
+
+    (*target)->right_subtree = nullptr;
+    (*target)->left_subtree = nullptr;
+
+    copy_subtree(&((*target)->left_subtree), src->left_subtree);
+    copy_subtree(&((*target)->right_subtree), src->right_subtree);
+}
+
+template<typename tkey, typename tvalue>
 void binary_search_tree<tkey, tvalue>::destroy_subtree(binary_search_tree::node *n) noexcept
 {
     if (n != nullptr)
@@ -759,27 +822,43 @@ void binary_search_tree<tkey, tvalue>::destroy_subtree(binary_search_tree::node 
 }
 
 template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **> node_path, const tkey &key, tvalue &&val)
+void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **>& node_path, const tkey &key, tvalue &&val)
 {
     *node_path.top() = static_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
-    allocator::construct(*node_path.top(), key, std::move(val));
+    try
+    {
+        allocator::construct(*node_path.top(), key, std::move(val));
+    } catch(...)
+    {
+        allocator_guardant::deallocate_with_guard(*node_path.top());
+        *node_path.top() = nullptr;
+        throw;
+    }
 }
 
 template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **> node_path, const tkey &key, const tvalue &val)
+void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **>& node_path, const tkey &key, const tvalue &val)
 {
     *node_path.top() = static_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
-    allocator::construct(*node_path.top(), key, val);
+    try
+    {
+        allocator::construct(*node_path.top(), key, val);
+    } catch(...)
+    {
+        allocator_guardant::deallocate_with_guard(*node_path.top());
+        *node_path.top() = nullptr;
+        throw;
+    }
 }
 
 template<typename tkey, typename tvalue>
-tvalue& binary_search_tree<tkey, tvalue>::obtain_inner(std::stack<node**> node_path)
+tvalue& binary_search_tree<tkey, tvalue>::obtain_inner(std::stack<node**>& node_path)
 {
     return (*node_path.top())->value;
 }
 
 template<typename tkey, typename tvalue>
-tvalue binary_search_tree<tkey, tvalue>::dispose_inner(std::stack<node**> node_path)
+tvalue binary_search_tree<tkey, tvalue>::dispose_inner(std::stack<node**>& node_path)
 {
     tvalue res = (*node_path.top())->value;
 
@@ -790,20 +869,20 @@ tvalue binary_search_tree<tkey, tvalue>::dispose_inner(std::stack<node**> node_p
         *node_path.top() = nullptr;
     } else if (current_node->right_subtree == nullptr || current_node->left_subtree == nullptr)
     {
-        node* node_of_interest = current_node->right_subtree == nullptr ? current_node->right_subtree : current_node->left_subtree;
+        node* node_of_interest = current_node->right_subtree != nullptr ? current_node->right_subtree : current_node->left_subtree;
 
         *node_path.top() = node_of_interest;
     } else
     {
-        node** node_of_interest = &current_node->right_subtree;
+        node** node_of_interest = &current_node->left_subtree;
 
-        while ((*node_of_interest)->left_subtree != nullptr)
+        while ((*node_of_interest)->right_subtree != nullptr)
         {
-            node_of_interest = &((*node_of_interest)->left_subtree);
+            node_of_interest = &((*node_of_interest)->right_subtree);
         }
 
         node* tmp = *node_of_interest;
-        *node_of_interest = (*node_of_interest)->right_subtree;
+        *node_of_interest = (*node_of_interest)->left_subtree;
         *node_path.top() = tmp;
 
         tmp->left_subtree = current_node->left_subtree;
@@ -855,130 +934,152 @@ binary_search_tree<tkey, tvalue>::node::node(tkey const &key_, tvalue &&value_) 
 
 // region iterator data implementation
 
-template<
-    typename tkey,
-    typename tvalue>
-binary_search_tree<tkey, tvalue>::iterator_data::iterator_data(
-    unsigned int depth,
-    tkey const &key,
-    tvalue const &value):
-    depth(depth),
-    key(key),
-    value(value)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::iterator_data::iterator_data(unsigned int, tkey const &, tvalue const &)", "your code should be here...");
-}
+template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::iterator_data::iterator_data(unsigned int depth, tkey const &key, tvalue const &value):
+    depth(depth), key(key), value(value){}
 
 // endregion iterator data implementation
 
 // region prefix_iterator implementation
 
-template<
-    typename tkey,
-    typename tvalue>
-binary_search_tree<tkey, tvalue>::prefix_iterator::prefix_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::prefix_iterator::prefix_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::prefix_iterator::prefix_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::prefix_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::prefix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_iterator::operator==(typename binary_search_tree<tkey, tvalue>::prefix_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::prefix_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::prefix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::prefix_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_iterator &binary_search_tree<tkey, tvalue>::prefix_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_iterator &binary_search_tree<tkey, tvalue>::prefix_iterator::operator++()", "your code should be here...");
+    if (_path.empty())
+        return *this;
+    if ((*_path.top())->left_subtree != nullptr)
+        _path.push(&(*_path.top())->left_subtree);
+    else if ((*_path.top())->right_subtree != nullptr)
+        _path.push(&(*_path.top())->right_subtree);
+    else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        while(!_path.empty() && !from_left && (*_path.top())->right_subtree != nullptr)
+        {
+            current_node = *_path.top();
+            _path.pop();
+            from_left = is_left_subtree(current_node, *_path.top());
+        }
+
+        if (!_path.empty())
+            _path.push(&((*_path.top())->right_subtree));
+
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-typename binary_search_tree<tkey, tvalue>::prefix_iterator const binary_search_tree<tkey, tvalue>::prefix_iterator::operator++(
-    int not_used)
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::prefix_iterator const binary_search_tree<tkey, tvalue>::prefix_iterator::operator++(int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_iterator const binary_search_tree<tkey, tvalue>::prefix_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::prefix_iterator::operator*() const
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::prefix_iterator::operator*()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::prefix_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion prefix_iterator implementation
 
 // region prefix_const_iterator implementation
 
-template<
-    typename tkey,
-    typename tvalue>
-binary_search_tree<tkey, tvalue>::prefix_const_iterator::prefix_const_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::prefix_const_iterator::prefix_const_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::prefix_const_iterator::prefix_const_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator==(typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_iterator &binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_const_iterator &binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator++()", "your code should be here...");
+    if (_path.empty())
+        return *this;
+    if ((*_path.top())->left_subtree != nullptr)
+        _path.push(&(*_path.top())->left_subtree);
+    else if ((*_path.top())->right_subtree != nullptr)
+        _path.push(&(*_path.top())->right_subtree);
+    else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        while(!_path.empty() && !from_left && (*_path.top())->right_subtree == nullptr)
+        {
+            current_node = *_path.top();
+            _path.pop();
+            from_left = is_left_subtree(current_node, *_path.top());
+        }
+
+        if (!_path.empty())
+            _path.push(&((*_path.top())->right_subtree));
+
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator++(
-    int not_used)
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator++(int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_const_iterator const binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::prefix_const_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion prefix_const_iterator implementation
@@ -988,11 +1089,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tr
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::prefix_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::prefix_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::prefix_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1000,7 +1097,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1009,7 +1106,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1017,7 +1114,38 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator &binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator &binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator++()", "your code should be here...");
+    if (_path.empty())
+        return *this;
+    if ((*_path.top())->right_subtree != nullptr)
+        _path.push(&(*_path.top())->right_subtree);
+    else if ((*_path.top())->left_subtree != nullptr)
+        _path.push(&(*_path.top())->left_subtree);
+    else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        while(!_path.empty() && from_left && (*_path.top())->left_subtree != nullptr)
+        {
+            current_node = *_path.top();
+            _path.pop();
+            from_left = is_left_subtree(current_node, *_path.top());
+        }
+
+        if (!_path.empty())
+            _path.push(&((*_path.top())->left_subtree));
+
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1026,7 +1154,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator const binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1034,7 +1164,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion prefix_reverse_iterator implementation
@@ -1044,11 +1174,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tke
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::prefix_const_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::prefix_const_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::prefix_const_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1056,7 +1182,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1065,7 +1191,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1073,7 +1199,38 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator++()", "your code should be here...");
+    if (_path.empty())
+        return *this;
+    if ((*_path.top())->right_subtree != nullptr)
+        _path.push(&(*_path.top())->right_subtree);
+    else if ((*_path.top())->left_subtree != nullptr)
+        _path.push(&(*_path.top())->left_subtree);
+    else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        while(!_path.empty() && from_left && (*_path.top())->left_subtree != nullptr)
+        {
+            current_node = *_path.top();
+            _path.pop();
+            from_left = is_left_subtree(current_node, *_path.top());
+        }
+
+        if (!_path.empty())
+            _path.push(&((*_path.top())->left_subtree));
+
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1082,7 +1239,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1090,63 +1249,78 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion prefix_const_reverse_iterator implementation
 
 // region infix_iterator implementation
 
-template<
-    typename tkey,
-    typename tvalue>
-binary_search_tree<tkey, tvalue>::infix_iterator::infix_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::infix_iterator::infix_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::infix_iterator::infix_iterator(const std::stack<node **> &path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::infix_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::infix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_iterator::operator==(typename binary_search_tree<tkey, tvalue>::infix_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 bool binary_search_tree<tkey, tvalue>::infix_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::infix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::infix_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_iterator &binary_search_tree<tkey, tvalue>::infix_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_iterator &binary_search_tree<tkey, tvalue>::infix_iterator::operator++()", "your code should be here...");
+
+    if ((*_path.top())->right_subtree != nullptr)
+    {
+        _path.push(&((*_path.top())->right_subtree));
+
+        while ((*_path.top())->left_subtree != nullptr)
+        {
+            _path.push(&((*_path.top())->left_subtree));
+        }
+    } else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool is_left = is_left_subtree(current_node, *_path.top());
+
+        while(!is_left && !_path.empty())
+        {
+            current_node = *_path.top();
+            _path.pop();
+            is_left = is_left_subtree(current_node, *_path.top());
+        }
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-typename binary_search_tree<tkey, tvalue>::infix_iterator const binary_search_tree<tkey, tvalue>::infix_iterator::operator++(
-    int not_used)
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::infix_iterator const binary_search_tree<tkey, tvalue>::infix_iterator::operator++(int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_iterator const binary_search_tree<tkey, tvalue>::infix_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::infix_iterator::operator*() const
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::infix_iterator::operator*()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::infix_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion infix_iterator implementation
@@ -1156,11 +1330,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tke
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::infix_const_iterator::infix_const_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::infix_const_iterator::infix_const_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::infix_const_iterator::infix_const_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1168,7 +1338,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_const_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::infix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_const_iterator::operator==(typename binary_search_tree<tkey, tvalue>::infix_const_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1177,7 +1347,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_const_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::infix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_const_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::infix_const_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1185,7 +1355,37 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_iterator &binary_search_tree<tkey, tvalue>::infix_const_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_const_iterator &binary_search_tree<tkey, tvalue>::infix_const_iterator::operator++()", "your code should be here...");
+    if ((*_path.top())->right_subtree != nullptr)
+    {
+        _path.push(&((*_path.top())->right_subtree));
+
+        while ((*_path.top())->left_subtree != nullptr)
+        {
+            _path.push(&((*_path.top())->left_subtree));
+        }
+    } else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool is_left = is_left_subtree(current_node, *_path.top());
+
+        while(!is_left && !_path.empty())
+        {
+            current_node = *_path.top();
+            _path.pop();
+            if (!_path.empty())
+                is_left = is_left_subtree(current_node, *_path.top());
+        }
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1194,7 +1394,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::infix_const_iterator const binary_search_tree<tkey, tvalue>::infix_const_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_const_iterator const binary_search_tree<tkey, tvalue>::infix_const_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1202,7 +1404,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::infix_const_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::infix_const_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion infix_const_iterator implementation
@@ -1212,11 +1414,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tr
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::infix_reverse_iterator::infix_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::infix_reverse_iterator::infix_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::infix_reverse_iterator::infix_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1224,7 +1422,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1233,7 +1431,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1241,7 +1439,36 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator &binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator &binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator++()", "your code should be here...");
+    if ((*_path.top())->left_subtree != nullptr)
+    {
+        _path.push(&((*_path.top())->left_subtree));
+
+        while ((*_path.top())->right_subtree != nullptr)
+        {
+            _path.push(&((*_path.top())->right_subtree));
+        }
+    } else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool is_left = is_left_subtree(current_node, *_path.top());
+
+        while(is_left && !_path.empty())
+        {
+            current_node = *_path.top();
+            _path.pop();
+            is_left = is_left_subtree(current_node, *_path.top());
+        }
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1250,7 +1477,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator const binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1258,7 +1487,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::infix_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion infix_reverse_iterator implementation
@@ -1268,11 +1497,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tke
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::infix_const_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::infix_const_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::infix_const_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1280,7 +1505,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1289,7 +1514,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1297,7 +1522,36 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator++()", "your code should be here...");
+    if ((*_path.top())->left_subtree != nullptr)
+    {
+        _path.push(&((*_path.top())->left_subtree));
+
+        while ((*_path.top())->right_subtree != nullptr)
+        {
+            _path.push(&((*_path.top())->right_subtree));
+        }
+    } else
+    {
+        node* current_node = *_path.top();
+        _path.pop();
+        bool is_left = is_left_subtree(current_node, *_path.top());
+
+        while(is_left && !_path.empty())
+        {
+            current_node = *_path.top();
+            _path.pop();
+            is_left = is_left_subtree(current_node, *_path.top());
+        }
+    }
+
+    if (!_path.empty())
+    {
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1306,7 +1560,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1314,7 +1570,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion infix_const_reverse_iterator implementation
@@ -1324,11 +1580,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tr
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::postfix_iterator::postfix_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::postfix_iterator::postfix_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::postfix_iterator::postfix_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1336,7 +1588,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::postfix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_iterator::operator==(typename binary_search_tree<tkey, tvalue>::postfix_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1345,7 +1597,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::postfix_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::postfix_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1353,7 +1605,32 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_iterator &binary_search_tree<tkey, tvalue>::postfix_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_iterator &binary_search_tree<tkey, tvalue>::postfix_iterator::operator++()", "your code should be here...");
+    node* current_node = *_path.top();
+    _path.pop();
+
+    if (!_path.empty())
+    {
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        if (from_left)
+        {
+            if ((*_path.top())->right_subtree != nullptr)
+            {
+                _path.push(&((*_path.top())->right_subtree));
+
+                while((*_path.top())->left_subtree != nullptr)
+                {
+                    _path.push(&((*_path.top())->left_subtree));
+                }
+            }
+        }
+
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1362,7 +1639,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::postfix_iterator const binary_search_tree<tkey, tvalue>::postfix_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_iterator const binary_search_tree<tkey, tvalue>::postfix_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1370,7 +1649,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::postfix_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::postfix_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion postfix_iterator implementation
@@ -1380,11 +1659,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tke
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::postfix_const_iterator::postfix_const_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::postfix_const_iterator::postfix_const_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::postfix_const_iterator::postfix_const_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1392,7 +1667,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator==(typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1401,7 +1676,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1409,7 +1684,32 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_iterator &binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_const_iterator &binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator++()", "your code should be here...");
+    node* current_node = *_path.top();
+    _path.pop();
+
+    if (!_path.empty())
+    {
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        if (from_left)
+        {
+            if ((*_path.top())->right_subtree != nullptr)
+            {
+                _path.push(&((*_path.top())->right_subtree));
+
+                while((*_path.top())->left_subtree != nullptr)
+                {
+                    _path.push(&((*_path.top())->left_subtree));
+                }
+            }
+        }
+
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1418,7 +1718,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_const_iterator const binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1426,7 +1728,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::postfix_const_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion postfix_const_iterator implementation
@@ -1436,11 +1738,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tr
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::postfix_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::postfix_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::postfix_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1448,7 +1746,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1457,7 +1755,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1465,7 +1763,32 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator &binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator &binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator++()", "your code should be here...");
+    node* current_node = *_path.top();
+    _path.pop();
+
+    if (!_path.empty())
+    {
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        if (!from_left)
+        {
+            if ((*_path.top())->left_subtree != nullptr)
+            {
+                _path.push(&((*_path.top())->left_subtree));
+
+                while((*_path.top())->right_subtree != nullptr)
+                {
+                    _path.push(&((*_path.top())->right_subtree));
+                }
+            }
+        }
+
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1474,7 +1797,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator const binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1482,7 +1807,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion postfix_reverse_iterator implementation
@@ -1492,11 +1817,7 @@ typename binary_search_tree<tkey, tvalue>::iterator_data *binary_search_tree<tke
 template<
     typename tkey,
     typename tvalue>
-binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::postfix_const_reverse_iterator(
-    typename binary_search_tree<tkey, tvalue>::node *subtree_root)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::postfix_const_reverse_iterator(typename binary_search_tree<tkey, tvalue>::node *)", "your code should be here...");
-}
+binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::postfix_const_reverse_iterator(const std::stack<node**>& path) : _path(path), _data(path.empty() ? 0 : path.size() - 1, path.empty() ? tkey() : (*path.top())->key, path.empty() ? tvalue() : (*path.top())->value) {}
 
 template<
     typename tkey,
@@ -1504,7 +1825,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator==(
     typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator==(typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return (_path.empty() && other._path.empty()) || (!_path.empty() && !other._path.empty() && _path.top() == other._path.top());
 }
 
 template<
@@ -1513,7 +1834,7 @@ template<
 bool binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator!=(
     typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const &other) const noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> bool binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator!=(typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const &) const noexcept", "your code should be here...");
+    return !(*this == other);
 }
 
 template<
@@ -1521,7 +1842,32 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator++()
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator &binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator++()", "your code should be here...");
+    node* current_node = *_path.top();
+    _path.pop();
+
+    if (!_path.empty())
+    {
+        bool from_left = is_left_subtree(current_node, *_path.top());
+
+        if (!from_left)
+        {
+            if ((*_path.top())->left_subtree != nullptr)
+            {
+                _path.push(&((*_path.top())->left_subtree));
+
+                while((*_path.top())->right_subtree != nullptr)
+                {
+                    _path.push(&((*_path.top())->right_subtree));
+                }
+            }
+        }
+
+        _data.key = (*_path.top())->key;
+        _data.value = (*_path.top())->value;
+        _data.depth = _path.size() - 1;
+    }
+
+    return *this;
 }
 
 template<
@@ -1530,7 +1876,9 @@ template<
 typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator++(
     int not_used)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator const binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator++(int)", "your code should be here...");
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
 }
 
 template<
@@ -1538,7 +1886,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator*() const
 {
-    throw not_implemented("template<typename tkey, typename tvalue> typename binary_search_tree<tkey, tvalue>::iterator_data const *binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::operator*() const", "your code should be here...");
+    return &_data;
 }
 
 // endregion postfix_const_reverse_iterator implementation
@@ -1552,7 +1900,7 @@ template<
     typename tvalue>
 binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_exception::insertion_of_existent_key_attempt_exception(
     tkey const &key):
-    std::logic_error("Attempt to insert already existing key inside the tree.")
+    std::logic_error("Attempt to insert already existing key inside the tree."), _key(key)
 {
 
 }
@@ -1570,7 +1918,7 @@ template<
     typename tvalue>
 binary_search_tree<tkey, tvalue>::obtaining_of_nonexistent_key_attempt_exception::obtaining_of_nonexistent_key_attempt_exception(
     tkey const &key):
-    std::logic_error("Attempt to obtain a value by non-existing key from the tree.")
+    std::logic_error("Attempt to obtain a value by non-existing key from the tree."), _key(key)
 {
 
 }
@@ -1588,7 +1936,7 @@ template<
     typename tvalue>
 binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_exception::disposal_of_nonexistent_key_attempt_exception(
     tkey const &key):
-    std::logic_error("Attempt to dispose a value by non-existing key from the tree.")
+    std::logic_error("Attempt to dispose a value by non-existing key from the tree."), _key(key)
 {
 
 }
@@ -1779,36 +2127,58 @@ template<
     typename tkey,
     typename tvalue>
 binary_search_tree<tkey, tvalue>::binary_search_tree(
-    binary_search_tree<tkey, tvalue> const &other)
+    binary_search_tree<tkey, tvalue> const &other) : search_tree<tkey, tvalue>(other), _insertion_stratagy(other._insertion_stratagy), _disposal_strategy(other._disposal_strategy)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::binary_search_tree(binary_search_tree<tkey, tvalue> const &)", "your code should be here...");
+    try {
+        copy_subtree(&_root, other._root);
+    } catch (...)
+    {
+        destroy_subtree(_root);
+        throw;
+    }
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 binary_search_tree<tkey, tvalue>::binary_search_tree(
-    binary_search_tree<tkey, tvalue> &&other) noexcept : search_tree<tkey, tvalue>(static_cast<const search_tree<tkey, tvalue>&>(other))
+    binary_search_tree<tkey, tvalue> &&other) noexcept : search_tree<tkey, tvalue>(std::move(other)), _insertion_stratagy(other._insertion_stratagy), _disposal_strategy(other._disposal_strategy)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue>::binary_search_tree(binary_search_tree<tkey, tvalue> &&) noexcept", "your code should be here...");
+    _root = std::exchange(other._root, nullptr);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(
     binary_search_tree<tkey, tvalue> const &other)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(binary_search_tree<tkey, tvalue> const &)", "your code should be here...");
+    if (this != &other)
+    {
+        search_tree<tkey, tvalue>::operator=(other);
+        _insertion_stratagy = other._insertion_stratagy;
+        _disposal_strategy = other._disposal_strategy;
+
+        try {
+            copy_subtree(&_root, other._root);
+        } catch (...)
+        {
+            destroy_subtree(_root);
+            throw;
+        }
+    }
+    return *this;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(
     binary_search_tree<tkey, tvalue> &&other) noexcept
 {
-    throw not_implemented("template<typename tkey, typename tvalue> binary_search_tree<tkey, tvalue> &binary_search_tree<tkey, tvalue>::operator=(binary_search_tree<tkey, tvalue> &&) noexcept", "your code should be here...");
+    if (this != &other)
+    {
+        search_tree<tkey, tvalue>::operator=(std::move(other));
+        _insertion_stratagy = other._insertion_stratagy;
+        _disposal_strategy = other._disposal_strategy;
+
+        std::swap(_root, other._root);
+    }
+    return *this;
 }
 
 template<typename tkey, typename tvalue>
@@ -1834,6 +2204,7 @@ void binary_search_tree<tkey, tvalue>::insert(tkey const &key, tvalue const &val
         } else
         {
             (*path.top())->value = value;
+            actions_after_update_insert(path);
         }
         return;
     }
@@ -1854,6 +2225,7 @@ void binary_search_tree<tkey, tvalue>::insert(tkey const &key, tvalue &&value)
         } else
         {
             (*path.top())->value = std::move(value);
+            actions_after_update_insert(path);
         }
         return;
     }
@@ -1883,7 +2255,44 @@ std::vector<typename associative_container<tkey, tvalue>::key_value_pair> binary
     bool lower_bound_inclusive,
     bool upper_bound_inclusive)
 {
-    throw not_implemented("template<typename tkey, typename tvalue> std::vector<typename associative_container<tkey, tvalue>::key_value_pair> binary_search_tree<tkey, tvalue>::obtain_between(tkey const &, tkey const &, bool, bool)", "your code should be here...");
+    auto path = find_path(lower_bound);
+
+    if (*path.top() == nullptr)
+        path.pop();
+
+    infix_iterator it(path), end = end_infix();
+
+    std::vector<typename associative_container<tkey, tvalue>::key_value_pair> result;
+
+    if (it != end)
+    {
+        int cmpresult = search_tree<tkey, tvalue>::_keys_comparer((*it)->key, lower_bound);
+
+        if (cmpresult < 0)
+            ++it;
+        else if (cmpresult == 0)
+        {
+            if (lower_bound_inclusive)
+                result.emplace_back((*it)->key, (*it)->value);
+            ++it;
+        }
+
+        if (it != end)
+            cmpresult = search_tree<tkey, tvalue>::_keys_comparer((*it)->key, upper_bound);
+
+        while (it != end && cmpresult < 0)
+        {
+            result.emplace_back((*it)->key, (*it)->value);
+            ++it;
+            if (it != end)
+                cmpresult = search_tree<tkey, tvalue>::_keys_comparer((*it)->key, upper_bound);
+        }
+
+        if (it != end && cmpresult == 0 && upper_bound_inclusive)
+            result.emplace_back((*it)->key, (*it)->value);
+    }
+
+    return result;
 }
 
 template<
@@ -1929,15 +2338,17 @@ void binary_search_tree<tkey, tvalue>::set_removal_strategy(
 template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_iterator binary_search_tree<tkey, tvalue>::begin_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    if (_root != nullptr)
+        stack.push(&_root);
+
+    return prefix_iterator(stack);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_iterator binary_search_tree<tkey, tvalue>::end_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::prefix_iterator(std::stack<node**>());
 }
 
 template<
@@ -1945,7 +2356,11 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_iterator binary_search_tree<tkey, tvalue>::cbegin_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_const_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    if (_root != nullptr)
+        stack.push(&_root);
+
+    return prefix_const_iterator(stack);
 }
 
 template<
@@ -1953,7 +2368,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_iterator binary_search_tree<tkey, tvalue>::cend_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_const_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::prefix_const_iterator(std::stack<node**>());
 }
 
 template<
@@ -1961,7 +2376,11 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator binary_search_tree<tkey, tvalue>::rbegin_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    if (_root != nullptr)
+        stack.push(&_root);
+
+    return prefix_reverse_iterator(stack);
 }
 
 template<
@@ -1969,7 +2388,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator binary_search_tree<tkey, tvalue>::rend_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::prefix_reverse_iterator(std::stack<node**>());
 }
 
 template<
@@ -1977,7 +2396,11 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crbegin_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    if (_root != nullptr)
+        stack.push(&_root);
+
+    return prefix_const_reverse_iterator(stack);
 }
 
 template<
@@ -1985,23 +2408,26 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crend_prefix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator(std::stack<node**>());
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_iterator binary_search_tree<tkey, tvalue>::begin_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = &((*current_node)->left_subtree);
+    }
+    return infix_iterator(stack);
 }
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_iterator binary_search_tree<tkey, tvalue>::end_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::infix_iterator(std::stack<node**>());
 }
 
 template<
@@ -2009,7 +2435,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_iterator binary_search_tree<tkey, tvalue>::cbegin_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_const_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = &((*current_node)->left_subtree);
+    }
+    return infix_const_iterator(stack);
 }
 
 template<
@@ -2017,7 +2450,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_iterator binary_search_tree<tkey, tvalue>::cend_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_const_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::infix_const_iterator(std::stack<node**>());
 }
 
 template<
@@ -2025,7 +2458,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator binary_search_tree<tkey, tvalue>::rbegin_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = &((*current_node)->right_subtree);
+    }
+    return infix_reverse_iterator(stack);
 }
 
 template<
@@ -2033,7 +2473,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator binary_search_tree<tkey, tvalue>::rend_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::infix_reverse_iterator(std::stack<node**>());
 }
 
 template<
@@ -2041,7 +2481,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crbegin_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = &((*current_node)->right_subtree);
+    }
+    return infix_const_reverse_iterator(stack);
 }
 
 template<
@@ -2049,7 +2496,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crend_infix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator(std::stack<node**>());
 }
 
 template<
@@ -2057,7 +2504,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_iterator binary_search_tree<tkey, tvalue>::begin_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = (*current_node)->left_subtree != nullptr ? &((*current_node)->left_subtree) : &((*current_node)->right_subtree);
+    }
+    return postfix_iterator(stack);
 }
 
 template<
@@ -2065,7 +2519,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_iterator binary_search_tree<tkey, tvalue>::end_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::postfix_iterator(std::stack<node**>());
 }
 
 template<
@@ -2073,7 +2527,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_iterator binary_search_tree<tkey, tvalue>::cbegin_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_const_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = (*current_node)->left_subtree != nullptr ? &((*current_node)->left_subtree) : &((*current_node)->right_subtree);
+    }
+    return postfix_const_iterator(stack);
 }
 
 template<
@@ -2081,7 +2542,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_iterator binary_search_tree<tkey, tvalue>::cend_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_const_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::postfix_const_iterator(std::stack<node**>());
 }
 
 template<
@@ -2089,7 +2550,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator binary_search_tree<tkey, tvalue>::rbegin_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = (*current_node)->right_subtree != nullptr ? &((*current_node)->right_subtree) : &((*current_node)->left_subtree);
+    }
+    return postfix_reverse_iterator(stack);
 }
 
 template<
@@ -2097,7 +2565,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_reverse_iterator binary_search_tree<tkey, tvalue>::rend_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::postfix_reverse_iterator(std::stack<node**>());
 }
 
 template<
@@ -2105,7 +2573,14 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crbegin_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator(dynamic_cast<typename binary_search_tree<tkey, tvalue>::node *>(_root));
+    std::stack<node**> stack;
+    node** current_node = &_root;
+    while(*current_node != nullptr)
+    {
+        stack.push(current_node);
+        current_node = (*current_node)->right_subtree != nullptr ? &((*current_node)->right_subtree) : &((*current_node)->left_subtree);
+    }
+    return postfix_const_reverse_iterator(stack);
 }
 
 template<
@@ -2113,7 +2588,7 @@ template<
     typename tvalue>
 typename binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator binary_search_tree<tkey, tvalue>::crend_postfix() const noexcept
 {
-    return binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator(nullptr);
+    return binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator(std::stack<node**>());
 }
 
 
