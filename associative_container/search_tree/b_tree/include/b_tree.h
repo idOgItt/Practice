@@ -43,7 +43,8 @@ private:
 
     struct btree_node
     {
-        std::array<tree_data_type, maximum_keys_in_node> keys;
+        // TODO: need additional data?
+        std::array<tree_data_type, maximum_keys_in_node + 1> keys;
         std::array<btree_node*, maximum_keys_in_node + 1> pointers;
     };
 
@@ -63,7 +64,8 @@ public:
     B_tree(compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
     template<typename iterator>
-    requires std::forward_iterator<iterator>
+    requires std::forward_iterator<iterator> && requires (iterator a)
+                                                {{ *a } -> std::convertible_to<tree_data_type>;}
     B_tree(iterator begin, iterator end, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
     // endregion constructors declaration
@@ -86,7 +88,7 @@ public:
     {
 
     public:
-        using value_type = std::pair<const tkey, tvalue>;
+        using value_type = tree_data_type;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -117,13 +119,13 @@ public:
         // TODO: other methods for testing
 
     private:
-        btree_iterator(const std::stack<btree_node**>& path, size_t index_in_node = 0);
+        btree_iterator(const std::stack<std::pair<btree_node**, size_t>>& path);
     };
 
     class btree_const_iterator
     {
     public:
-        using value_type = std::pair<const tkey, tvalue>;
+        using value_type = tree_data_type;
         using reference = const value_type&;
         using pointer = const value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -156,13 +158,13 @@ public:
         // TODO: other methods for testing
 
     private:
-        btree_const_iterator(const std::stack<btree_node**>& path, size_t index_in_node = 0);
+        btree_const_iterator(const std::stack<std::pair<btree_node**, size_t>>& path);
     };
 
     class btree_reverse_iterator
     {
     public:
-        using value_type = std::pair<const tkey, tvalue>;
+        using value_type = tree_data_type;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -196,13 +198,13 @@ public:
 
     private:
         // need validate index
-        btree_reverse_iterator(const std::stack<btree_node**>& path, size_t index_in_node = maximum_keys_in_node);
+        btree_reverse_iterator(const std::stack<std::pair<btree_node**, size_t>>& path);
     };
 
     class btree_const_reverse_iterator
     {
     public:
-        using value_type = std::pair<const tkey, tvalue>;
+        using value_type = tree_data_type;
         using reference = const value_type&;
         using pointer = const value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -236,7 +238,7 @@ public:
 
     private:
         // need validate index
-        btree_const_reverse_iterator(const std::stack<btree_node**>& path, size_t index_in_node = maximum_keys_in_node);
+        btree_const_reverse_iterator(const std::stack<std::pair<btree_node**, size_t>>& path);
     };
 
     friend class btree_iterator;

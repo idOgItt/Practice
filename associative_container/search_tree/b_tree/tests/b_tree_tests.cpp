@@ -3,6 +3,7 @@
 //
 #include <b_tree.h>
 #include <string>
+#include <allocator_sorted_list.h>
 
 int main()
 {
