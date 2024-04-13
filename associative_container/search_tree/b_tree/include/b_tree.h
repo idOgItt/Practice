@@ -23,6 +23,8 @@ concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
 template<typename f_iter, typename tval>
 concept forward_iterator_for = std::forward_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, tval>;
 
+//TODO: memory resource instead of allocator - std::pmr::memory_resource, std::pmr::polymorphic_allocator
+
 template <typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
 class B_tree final : public allocator_guardant, public logger_guardant, private compare
 {
