@@ -7,6 +7,7 @@
 #include <array>
 #include <concepts>
 #include <stack>
+#include <initializer_list>
 #include <allocator_guardant.h>
 #include <logger_guardant.h>
 
@@ -14,14 +15,15 @@
 #define MP_OS_B_TREE_H
 
 template<typename compare, typename tkey>
-concept compator = requires(compare c, const tkey& lhs, const tkey& rhs)
+concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
 {
     {c(lhs, rhs)} -> std::same_as<bool>;
 } && std::copyable<compare> && std::default_initializable<compare>;
 
+template<typename f_iter, typename tval>
+concept forward_iterator_for = std::forward_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, tval>;
 
-
-template <typename tkey, typename tvalue, std::size_t t = 5, compator<tkey> compare = std::less<tkey>>
+template <typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
 class B_tree final : public allocator_guardant, public logger_guardant, private compare
 {
 public:
@@ -61,12 +63,13 @@ private:
 public:
 
     // region constructors declaration
-    B_tree(compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
-    template<typename iterator>
-    requires std::forward_iterator<iterator> && requires (iterator a)
-                                                {{ *a } -> std::convertible_to<tree_data_type>;}
-    B_tree(iterator begin, iterator end, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit B_tree(compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+
+    template<forward_iterator_for<tree_data_type> iterator>
+    explicit B_tree(iterator begin, iterator end, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+
+	explicit B_tree(std::initializer_list<tree_data_type> data, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
     // endregion constructors declaration
 
@@ -331,15 +334,15 @@ public:
     // endregion modifiers declaration
 };
 
-template<typename tkey, typename tvalue, std::size_t t, compator<tkey> compare>
-bool B_tree<tkey, tvalue, t, compare>::compare_pairs(const B_tree::tree_data_type &lhs,
+template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
+bool B_tree<tkey, tvalue, compare, t>::compare_pairs(const B_tree::tree_data_type &lhs,
                                                      const B_tree::tree_data_type &rhs) const
 {
     return compare_keys(lhs.first, rhs.first);
 }
 
-template<typename tkey, typename tvalue, std::size_t t, compator<tkey> compare>
-bool B_tree<tkey, tvalue, t, compare>::compare_keys(const tkey &lhs, const tkey &rhs) const
+template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
+bool B_tree<tkey, tvalue, compare, t>::compare_keys(const tkey &lhs, const tkey &rhs) const
 {
     return compare::operator()(lhs, rhs);
 }
