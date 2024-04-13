@@ -22,19 +22,19 @@ public:
 
     client_logger_builder() : _format("%m"){};
 
-//    client_logger_builder(
-//        client_logger_builder const &other);
-//
-//    client_logger_builder &operator=(
-//        client_logger_builder const &other);
-//
-//    client_logger_builder(
-//        client_logger_builder &&other) noexcept;
-//
-//    client_logger_builder &operator=(
-//        client_logger_builder &&other) noexcept;
-//
-//    ~client_logger_builder() noexcept override;
+    client_logger_builder(
+        client_logger_builder const &other) =delete;
+
+    client_logger_builder &operator=(
+        client_logger_builder const &other) =delete;
+
+    client_logger_builder(
+        client_logger_builder &&other) noexcept =default;
+
+    client_logger_builder &operator=(
+        client_logger_builder &&other) noexcept =default;
+
+    ~client_logger_builder() noexcept override =default;
 
 public:
 

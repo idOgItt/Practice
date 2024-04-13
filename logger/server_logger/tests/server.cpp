@@ -74,7 +74,7 @@ server::server(uint16_t port)
         int pid = std::stoi(pid_str);
         logger::severity sev = logger_builder::string_to_severity(sev_str);
 
-        std::lock_guard lock(_mut);
+        std::shared_lock lock(_mut);
         auto it = _streams.find(pid);
 
         if (it != _streams.end())
@@ -99,5 +99,6 @@ server::server(uint16_t port)
 
 
 
-    app.port(port).multithreaded().run();
+    app.port(port).loglevel(crow::LogLevel::Warning).multithreaded();
+	app.run();
 }

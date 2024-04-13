@@ -285,6 +285,8 @@ public:
 
     size_t size() const noexcept;
 
+	bool empty() const noexcept;
+
     /*
      * Returns end() if not exist
      */

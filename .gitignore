@@ -2,7 +2,7 @@
 *.d
 
 .idea
-cmake-*
+cmake-build-*
 *.txt
 
 # Compiled Object files

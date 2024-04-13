@@ -4,8 +4,13 @@
 #include <b_tree.h>
 #include <string>
 #include <allocator_sorted_list.h>
+#include <memory>
 
 int main()
 {
-    B_tree<int, std::string> c;
+	std::unique_ptr<allocator> _allocate(new allocator_sorted_list(10000));
+
+    B_tree<int, std::string> c({}, _allocate.get());
+
+
 }
