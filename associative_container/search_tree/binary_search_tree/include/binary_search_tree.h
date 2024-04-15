@@ -70,7 +70,8 @@ public:
             unsigned int depth = 0,
             tkey const &key = tkey(),
             tvalue const &value = tvalue());
-        
+
+        virtual ~iterator_data() =default;
     };
     
     class prefix_iterator
@@ -1091,7 +1092,7 @@ void binary_search_tree<tkey, tvalue>::destroy_subtree(binary_search_tree::node 
 template<typename tkey, typename tvalue>
 void binary_search_tree<tkey, tvalue>::insert_inner(std::stack<node **>& node_path, const tkey &key, tvalue &&val)
 {
-    *node_path.top() = static_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
+    *node_path.top() = reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
     try
     {
         allocator::construct(*node_path.top(), key, std::move(val));
@@ -1760,13 +1761,16 @@ typename binary_search_tree<tkey, tvalue>::infix_iterator &binary_search_tree<tk
     {
         node* current_node = *_path.top();
         _path.pop();
-        bool is_left = is_left_subtree(current_node, *_path.top());
+        bool is_left;
+        if (!_path.empty())
+            is_left = is_left_subtree(current_node, *_path.top());
 
         while(!is_left && !_path.empty())
         {
             current_node = *_path.top();
             _path.pop();
-            is_left = is_left_subtree(current_node, *_path.top());
+            if (!_path.empty())
+                is_left = is_left_subtree(current_node, *_path.top());
         }
     }
 
@@ -1844,7 +1848,9 @@ typename binary_search_tree<tkey, tvalue>::infix_const_iterator &binary_search_t
     {
         node* current_node = *_path.top();
         _path.pop();
-        bool is_left = is_left_subtree(current_node, *_path.top());
+        bool is_left;
+        if (!_path.empty())
+            is_left = is_left_subtree(current_node, *_path.top());
 
         while(!is_left && !_path.empty())
         {
@@ -1934,13 +1940,16 @@ typename binary_search_tree<tkey, tvalue>::infix_reverse_iterator &binary_search
     {
         node* current_node = *_path.top();
         _path.pop();
-        bool is_left = is_left_subtree(current_node, *_path.top());
+        bool is_left;
+        if (!_path.empty())
+            is_left = is_left_subtree(current_node, *_path.top());
 
         while(is_left && !_path.empty())
         {
             current_node = *_path.top();
             _path.pop();
-            is_left = is_left_subtree(current_node, *_path.top());
+            if (!_path.empty())
+                is_left = is_left_subtree(current_node, *_path.top());
         }
     }
 
@@ -2023,13 +2032,16 @@ typename binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator &binary_
     {
         node* current_node = *_path.top();
         _path.pop();
-        bool is_left = is_left_subtree(current_node, *_path.top());
+        bool is_left;
+        if (!_path.empty())
+            is_left = is_left_subtree(current_node, *_path.top());
 
         while(is_left && !_path.empty())
         {
             current_node = *_path.top();
             _path.pop();
-            is_left = is_left_subtree(current_node, *_path.top());
+            if (!_path.empty())
+                is_left = is_left_subtree(current_node, *_path.top());
         }
     }
 

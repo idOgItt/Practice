@@ -94,11 +94,14 @@ bool infix_iterator_test(
     binary_search_tree<tkey, tvalue> const &tree,
     std::vector<typename binary_search_tree<tkey, tvalue>::iterator_data> &expected_result)
 {
-    auto end_infix = tree.cend_infix();
-    auto it = tree.cbegin_infix();
+    auto end_infix = tree.crend_infix();
+    auto it = tree.crbegin_infix();
+
+    auto vec_begin =  expected_result.rbegin(), vec_end = expected_result.rend();
     
-    for (auto const &item: expected_result)
+    for (; vec_begin != vec_end; ++vec_begin)
     {
+        auto& item = *vec_begin;
         if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value)
         {
             return false;
@@ -141,10 +144,10 @@ bool postfix_iterator_test(
     std::vector<typename binary_search_tree<tkey, tvalue>::iterator_data> &expected_result)
 {
     std::string line;
-    auto end_postfix = tree.end_postfix();
+    auto end_postfix = tree.cend_postfix();
     auto it = tree.cbegin_postfix();
     
-    for (auto const &item: expected_result)
+    for (auto& item : expected_result)
     {
         if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value)
         {

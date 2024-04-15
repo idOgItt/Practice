@@ -15,6 +15,13 @@ private:
     {
         size_t height;
 
+        void recalculate_height() noexcept;
+
+        /*
+         * Returns positive if right subtree is bigger
+         */
+        short get_balance() const noexcept;
+
         ~node() noexcept override =default;
     };
 
@@ -351,6 +358,184 @@ private:
 };
 
 template<typename tkey, typename tvalue>
+void AVL_tree<tkey, tvalue>::node::recalculate_height() noexcept
+{
+    size_t lheight = binary_search_tree<tkey, tvalue>::node::left_subtree == nullptr ? 0 : static_cast<node*>(binary_search_tree<tkey, tvalue>::node::left_subtree)->height;
+    size_t rheight = binary_search_tree<tkey, tvalue>::node::right_subtree == nullptr ? 0 : static_cast<node*>(binary_search_tree<tkey, tvalue>::node::right_subtree)->height;
+    height = std::max(lheight, rheight) + 1;
+}
+
+template<typename tkey, typename tvalue>
+short AVL_tree<tkey, tvalue>::node::get_balance() const noexcept
+{
+    long long lheight = binary_search_tree<tkey, tvalue>::node::left_subtree == nullptr ? 0 : static_cast<node*>(binary_search_tree<tkey, tvalue>::node::left_subtree)->height;
+    long long rheight = binary_search_tree<tkey, tvalue>::node::right_subtree == nullptr ? 0 : static_cast<node*>(binary_search_tree<tkey, tvalue>::node::right_subtree)->height;
+
+    return rheight - lheight;
+}
+
+template<typename tkey, typename tvalue>
+tvalue AVL_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path)
+{
+    tvalue res = (*node_path.top())->value;
+
+    typename binary_search_tree<tkey, tvalue>::node* current_node = *node_path.top();
+
+    if (current_node->right_subtree == nullptr && current_node->left_subtree == nullptr)
+    {
+        *node_path.top() = nullptr;
+        node_path.pop();
+    } else if (current_node->right_subtree == nullptr || current_node->left_subtree == nullptr)
+    {
+        typename binary_search_tree<tkey, tvalue>::node* node_of_interest = current_node->right_subtree != nullptr ? current_node->right_subtree : current_node->left_subtree;
+
+        *node_path.top() = node_of_interest;
+
+        node_path.pop();
+    } else
+    {
+        std::deque<typename binary_search_tree<tkey, tvalue>::node**> additional_path;
+        typename binary_search_tree<tkey, tvalue>::node** node_of_interest = &current_node->left_subtree;
+
+        while ((*node_of_interest)->right_subtree != nullptr)
+        {
+            node_of_interest = &((*node_of_interest)->right_subtree);
+            additional_path.push_back(node_of_interest);
+        }
+
+        node* tmp = *node_of_interest;
+        *node_of_interest = (*node_of_interest)->left_subtree;
+        *node_path.top() = tmp;
+
+        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
+        tmp->right_subtree = current_node->right_subtree;
+
+        if (current_node->left_subtree != tmp)
+            node_path.push(&current_node->left_subtree);
+
+        if (!additional_path.empty())
+            additional_path.pop_back();
+
+        while (!additional_path.empty())
+        {
+            node_path.push(additional_path.front());
+            additional_path.pop_front();
+        }
+    }
+
+    allocator::destruct(current_node);
+    allocator_guardant::deallocate_with_guard(current_node);
+
+    while (!node_path.empty())
+    {
+        static_cast<node*>(*node_path.top())->recalculate_height();
+        short balance = static_cast<node*>(*node_path.top())->get_balance();
+
+        if (balance < -1)
+        {
+            short inner_balance = static_cast<node*>((*node_path.top())->left_subtree)->get_balance();
+            if (inner_balance <= 0)
+            {
+                binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            } else
+            {
+                binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            }
+        } else if (balance > 1)
+        {
+            short inner_balance = static_cast<node*>((*node_path.top())->right_subtree)->get_balance();
+            if (inner_balance >= 0)
+            {
+                binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            } else
+            {
+                binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            }
+        }
+    }
+
+    return res;
+}
+
+template<typename tkey, typename tvalue>
+template<typename tval_arg>
+void AVL_tree<tkey, tvalue>::insert_inner_t(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path,
+                                            const tkey &key, tval_arg &&val)
+{
+    *node_path.top() = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
+    try
+    {
+        allocator::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
+    } catch(...)
+    {
+        allocator_guardant::deallocate_with_guard(static_cast<node*>(*node_path.top()));
+        *node_path.top() = nullptr;
+        throw;
+    }
+
+    static_cast<node*>(*node_path.top())->recalculate_height();
+
+    node* current_node = static_cast<node*>(*node_path.top());
+
+    node_path.pop();
+
+    bool is_last_lift_left, is_prelast_lift_left;
+
+    if (!node_path.empty())
+        is_last_lift_left = is_prelast_lift_left = binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, *node_path.top());
+
+    while (!node_path.empty())
+    {
+        static_cast<node*>(*node_path.top())->recalculate_height();
+
+        short balance = static_cast<node*>(*node_path.top())->get_balance();
+
+        if (balance < -1 || balance > 1)
+        {
+            if (balance > 1 && is_last_lift_left == is_prelast_lift_left)
+            {
+                binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            } else if (balance > 1)
+            {
+                binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            } else if (balance < 1 && is_last_lift_left == is_prelast_lift_left)
+            {
+                binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            } else
+            {
+                binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::right_subtree)->recalculate_height();
+                static_cast<node*>((*node_path.top())->binary_search_tree<tkey, tvalue>::node::left_subtree)->recalculate_height();
+                static_cast<node*>(*node_path.top())->recalculate_height();
+            }
+        }
+
+        current_node = static_cast<node*>(*node_path.top());
+        node_path.pop();
+
+        if (!node_path.empty())
+            is_prelast_lift_left = std::exchange(is_last_lift_left, binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, *node_path.top()));
+    }
+}
+
+template<typename tkey, typename tvalue>
 void AVL_tree<tkey, tvalue>::insert_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path, const tkey &key, tvalue&& val)
 {
     insert_inner_t(node_path, key, std::move(val));
@@ -371,13 +556,13 @@ void AVL_tree<tkey, tvalue>::copy_subtree(typename binary_search_tree<tkey, tval
         return;
     }
 
-    *target = reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
+    *target = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
     try
     {
-        allocator::construct(*static_cast<node**>(target), *static_cast<node*>(src));
+        allocator::construct(static_cast<node*>(*target), *static_cast<node*>(src));
     } catch(...)
     {
-        allocator_guardant::deallocate_with_guard(*target);
+        allocator_guardant::deallocate_with_guard(static_cast<node*>(*target));
         *target = nullptr;
         throw;
     }
@@ -432,7 +617,7 @@ typename AVL_tree<tkey, tvalue>::prefix_iterator AVL_tree<tkey, tvalue>::begin_p
 template<typename tkey, typename tvalue>
 typename AVL_tree<tkey, tvalue>::prefix_iterator AVL_tree<tkey, tvalue>::end_prefix() const noexcept
 {
-    return {};
+    return prefix_iterator();
 }
 
 template<
@@ -452,7 +637,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::prefix_const_iterator AVL_tree<tkey, tvalue>::cend_prefix() const noexcept
 {
-    return {};
+    return prefix_const_iterator();
 }
 
 template<
@@ -472,7 +657,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::prefix_reverse_iterator AVL_tree<tkey, tvalue>::rend_prefix() const noexcept
 {
-    return {};
+    return prefix_reverse_iterator();
 }
 
 template<
@@ -492,7 +677,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::prefix_const_reverse_iterator AVL_tree<tkey, tvalue>::crend_prefix() const noexcept
 {
-    return {};
+    return prefix_const_reverse_iterator();
 }
 
 template<typename tkey, typename tvalue>
@@ -511,7 +696,7 @@ typename AVL_tree<tkey, tvalue>::infix_iterator AVL_tree<tkey, tvalue>::begin_in
 template<typename tkey, typename tvalue>
 typename AVL_tree<tkey, tvalue>::infix_iterator AVL_tree<tkey, tvalue>::end_infix() const noexcept
 {
-    return {};
+    return infix_iterator();
 }
 
 template<
@@ -534,7 +719,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::infix_const_iterator AVL_tree<tkey, tvalue>::cend_infix() const noexcept
 {
-    return {};
+    return infix_const_iterator();
 }
 
 template<
@@ -557,7 +742,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::infix_reverse_iterator AVL_tree<tkey, tvalue>::rend_infix() const noexcept
 {
-    return {};
+    return infix_reverse_iterator();
 }
 
 template<
@@ -580,7 +765,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::infix_const_reverse_iterator AVL_tree<tkey, tvalue>::crend_infix() const noexcept
 {
-    return {};
+    return infix_const_reverse_iterator();
 }
 
 template<
@@ -603,7 +788,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::postfix_iterator AVL_tree<tkey, tvalue>::end_postfix() const noexcept
 {
-    return {};
+    return postfix_iterator();
 }
 
 template<
@@ -626,7 +811,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::postfix_const_iterator AVL_tree<tkey, tvalue>::cend_postfix() const noexcept
 {
-    return {};
+    return postfix_const_iterator();
 }
 
 template<
@@ -649,7 +834,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::postfix_reverse_iterator AVL_tree<tkey, tvalue>::rend_postfix() const noexcept
 {
-    return {};
+    return postfix_reverse_iterator();
 }
 
 template<
@@ -672,7 +857,7 @@ template<
     typename tvalue>
 typename AVL_tree<tkey, tvalue>::postfix_const_reverse_iterator AVL_tree<tkey, tvalue>::crend_postfix() const noexcept
 {
-    return {};
+    return postfix_const_reverse_iterator();
 }
 
 // endregion iterator requests definition
