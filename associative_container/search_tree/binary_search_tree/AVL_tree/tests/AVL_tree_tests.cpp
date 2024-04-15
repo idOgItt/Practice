@@ -119,7 +119,7 @@ bool prefix_iterator_test(
     std::vector<typename AVL_tree<tkey, tvalue>::iterator_data> &expected_result)
 {
     std::string line;
-    auto end_prefix = tree.end_prefix();
+    auto end_prefix = tree.cend_prefix();
     auto it = tree.cbegin_prefix();
     
     for (auto const &item: expected_result)
@@ -142,7 +142,7 @@ bool postfix_iterator_test(
     std::vector<typename AVL_tree<tkey, tvalue>::iterator_data> &expected_result)
 {
     std::string line;
-    auto end_postfix = tree.end_postfix();
+    auto end_postfix = tree.cend_postfix();
     auto it = tree.cbegin_postfix();
     
     for (auto const &item: expected_result)
@@ -420,7 +420,7 @@ TEST(AVLTreePositiveTests, test7)
         {
             AVL_tree<int, std::string>::iterator_data(2, 2, "l", 1),
             AVL_tree<int, std::string>::iterator_data(1, 4, "j", 2),
-            AVL_tree<int, std::string>::iterator_data(1, 5, "b", 1),
+            AVL_tree<int, std::string>::iterator_data(2, 5, "b", 1),
             AVL_tree<int, std::string>::iterator_data(0, 6, "a", 3),
             AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
             AVL_tree<int, std::string>::iterator_data(2, 15, "x", 1)
