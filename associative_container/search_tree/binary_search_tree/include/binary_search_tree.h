@@ -65,6 +65,10 @@ public:
         tvalue value;
     
     public:
+
+		virtual void update(const node* n, unsigned int _depth);
+
+		virtual iterator_data* clone();
     
         explicit iterator_data(
             unsigned int depth = 0,
@@ -80,10 +84,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
         
@@ -121,10 +121,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit prefix_const_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -160,10 +156,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
         
@@ -201,10 +193,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit prefix_const_reverse_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -240,10 +228,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
 
@@ -281,10 +265,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit infix_const_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -320,10 +300,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
         
@@ -361,10 +337,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit infix_const_reverse_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -400,10 +372,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
         
@@ -441,10 +409,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit postfix_const_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -481,10 +445,6 @@ public:
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
 
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
-
     public:
         
         explicit postfix_reverse_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
@@ -520,10 +480,6 @@ public:
 
         std::unique_ptr<iterator_data> _data;
         std::stack<node**> _path;
-
-        virtual void update_value(iterator_data* data);
-
-        virtual iterator_data* clone_data() { return _data.get() == nullptr ? nullptr : new iterator_data(*_data.get()); }
 
     public:
         
@@ -941,102 +897,17 @@ protected:
 };
 
 template<typename tkey, typename tvalue>
-void
-binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
+void binary_search_tree<tkey, tvalue>::iterator_data::update(const binary_search_tree::node *n, unsigned int _depth)
 {
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
+	key = n->key;
+	value = n->value;
+	depth = _depth;
 }
 
 template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
+binary_search_tree<tkey, tvalue>::iterator_data* binary_search_tree<tkey, tvalue>::iterator_data::clone()
 {
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::postfix_const_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::postfix_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void
-binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::infix_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::infix_const_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::infix_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void
-binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::prefix_const_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
-}
-
-template<typename tkey, typename tvalue>
-void binary_search_tree<tkey, tvalue>::prefix_iterator::update_value(binary_search_tree::iterator_data *data)
-{
-    _data->key = (*_path.top())->key;
-    _data->value = (*_path.top())->value;
-    _data->depth = _path.size() - 1;
+	return new iterator_data(*this);
 }
 
 template<typename tkey, typename tvalue>
@@ -1215,9 +1086,7 @@ binary_search_tree<tkey, tvalue>::prefix_iterator::prefix_iterator(const std::st
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1433,7 +1302,7 @@ typename binary_search_tree<tkey, tvalue>::prefix_iterator &binary_search_tree<t
 
     if (!_path.empty())
     {
-        update_value(_data.get());
+		_data->update(*_path.top(), _path.size() - 1);
     }
 
     return *this;
@@ -1462,9 +1331,7 @@ binary_search_tree<tkey, tvalue>::prefix_const_iterator::prefix_const_iterator(c
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1543,9 +1410,7 @@ binary_search_tree<tkey, tvalue>::prefix_reverse_iterator::prefix_reverse_iterat
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1599,7 +1464,7 @@ typename binary_search_tree<tkey, tvalue>::prefix_reverse_iterator &binary_searc
 
     if (!_path.empty())
     {
-        update_value(_data.get());
+		_data->update(*_path.top(), _path.size() - 1);
     }
 
     return *this;
@@ -1635,9 +1500,7 @@ binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator::prefix_const_re
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1691,7 +1554,7 @@ typename binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator &binary
 
     if (!_path.empty())
     {
-        update_value(_data.get());
+		_data->update(*_path.top(), _path.size() - 1);
     }
 
     return *this;
@@ -1725,9 +1588,7 @@ binary_search_tree<tkey, tvalue>::infix_iterator::infix_iterator(const std::stac
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1807,9 +1668,7 @@ binary_search_tree<tkey, tvalue>::infix_const_iterator::infix_const_iterator(con
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1899,9 +1758,7 @@ binary_search_tree<tkey, tvalue>::infix_reverse_iterator::infix_reverse_iterator
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -1991,9 +1848,7 @@ binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator::infix_const_reve
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -2083,9 +1938,7 @@ binary_search_tree<tkey, tvalue>::postfix_iterator::postfix_iterator(const std::
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -2168,9 +2021,7 @@ binary_search_tree<tkey, tvalue>::postfix_const_iterator::postfix_const_iterator
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -2253,9 +2104,7 @@ binary_search_tree<tkey, tvalue>::postfix_reverse_iterator::postfix_reverse_iter
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 
@@ -2338,9 +2187,7 @@ binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator::postfix_const_
 {
     if (!_path.empty())
     {
-        _data->key = (*_path.top())->key;
-        _data->value = (*_path.top())->value;
-        _data->depth = _path.size() - 1;
+		_data->update(*_path.top(), _path.size() - 1);
     }
 }
 

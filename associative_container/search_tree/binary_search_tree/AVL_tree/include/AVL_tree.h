@@ -22,6 +22,9 @@ private:
          */
         short get_balance() const noexcept;
 
+		node(tkey const &key_, tvalue &&value_);
+		node(tkey const &key_, const tvalue& value_);
+
         ~node() noexcept override =default;
     };
 
@@ -34,7 +37,11 @@ public:
     public:
         
         size_t subtree_height;
-    
+
+		void update(const typename binary_search_tree<tkey, tvalue>::node* n, unsigned int _depth) override;
+
+		binary_search_tree<tkey, tvalue>::iterator_data* clone() override;
+
     public:
         
         explicit iterator_data(
@@ -358,6 +365,27 @@ private:
 };
 
 template<typename tkey, typename tvalue>
+binary_search_tree<tkey, tvalue>::iterator_data *AVL_tree<tkey, tvalue>::iterator_data::clone()
+{
+	return new iterator_data(*this);
+}
+
+template<typename tkey, typename tvalue>
+void AVL_tree<tkey, tvalue>::iterator_data::update(const binary_search_tree<tkey, tvalue>::node *n, unsigned int _depth)
+{
+	binary_search_tree<tkey, tvalue>::iterator_data::key = n->key;
+	binary_search_tree<tkey, tvalue>::iterator_data::value = n->value;
+	binary_search_tree<tkey, tvalue>::iterator_data::depth = _depth;
+	subtree_height = static_cast<node*>(n)->height;
+}
+
+template<typename tkey, typename tvalue>
+AVL_tree<tkey, tvalue>::node::node(const tkey &key_, tvalue &&value_) : binary_search_tree<tkey, tvalue>::node(key_, std::move(value_)), height(1) {}
+
+template<typename tkey, typename tvalue>
+AVL_tree<tkey, tvalue>::node::node(const tkey &key_, const tvalue& value_) : binary_search_tree<tkey, tvalue>::node(key_, value_), height(1) {}
+
+template<typename tkey, typename tvalue>
 void AVL_tree<tkey, tvalue>::node::recalculate_height() noexcept
 {
     size_t lheight = binary_search_tree<tkey, tvalue>::node::left_subtree == nullptr ? 0 : static_cast<node*>(binary_search_tree<tkey, tvalue>::node::left_subtree)->height;
@@ -403,7 +431,7 @@ tvalue AVL_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_search_t
             additional_path.push_back(node_of_interest);
         }
 
-        node* tmp = *node_of_interest;
+		typename binary_search_tree<tkey, tvalue>::node* tmp = *node_of_interest;
         *node_of_interest = (*node_of_interest)->left_subtree;
         *node_path.top() = tmp;
 
