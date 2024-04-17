@@ -20,8 +20,8 @@ concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
     {c(lhs, rhs)} -> std::same_as<bool>;
 } && std::copyable<compare> && std::default_initializable<compare>;
 
-template<typename f_iter, typename tval>
-concept forward_iterator_for = std::forward_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, tval>;
+template<typename f_iter, typename tkey, typename tval>
+concept input_iterator_for = std::input_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, std::pair<tkey, tval>>;
 
 // TODO: memory resource instead of allocator - std::pmr::memory_resource, std::pmr::polymorphic_allocator
 
@@ -68,12 +68,13 @@ public:
 
     // region constructors declaration
 
-    explicit B_tree(compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit B_tree(const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
-    template<forward_iterator_for<tree_data_type> iterator>
-    explicit B_tree(iterator begin, iterator end, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    template<input_iterator_for<tkey, tvalue> iterator>
+    explicit B_tree(iterator begin, iterator end, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
-	explicit B_tree(std::initializer_list<tree_data_type> data, compare cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+
+	explicit B_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
 
     // endregion constructors declaration
 
@@ -337,6 +338,16 @@ public:
 
     // endregion modifiers declaration
 };
+
+template<std::input_iterator iterator, compator<typename std::iterator_traits<iterator>::value_type::first_type> compare = std::less<typename std::iterator_traits<iterator>::value_type::first_type>,
+    std::size_t t = 5>
+B_tree(iterator begin, iterator end, const compare &cmp = compare(), allocator *allocator = nullptr,
+                                         logger *logger = nullptr) -> B_tree<typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare, t>;
+
+template<typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
+B_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare &cmp = compare(), allocator *allocator = nullptr,
+                                         logger *logger = nullptr) -> B_tree<tkey, tvalue, compare, t>;
+
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 bool B_tree<tkey, tvalue, compare, t>::compare_pairs(const B_tree::tree_data_type &lhs,

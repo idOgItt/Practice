@@ -97,7 +97,7 @@ bool infix_iterator_test(
 {
     
     std::string line;
-    auto end_infix = tree.end_infix();
+    auto end_infix = tree.cend_infix();
     auto it = tree.cbegin_infix();
     
     for (auto const &item: expected_result)
@@ -119,7 +119,7 @@ bool prefix_iterator_test(
     std::vector<typename scapegoat_tree<tkey, tvalue>::iterator_data> &expected_result)
 {
     std::string line;
-    auto end_prefix = tree.end_prefix();
+    auto end_prefix = tree.cend_prefix();
     auto it = tree.cbegin_prefix();
     
     for (auto const &item: expected_result)
@@ -142,7 +142,7 @@ bool postfix_iterator_test(
 {
     
     std::string line;
-    auto end_postfix = tree.end_postfix();
+    auto end_postfix = tree.cend_postfix();
     auto it = tree.cbegin_postfix();
     
     for (auto const &item: expected_result)
@@ -168,7 +168,7 @@ TEST(scapegoatTreePositiveTests, test1)
     
     logger->trace("scapegoatTreePositiveTests.test1 started");
     
-    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(nullptr, logger, 0.7);
+    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.7);
     
     sg->insert(5, "a");
     sg->insert(2, "b");
@@ -207,7 +207,7 @@ TEST(scapegoatTreePositiveTests, test2)
     
     logger->trace("scapegoatTreePositiveTests.test2 started");
     
-    search_tree<int, int> *sg = new scapegoat_tree<int, int>(nullptr, logger, 0.5);
+    search_tree<int, int> *sg = new scapegoat_tree<int, int>(key_comparer(), nullptr, logger, 0.5);
     
     sg->insert(1, 5);
     sg->insert(2, 12);
@@ -217,11 +217,11 @@ TEST(scapegoatTreePositiveTests, test2)
     
     std::vector<typename scapegoat_tree<int, int>::iterator_data> expected_result =
         {
-            scapegoat_tree<int, int>::iterator_data(0, 2, 12),
-            scapegoat_tree<int, int>::iterator_data(1, 1, 5),
-            scapegoat_tree<int, int>::iterator_data(1, 4, 45),
-            scapegoat_tree<int, int>::iterator_data(2, 3, 67),
-            scapegoat_tree<int, int>::iterator_data(2, 15, 1)
+            scapegoat_tree<int, int>::iterator_data(0, 3, 67),
+            scapegoat_tree<int, int>::iterator_data(1, 2, 12),
+            scapegoat_tree<int, int>::iterator_data(2, 1, 5),
+            scapegoat_tree<int, int>::iterator_data(1, 15, 1),
+            scapegoat_tree<int, int>::iterator_data(2, 4, 45)
         };
     
     EXPECT_TRUE(prefix_iterator_test(*reinterpret_cast<scapegoat_tree<int, int> *>(sg), expected_result));
@@ -244,7 +244,7 @@ TEST(scapegoatTreePositiveTests, test3)
     
     logger->trace("scapegoatTreePositiveTests.test3 started");
     
-    search_tree<std::string, int> *sg = new scapegoat_tree<std::string, int>(nullptr, logger, 0.9);
+    search_tree<std::string, int> *sg = new scapegoat_tree<std::string, int>(key_comparer(), nullptr, logger, 0.9);
     
     sg->insert("a", 1);
     sg->insert("b", 2);
@@ -281,7 +281,7 @@ TEST(scapegoatTreePositiveTests, test4)
     
     logger->trace("scapegoatTreePositiveTests.test4 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger, 0.65);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.65);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -322,7 +322,7 @@ TEST(scapegoatTreePositiveTests, test5)
     
     logger->trace("scapegoatTreePositiveTests.test5 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger, 0.65);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.65);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -364,7 +364,7 @@ TEST(scapegoatTreePositiveTests, test6)
     
     logger->trace("scapegoatTreePositiveTests.test6 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger, 0.5);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.5);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -404,7 +404,7 @@ TEST(scapegoatTreePositiveTests, test7)
     
     logger->trace("scapegoatTreePositiveTests.test7 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger, 0.7);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.7);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -447,7 +447,7 @@ TEST(scapegoatTreePositiveTests, test8)
     
     logger->trace("scapegoatTreePositiveTests.test8 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -465,10 +465,10 @@ TEST(scapegoatTreePositiveTests, test8)
         {
             scapegoat_tree<int, std::string>::iterator_data(2, 6, "a"),
             scapegoat_tree<int, std::string>::iterator_data(1, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 11, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 17, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 18, "e"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 19, "i"),
+            scapegoat_tree<int, std::string>::iterator_data(0, 11, "j"),
+            scapegoat_tree<int, std::string>::iterator_data(2, 17, "b"),
+            scapegoat_tree<int, std::string>::iterator_data(1, 18, "e"),
+            scapegoat_tree<int, std::string>::iterator_data(2, 19, "i"),
         };
     
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
@@ -491,7 +491,7 @@ TEST(scapegoatTreePositiveTests, test9)
     
     logger->trace("scapegoatTreePositiveTests.test9 started");
     
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(nullptr, logger);
+    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
     
     sg1->insert(6, "l");
     sg1->insert(8, "c");
@@ -538,7 +538,7 @@ TEST(scapegoatTreePositiveTests, test10)
     
     logger->trace("scapegoatTreePositiveTests.test10 started");
     
-    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(nullptr, logger);
+    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
     
     sg->insert(6, "l");
     sg->insert(8, "c");

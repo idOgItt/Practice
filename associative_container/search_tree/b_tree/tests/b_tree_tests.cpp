@@ -18,11 +18,6 @@ struct greater_comparator
 
 int main()
 {
-	std::unique_ptr<allocator> _allocate(new allocator_sorted_list(10000));
-
-	std::map<int, std::string, greater_comparator> map;
-
-    B_tree<int, std::string, greater_comparator, 15> c;
 
 
 }

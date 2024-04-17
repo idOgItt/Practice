@@ -231,6 +231,8 @@ public:
 
     public:
 
+        friend class binary_search_tree;
+
         explicit infix_iterator(const std::stack<node**>& path = std::stack<node**>(), iterator_data* data = nullptr);
     
     public:
@@ -740,7 +742,9 @@ protected:
     static bool is_left_subtree(node* child, node* parent) noexcept;
 
     virtual void actions_after_update_insert(std::stack<node**>& path);
-    
+
+    static node** get_last_node(infix_iterator& it);
+
     // region subtree rotations definition
     
     void small_left_rotation(
@@ -764,6 +768,12 @@ protected:
     // endregion subtree rotations definition
     
 };
+
+template<typename tkey, typename tvalue>
+typename binary_search_tree<tkey, tvalue>::node **binary_search_tree<tkey, tvalue>::get_last_node(binary_search_tree::infix_iterator &it)
+{
+    return it._path.top();
+}
 
 template<typename tkey, typename tvalue>
 void binary_search_tree<tkey, tvalue>::iterator_data::update(const binary_search_tree::node *n, unsigned int _depth)
@@ -882,21 +892,20 @@ tvalue binary_search_tree<tkey, tvalue>::dispose_inner(std::stack<node**>& node_
         *node_path.top() = node_of_interest;
     } else
     {
-        node** node_of_interest = &current_node->left_subtree;
+        typename binary_search_tree<tkey, tvalue>::node** node_of_interest = &current_node->left_subtree;
 
         while ((*node_of_interest)->right_subtree != nullptr)
         {
             node_of_interest = &((*node_of_interest)->right_subtree);
         }
 
-        node* tmp = *node_of_interest;
-
-        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
-        tmp->right_subtree = current_node->right_subtree;
+        typename binary_search_tree<tkey, tvalue>::node* tmp = *node_of_interest;
 
         *node_of_interest = (*node_of_interest)->left_subtree;
         *node_path.top() = tmp;
 
+        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
+        tmp->right_subtree = current_node->right_subtree;
     }
 
     allocator::destruct(current_node);
@@ -2210,7 +2219,7 @@ binary_search_tree<tkey, tvalue>::binary_search_tree(
     binary_search_tree<tkey, tvalue> const &other) : search_tree<tkey, tvalue>(other), _insertion_stratagy(other._insertion_stratagy), _disposal_strategy(other._disposal_strategy)
 {
     try {
-        copy_subtree(&_root, other._root);
+        other.copy_subtree(&_root, other._root);
     } catch (...)
     {
         destroy_subtree(_root);

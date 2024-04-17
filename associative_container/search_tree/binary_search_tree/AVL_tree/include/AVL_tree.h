@@ -313,16 +313,15 @@ tvalue AVL_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_search_t
 
 		typename binary_search_tree<tkey, tvalue>::node* tmp = *node_of_interest;
 
-        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
-        tmp->right_subtree = current_node->right_subtree;
-
         *node_of_interest = (*node_of_interest)->left_subtree;
         *node_path.top() = tmp;
 
+        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
+        tmp->right_subtree = current_node->right_subtree;
 
         if (!additional_path.empty())
         {
-            node_path.push(&current_node->left_subtree);
+            node_path.push(&(*node_path.top())->left_subtree);
             additional_path.pop_back();
         }
 
