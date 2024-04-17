@@ -158,38 +158,38 @@ bool postfix_iterator_test(
 TEST(splayTreePositiveTests, test1)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test1 started");
-    
+
     search_tree<int, std::string> *splay = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay->insert(5, "a");
     splay->insert(2, "b");
     splay->insert(15, "c");
     splay->insert(3, "d");
     splay->insert(14, "e");
     splay->insert(1, "l");
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
             splay_tree<int, std::string>::iterator_data(0, 1, "l"),
-            splay_tree<int, std::string>::iterator_data(3, 2, "b"),
-            splay_tree<int, std::string>::iterator_data(2, 3, "d"),
-            splay_tree<int, std::string>::iterator_data(3, 5, "a"),
+            splay_tree<int, std::string>::iterator_data(2, 2, "b"),
+            splay_tree<int, std::string>::iterator_data(3, 3, "d"),
+            splay_tree<int, std::string>::iterator_data(4, 5, "a"),
             splay_tree<int, std::string>::iterator_data(1, 14, "e"),
             splay_tree<int, std::string>::iterator_data(2, 15, "c")
         };
-    
+
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<splay_tree<int, std::string> *>(splay), expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test1 finished");
-    
+
     delete splay;
     delete logger;
 }
@@ -197,23 +197,23 @@ TEST(splayTreePositiveTests, test1)
 TEST(splayTreePositiveTests, test2)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test2 started");
-    
+
     search_tree<int, int> *splay = new splay_tree<int, int>(key_comparer(), nullptr, logger);
-    
+
     splay->insert(1, 5);
     splay->insert(2, 12);
     splay->insert(15, 1);
     splay->insert(3, 67);
     splay->insert(4, 45);
-    
+
     std::vector<typename splay_tree<int, int>::iterator_data> expected_result =
         {
             splay_tree<int, int>::iterator_data(0, 4, 45),
@@ -222,11 +222,11 @@ TEST(splayTreePositiveTests, test2)
             splay_tree<int, int>::iterator_data(3, 1, 5),
             splay_tree<int, int>::iterator_data(1, 15, 1)
         };
-    
+
     EXPECT_TRUE(prefix_iterator_test(*reinterpret_cast<splay_tree<int, int> *>(splay), expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test2 finished");
-    
+
     delete splay;
     delete logger;
 }
@@ -234,23 +234,23 @@ TEST(splayTreePositiveTests, test2)
 TEST(splayTreePositiveTests, test3)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test3 started");
-    
+
     search_tree<std::string, int> *splay = new splay_tree<std::string, int>(key_comparer(), nullptr, logger);
-    
+
     splay->insert("a", 1);
     splay->insert("b", 2);
     splay->insert("c", 15);
     splay->insert("d", 3);
     splay->insert("e", 4);
-    
+
     std::vector<typename splay_tree<std::string, int>::iterator_data> expected_result =
         {
             splay_tree<std::string, int>::iterator_data(4, "a", 1),
@@ -259,11 +259,11 @@ TEST(splayTreePositiveTests, test3)
             splay_tree<std::string, int>::iterator_data(1, "d", 3),
             splay_tree<std::string, int>::iterator_data(0, "e", 4)
         };
-    
+
     EXPECT_TRUE(postfix_iterator_test(*reinterpret_cast<splay_tree<std::string, int> *>(splay), expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test3 finished");
-    
+
     delete splay;
     delete logger;
 }
@@ -271,40 +271,40 @@ TEST(splayTreePositiveTests, test3)
 TEST(splayTreePositiveTests, test4)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test4 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "a");
     splay1->insert(8, "c");
     splay1->insert(15, "x");
     splay1->insert(4, "j");
     splay1->insert(1, "i");
     splay1->insert(5, "b");
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
-            splay_tree<int, std::string>::iterator_data(1, 1, "i"),
-            splay_tree<int, std::string>::iterator_data(2, 4, "j"),
+            splay_tree<int, std::string>::iterator_data(2, 1, "i"),
+            splay_tree<int, std::string>::iterator_data(1, 4, "j"),
             splay_tree<int, std::string>::iterator_data(0, 5, "b"),
-            splay_tree<int, std::string>::iterator_data(3, 6, "a"),
-            splay_tree<int, std::string>::iterator_data(2, 8, "c"),
-            splay_tree<int, std::string>::iterator_data(1, 15, "x")
+            splay_tree<int, std::string>::iterator_data(1, 6, "a"),
+            splay_tree<int, std::string>::iterator_data(3, 8, "c"),
+            splay_tree<int, std::string>::iterator_data(2, 15, "x")
         };
-    
+
     splay_tree<int, std::string> splay2(std::move(*reinterpret_cast<splay_tree<int, std::string> *>(splay1)));
-    
+
     EXPECT_TRUE(infix_iterator_test(splay2, expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test4 finished");
-    
+
     delete splay1;
     delete logger;
 }
@@ -312,40 +312,40 @@ TEST(splayTreePositiveTests, test4)
 TEST(splayTreePositiveTests, test5)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test5 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "a");
     splay1->insert(8, "c");
     splay1->insert(15, "x");
     splay1->insert(4, "j");
     splay1->insert(1, "i");
     splay1->insert(5, "b");
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
-            splay_tree<int, std::string>::iterator_data(1, 1, "i"),
-            splay_tree<int, std::string>::iterator_data(2, 4, "j"),
+            splay_tree<int, std::string>::iterator_data(2, 1, "i"),
+            splay_tree<int, std::string>::iterator_data(1, 4, "j"),
             splay_tree<int, std::string>::iterator_data(0, 5, "b"),
-            splay_tree<int, std::string>::iterator_data(3, 6, "a"),
-            splay_tree<int, std::string>::iterator_data(2, 8, "c"),
-            splay_tree<int, std::string>::iterator_data(1, 15, "x")
+            splay_tree<int, std::string>::iterator_data(1, 6, "a"),
+            splay_tree<int, std::string>::iterator_data(3, 8, "c"),
+            splay_tree<int, std::string>::iterator_data(2, 15, "x")
         };
-    
+
     splay_tree<int, std::string> splay2 = std::move(*reinterpret_cast<splay_tree<int, std::string> *>(splay1));
-    
+
     EXPECT_TRUE(infix_iterator_test(splay2, expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test5 finished");
-    
+
     delete splay1;
     delete logger;
 }
@@ -353,39 +353,39 @@ TEST(splayTreePositiveTests, test5)
 TEST(splayTreePositiveTests, test6)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test6 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "a");
     splay1->insert(8, "c");
     splay1->insert(15, "x");
     splay1->insert(4, "j");
     splay1->insert(1, "i");
     splay1->insert(5, "b");
-    
+
     splay1->dispose(5);
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
             splay_tree<int, std::string>::iterator_data(1, 1, "i"),
             splay_tree<int, std::string>::iterator_data(0, 4, "j"),
-            splay_tree<int, std::string>::iterator_data(3, 6, "a"),
-            splay_tree<int, std::string>::iterator_data(2, 8, "c"),
-            splay_tree<int, std::string>::iterator_data(1, 15, "x"),
+            splay_tree<int, std::string>::iterator_data(1, 6, "a"),
+            splay_tree<int, std::string>::iterator_data(3, 8, "c"),
+            splay_tree<int, std::string>::iterator_data(2, 15, "x"),
         };
-    
+
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<splay_tree<int, std::string> *>(splay1), expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test6 finished");
-    
+
     delete splay1;
     delete logger;
 }
@@ -393,17 +393,17 @@ TEST(splayTreePositiveTests, test6)
 TEST(splayTreePositiveTests, test7)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test7 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "a");
     splay1->insert(8, "c");
     splay1->insert(15, "x");
@@ -411,43 +411,43 @@ TEST(splayTreePositiveTests, test7)
     splay1->insert(3, "i");
     splay1->insert(2, "l");
     splay1->insert(5, "b");
-    
+
     splay1->dispose(3);
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
             splay_tree<int, std::string>::iterator_data(0, 2, "l"),
             splay_tree<int, std::string>::iterator_data(2, 4, "j"),
             splay_tree<int, std::string>::iterator_data(1, 5, "b"),
-            splay_tree<int, std::string>::iterator_data(4, 6, "a"),
-            splay_tree<int, std::string>::iterator_data(3, 8, "c"),
-            splay_tree<int, std::string>::iterator_data(2, 15, "x")
+            splay_tree<int, std::string>::iterator_data(2, 6, "a"),
+            splay_tree<int, std::string>::iterator_data(4, 8, "c"),
+            splay_tree<int, std::string>::iterator_data(3, 15, "x")
         };
-    
+
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<splay_tree<int, std::string> *>(splay1),
-        expected_result));
-    
+                                    expected_result));
+
     logger->trace("splayTreePositiveTests.test7 finished");
-    
+
     delete splay1;
     delete logger;
-    
+
 }
 
 TEST(splayTreePositiveTests, test8)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test8 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "a");
     splay1->insert(8, "c");
     splay1->insert(15, "x");
@@ -456,43 +456,43 @@ TEST(splayTreePositiveTests, test8)
     splay1->insert(12, "l");
     splay1->insert(17, "b");
     splay1->insert(18, "e");
-    
+
     splay1->dispose(12);
-    
+
     std::vector<typename splay_tree<int, std::string>::iterator_data> expected_result =
         {
             splay_tree<int, std::string>::iterator_data(2, 6, "a"),
             splay_tree<int, std::string>::iterator_data(1, 8, "c"),
             splay_tree<int, std::string>::iterator_data(0, 11, "j"),
-            splay_tree<int, std::string>::iterator_data(3, 15, "x"),
-            splay_tree<int, std::string>::iterator_data(2, 17, "b"),
-            splay_tree<int, std::string>::iterator_data(1, 18, "e"),
-            splay_tree<int, std::string>::iterator_data(2, 19, "i"),
+            splay_tree<int, std::string>::iterator_data(2, 15, "x"),
+            splay_tree<int, std::string>::iterator_data(1, 17, "b"),
+            splay_tree<int, std::string>::iterator_data(2, 18, "e"),
+            splay_tree<int, std::string>::iterator_data(3, 19, "i"),
         };
-    
+
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<splay_tree<int, std::string> *>(splay1), expected_result));
-    
+
     logger->trace("splayTreePositiveTests.test8 finished");
-    
+
     delete splay1;
     delete logger;
-    
+
 }
 
 TEST(splayTreePositiveTests, test9)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           },
+                                       });
+
     logger->trace("splayTreePositiveTests.test9 started");
-    
+
     search_tree<int, std::string> *splay1 = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay1->insert(6, "l");
     splay1->insert(8, "c");
     splay1->insert(15, "l");
@@ -501,45 +501,45 @@ TEST(splayTreePositiveTests, test9)
     splay1->insert(2, "e");
     splay1->insert(4, "b");
     splay1->insert(18, "e");
-    
+
     std::vector<std::string> vector;
-    
+
     vector.push_back(splay1->obtain(9));
     vector.push_back(splay1->obtain(2));
     vector.push_back(splay1->obtain(15));
     vector.push_back(splay1->obtain(6));
     vector.push_back(splay1->obtain(11));
-    
+
     std::string actual_result;
-    
+
     for (auto const &item: vector)
     {
         actual_result.append(item + " ");
     }
-    
+
     EXPECT_EQ(actual_result, "h e l l o ");
-    
+
     logger->trace("splayTreePositiveTests.test9 finished");
-    
+
     delete splay1;
     delete logger;
-    
+
 }
 
 TEST(splayTreePositiveTests, test10)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "splay_tree_tests_logs.txt",
-                logger::severity::trace
-            }
-        });
-    
+                                       {
+                                           {
+                                               "splay_tree_tests_logs.txt",
+                                               logger::severity::trace
+                                           }
+                                       });
+
     logger->trace("splayTreePositiveTests.test10 started");
-    
+
     search_tree<int, std::string> *splay = new splay_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
+
     splay->insert(6, "l");
     splay->insert(8, "c");
     splay->insert(15, "l");
@@ -548,9 +548,9 @@ TEST(splayTreePositiveTests, test10)
     splay->insert(2, "e");
     splay->insert(4, "b");
     splay->insert(18, "e");
-    
+
     std::vector<associative_container<int, std::string>::key_value_pair> actual_result = splay->obtain_between(2, 10, true, false);
-    
+
     std::vector<associative_container<int, std::string>::key_value_pair> expected_result =
         {
             { 2, "e" },
@@ -559,11 +559,11 @@ TEST(splayTreePositiveTests, test10)
             { 8, "c" },
             { 9, "h" }
         };
-    
+
     EXPECT_TRUE(compare_results(expected_result, actual_result));
-    
+
     logger->trace("splayTreePositiveTests.test10 finished");
-    
+
     delete splay;
     delete logger;
 }

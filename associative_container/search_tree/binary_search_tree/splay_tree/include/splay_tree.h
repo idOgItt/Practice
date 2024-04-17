@@ -54,7 +54,43 @@ private:
 template<typename tkey, typename tvalue>
 void splay_tree<tkey, tvalue>::splay(std::stack<node * *> path)
 {
-    while (path.size() > 1)
+    while (path.size() >= 3)
+    {
+        node* current_node = *path.top();
+
+        path.pop();
+
+        bool is_prelast_lift_left, is_last_lift_left;
+
+        is_prelast_lift_left = binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, *path.top());
+
+        current_node = *path.top();
+        path.pop();
+
+        is_last_lift_left = binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, *path.top());
+
+        if (is_last_lift_left)
+        {
+            if(is_prelast_lift_left)
+            {
+                binary_search_tree<tkey, tvalue>::double_right_rotation(*path.top());
+            } else
+            {
+                binary_search_tree<tkey, tvalue>::big_right_rotation(*path.top());
+            }
+        } else
+        {
+            if (!is_prelast_lift_left)
+            {
+                binary_search_tree<tkey, tvalue>::double_left_rotation(*path.top());
+            } else
+            {
+                binary_search_tree<tkey, tvalue>::big_left_rotation(*path.top());
+            }
+        }
+    }
+
+    if (path.size() >= 2)
     {
         node* current_node = *path.top();
 
@@ -63,7 +99,6 @@ void splay_tree<tkey, tvalue>::splay(std::stack<node * *> path)
         bool is_last_lift_left;
 
         is_last_lift_left = binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, *path.top());
-
         if (is_last_lift_left)
         {
             binary_search_tree<tkey, tvalue>::small_right_rotation(*path.top());
@@ -71,7 +106,6 @@ void splay_tree<tkey, tvalue>::splay(std::stack<node * *> path)
         {
             binary_search_tree<tkey, tvalue>::small_left_rotation(*path.top());
         }
-
     }
 }
 
