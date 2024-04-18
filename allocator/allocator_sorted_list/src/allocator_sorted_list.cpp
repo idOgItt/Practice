@@ -108,7 +108,7 @@ allocator_sorted_list::allocator_sorted_list(
 
     if (free_block_size < real_size + block_metadata_size)
     {
-        warning_with_guard("Allocator with boundary tags changed allocating block size to " + std::to_string(free_block_size));
+        warning_with_guard("Allocator sorted list changed allocating block size to " + std::to_string(free_block_size));
         real_size = free_block_size;
         need_fraq = false;
     }

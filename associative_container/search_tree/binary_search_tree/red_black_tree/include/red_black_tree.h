@@ -12,7 +12,7 @@ class red_black_tree final:
 
 public:
     
-    enum class node_color
+    enum class node_color : unsigned char
     {
         RED,
         BLACK
@@ -520,16 +520,14 @@ tvalue red_black_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_se
             }
         }
 
+        std::swap(static_cast<node*>(*node_of_interest)->color, static_cast<node*>(current_node)->color);
         *node_of_interest = (*node_of_interest)->left_subtree;
         *node_path.top() = tmp;
 
         tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
         tmp->right_subtree = current_node->right_subtree;
 
-        if (!additional_path.empty())
-        {
-            node_path.push(&(*node_path.top())->left_subtree);
-        }
+        node_path.push(&(*node_path.top())->left_subtree);
 
         while (!additional_path.empty())
         {
