@@ -291,10 +291,10 @@ void red_black_tree<tkey, tvalue>::balance_black_leaf(std::stack<typename binary
             {
                 if (from_left)
                 {
-                    binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
+                    binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
                 } else
                 {
-                    binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
+                    binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
                 }
 
                 static_cast<node*>(brother_node)->color = static_cast<node*>(parent_node)->color;
@@ -304,10 +304,10 @@ void red_black_tree<tkey, tvalue>::balance_black_leaf(std::stack<typename binary
             {
                 if (from_left)
                 {
-                    binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
+                    binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
                 } else
                 {
-                    binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
+                    binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
                 }
 
                 static_cast<node*>(near_nephew)->color = static_cast<node*>(parent_node)->color;
@@ -508,16 +508,12 @@ tvalue red_black_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_se
 
         was_black_list = static_cast<node*>(tmp)->color == node_color::BLACK && tmp->left_subtree == nullptr && tmp->right_subtree == nullptr;
 
-        if (!was_black_list && (tmp->right_subtree == nullptr || tmp->left_subtree == nullptr) && !(tmp->right_subtree == nullptr && tmp->left_subtree == nullptr))
+        if (static_cast<node*>(tmp)->color == node_color::BLACK && tmp->left_subtree != nullptr)
         {
-            typename binary_search_tree<tkey, tvalue>::node* bottom_node = tmp->right_subtree != nullptr ? tmp->right_subtree : tmp->left_subtree;
+            typename binary_search_tree<tkey, tvalue>::node* bottom_node = tmp->left_subtree;
 
-            node_color color = static_cast<node*>(*node_path.top())->color;
+			static_cast<node*>(bottom_node)->color = node_color::BLACK;
 
-            if (color == node_color::BLACK)
-            {
-                static_cast<node*>(bottom_node)->color = node_color::BLACK;
-            }
         }
 
         std::swap(static_cast<node*>(*node_of_interest)->color, static_cast<node*>(current_node)->color);

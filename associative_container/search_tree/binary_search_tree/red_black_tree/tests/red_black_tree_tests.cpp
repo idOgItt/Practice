@@ -4,6 +4,7 @@
 #include <logger_builder.h>
 #include <client_logger_builder.h>
 #include <iostream>
+#include <map>
 
 logger *create_logger(
     std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
@@ -616,6 +617,88 @@ TEST(redBlackTreePositiveTests, test11)
     
     delete rb;
     delete logger;
+}
+
+TEST(redBlackTreePositiveTests, test17)
+{
+	red_black_tree<int, int> tree{key_comparer()};
+	std::map<int, int> map;
+
+	size_t iterations = 100'000;
+
+	srand(time(nullptr));
+
+	for(size_t i = 0; i < iterations; ++i)
+	{
+		switch(rand() % 3)
+		{
+			case 0:
+			case 1:
+			{
+				int tmp = rand();
+				try
+				{
+
+					if (map.find(tmp) == map.end())
+					{
+						map.insert(std::make_pair(tmp, 1));
+						tree.insert(tmp, 1);
+					}
+				} catch (std::logic_error& er)
+				{
+					std::cout << er.what() << std::endl;
+				}
+				break;
+			}
+			case 2:
+			{
+				if (!map.empty())
+				{
+					auto it = map.begin();
+
+					std::advance(it, rand() % map.size());
+
+					tree.dispose(it->first);
+					map.erase(it);
+				} else
+				{
+					std::cout << "Empty" << std::endl;
+				}
+			}
+				break;
+		}
+	}
+
+	while(!map.empty())
+	{
+		auto it = map.begin();
+		std::advance(it, rand() % map.size());
+
+		tree.dispose(it->first);
+		map.erase(it);
+	}
+
+}
+
+TEST(RBT_TMP, test1)
+{
+	red_black_tree<int, int> c{key_comparer()};
+
+	c.insert(2738, 1);
+	c.insert(10293, 1);
+	c.insert(14897, 1);
+	c.insert(15347, 1);
+	c.insert(25446, 1);
+	c.dispose(14897);
+	c.insert(10502, 1);
+	c.insert(16061, 1);
+	c.dispose(16061);
+	c.insert(21263, 1);
+	c.insert(29077, 1);
+	c.dispose(25446);
+	c.insert(27114, 1);
+
+	c.dispose(15347);
 }
 
 int main(

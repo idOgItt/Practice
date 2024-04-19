@@ -38,7 +38,7 @@ TEST(allocatorSortedListPositiveTests, test1)
                                                             {
                                                                     "allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
                                                                     logger::severity::information
-                                                            }
+                                                            },
                                                     });
     
     allocator *alloc = new allocator_sorted_list(3000, nullptr, logger_instance, allocator_with_fit_mode::fit_mode::first_fit);
@@ -113,7 +113,6 @@ TEST(allocatorSortedListPositiveTests, test3)
         switch (rand() % 2)
         {
             case 0:
-            case 1:
                 try
                 {
                     allocated_blocks.push_front(allocator->allocate(sizeof(void *), rand() % 251 + 50));
@@ -124,7 +123,7 @@ TEST(allocatorSortedListPositiveTests, test3)
                     std::cout << ex.what() << std::endl;
                 }
                 break;
-            case 2:
+            case 1:
                 if (allocated_blocks.empty())
                 {
                     std::cout << "No blocks to deallocate" << std::endl;

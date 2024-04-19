@@ -68,8 +68,7 @@ public:
 
     std::vector<allocator_test_utils::block_info> get_blocks_info() const override;
     
-    inline void set_fit_mode(
-        allocator_with_fit_mode::fit_mode mode) override;
+    inline void set_fit_mode(allocator_with_fit_mode::fit_mode mode) override;
 
 private:
 
@@ -108,6 +107,8 @@ private:
     void insert(void* block) noexcept;
 
     void remove(void* block) noexcept;
+
+	void print_tree(void* block, size_t depth = 0);
 
     static bool is_left_subtree(void* child, void* parent) noexcept;
 

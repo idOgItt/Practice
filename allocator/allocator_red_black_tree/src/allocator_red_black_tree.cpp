@@ -60,23 +60,15 @@ allocator_red_black_tree::allocator_red_black_tree(
 
     *first_block_ptr = reinterpret_cast<std::byte*>(_trusted_memory) + allocator_metadata_size;
 
-    auto block_data_ptr = reinterpret_cast<block_data*>(first_block_ptr + 1);
+    auto block_data_ptr = reinterpret_cast<void*>(reinterpret_cast<std::byte*>(_trusted_memory) + allocator_metadata_size);
 
-    block_data_ptr->occupied = false;
-    block_data_ptr->color = block_color::BLACK;
-
-    auto block_back_ptr = reinterpret_cast<void**>(block_data_ptr + 1);
-
-    *block_back_ptr = nullptr;
-
-    auto block_forward_ptr = reinterpret_cast<void**>(block_back_ptr + 1);
-
-    *block_forward_ptr = nullptr;
-
-    auto block_parent_ptr = reinterpret_cast<void**>(block_forward_ptr + 1);
-
-    *block_parent_ptr = nullptr;
-
+	get_data_from_block(block_data_ptr).color = block_color::BLACK;
+	get_data_from_block(block_data_ptr).occupied = false;
+	get_parent_from_block(block_data_ptr) = nullptr;
+	get_back_from_block(block_data_ptr) = nullptr;
+	get_forward_from_block(block_data_ptr) = nullptr;
+	get_left_from_block(block_data_ptr) = nullptr;
+	get_right_from_block(block_data_ptr) = nullptr;
 }
 
 [[nodiscard]] void *allocator_red_black_tree::allocate(
@@ -111,7 +103,11 @@ allocator_red_black_tree::allocator_red_black_tree(
     }
 
     remove(current_free);
+
+//	print_tree(*get_first_block_ptr(_trusted_memory));
+
     get_data_from_block(current_free).occupied = true;
+	get_parent_from_block(current_free) = _trusted_memory;
 
     size_t free_block_size = get_block_size(current_free, _trusted_memory);
 
@@ -136,19 +132,16 @@ allocator_red_black_tree::allocator_red_black_tree(
             get_back_from_block(get_forward_from_block(new_free_block)) = new_free_block;
 
         get_data_from_block(new_free_block).occupied = false;
+		get_parent_from_block(new_free_block) = nullptr;
 
         insert(new_free_block);
-    } else
-    {
-        if (get_back_from_block(current_free) != nullptr)
-            get_forward_from_block(get_back_from_block(current_free)) = get_forward_from_block(current_free);
-        if (get_forward_from_block(current_free) != nullptr)
-            get_back_from_block(get_forward_from_block(current_free)) = get_back_from_block(current_free);
     }
 
     information_with_guard(std::to_string(get_free_size()));
     debug_with_guard(print_blocks());
+//	print_tree(*get_first_block_ptr(_trusted_memory));
 
+	debug_with_guard("Allocator red black tree finished allocating");
     return reinterpret_cast<std::byte*>(current_free) + occupied_block_metadata_size;
 }
 
@@ -167,14 +160,65 @@ size_t allocator_red_black_tree::get_free_size() const noexcept
 void allocator_red_black_tree::deallocate(
     void *at)
 {
-    throw not_implemented("void allocator_red_black_tree::deallocate(void *)", "your code should be here...");
+	std::lock_guard lock(get_mutex());
+
+	void* block_start = reinterpret_cast<std::byte*>(at) - occupied_block_metadata_size;
+
+	if (get_parent_from_block(block_start) != _trusted_memory)
+	{
+		error_with_guard("Incorrect deallocation object");
+		throw std::logic_error("Incorrect deallocation object");
+	}
+
+	size_t block_size = get_block_size(block_start, _trusted_memory);
+
+	debug_with_guard("Allocator red black tree started deallocating " + std::to_string(block_size) + " bytes");
+
+	if (block_size > 300)
+		std::cout << 5;
+
+	debug_with_guard(get_dump((char*)at, block_size));
+
+	get_data_from_block(block_start).occupied == false;
+
+	if(get_back_from_block(block_start) != nullptr && get_data_from_block(get_back_from_block(block_start)).occupied == false)
+	{
+		void* next = block_start;
+		block_start = get_back_from_block(block_start);
+		remove(block_start);
+
+		get_forward_from_block(block_start) = get_forward_from_block(next);
+		if(get_forward_from_block(block_start) != nullptr)
+		{
+			get_back_from_block(get_forward_from_block(block_start)) = block_start;
+		}
+	}
+
+	if (get_forward_from_block(block_start) != nullptr && get_data_from_block(get_forward_from_block(block_start)).occupied == false)
+	{
+		void* next = get_forward_from_block(block_start);
+		remove(next);
+
+		get_forward_from_block(block_start) = get_forward_from_block(next);
+		if (get_forward_from_block(block_start) != nullptr)
+		{
+			get_back_from_block(get_forward_from_block(block_start)) = block_start;
+		}
+	}
+
+	insert(block_start);
+
+//	print_tree(*get_first_block_ptr(_trusted_memory));
+
+	information_with_guard(std::to_string(get_free_size()));
+	debug_with_guard(print_blocks());
+	debug_with_guard("Allocator red black tree finished deallocating");
 }
 
-inline void allocator_red_black_tree::set_fit_mode(
-    allocator_with_fit_mode::fit_mode mode)
+void allocator_red_black_tree::set_fit_mode(allocator_with_fit_mode::fit_mode mode)
 {
-    std::lock_guard lock(get_mutex());
-    get_fit_mod() = mode;
+	std::lock_guard lock(get_mutex());
+	get_fit_mod() = mode;
 }
 
 inline allocator *allocator_red_black_tree::get_allocator() const
@@ -307,19 +351,19 @@ void*& allocator_red_black_tree::get_right_from_block(void* block) noexcept
 
 void allocator_red_black_tree::insert(void *block) noexcept
 {
-    void** current_top = get_first_block_ptr(_trusted_memory);
+    void* current_top = *get_first_block_ptr(_trusted_memory);
     void* _parent = nullptr;
 
-    while (*current_top != nullptr)
+    while (current_top != nullptr)
     {
-        if (get_block_size(block, _trusted_memory) < get_block_size(*current_top, _trusted_memory))
+        if (get_block_size(block, _trusted_memory) < get_block_size(current_top, _trusted_memory))
         {
-            _parent = *current_top;
-            current_top = &(get_left_from_block(*current_top));
+            _parent = current_top;
+            current_top = get_left_from_block(current_top);
         } else
         {
-            _parent = *current_top;
-            current_top = &(get_right_from_block(*current_top));
+            _parent = current_top;
+            current_top = get_right_from_block(current_top);
         }
     }
 
@@ -328,6 +372,20 @@ void allocator_red_black_tree::insert(void *block) noexcept
     get_parent_from_block(block) = _parent;
     get_data_from_block(block).occupied = false;
     get_data_from_block(block).color = block_color::RED;
+
+	if (_parent == nullptr)
+	{
+		*get_first_block_ptr(_trusted_memory) = block;
+	} else
+	{
+		if (get_block_size(block, _trusted_memory) < get_block_size(_parent, _trusted_memory))
+		{
+			get_left_from_block(_parent) = block;
+		} else
+		{
+			get_right_from_block(_parent) = block;
+		}
+	}
 
     bool need_continue = true;
 
@@ -349,6 +407,10 @@ void allocator_red_black_tree::insert(void *block) noexcept
             bool is_left_parent = is_left_subtree(parent, grandparent);
 
             void* uncle = is_left_parent ? get_right_from_block(grandparent) : get_left_from_block(grandparent);
+
+			block_color clr;
+			if (uncle != nullptr)
+				clr = get_data_from_block(uncle).color;
 
             if (uncle == nullptr)
             {
@@ -440,6 +502,7 @@ void allocator_red_black_tree::remove(void *block) noexcept
         was_black_list = get_data_from_block(block).color == block_color::BLACK;
         parent = get_parent_from_block(block);
         reset_parent_ptr(block, nullptr);
+		debug_with_guard("Remove zero");
     } else if (get_left_from_block(block) == nullptr || get_right_from_block(block) == nullptr)
     {
         void* node_of_interest = get_right_from_block(block) != nullptr ? get_right_from_block(block) : get_left_from_block(block);
@@ -452,6 +515,9 @@ void allocator_red_black_tree::remove(void *block) noexcept
         }
 
         reset_parent_ptr(block, node_of_interest);
+		get_parent_from_block(node_of_interest) = get_parent_from_block(block);
+
+		debug_with_guard("Remove one");
     } else
     {
         void* node_of_interest = get_left_from_block(block);
@@ -461,33 +527,35 @@ void allocator_red_black_tree::remove(void *block) noexcept
             node_of_interest = get_right_from_block(node_of_interest);
         }
 
+		debug_with_guard("Remove two");
         was_black_list = get_data_from_block(node_of_interest).color == block_color::BLACK && get_left_from_block(node_of_interest) == nullptr;
 
-        parent = get_parent_from_block(block);
+        parent = get_parent_from_block(node_of_interest);
 
-        if (!was_black_list && get_left_from_block(node_of_interest) != nullptr)
+        if (get_data_from_block(node_of_interest).color == block_color::BLACK && get_left_from_block(node_of_interest) != nullptr)
         {
-            block_color color = get_data_from_block(block).color;
+			debug_with_guard("with one");
 
-            if (color == block_color::BLACK)
-            {
-                get_data_from_block(get_left_from_block(node_of_interest)).color = block_color::BLACK;
-            }
+			get_data_from_block(get_left_from_block(node_of_interest)).color = block_color::BLACK;
         }
 
-        std::swap(get_right_from_block(block), get_right_from_block(node_of_interest));
-
+		reset_parent_ptr(block, node_of_interest);
+		get_right_from_block(node_of_interest) = get_right_from_block(block);
+		get_parent_from_block(get_right_from_block(node_of_interest)) = node_of_interest;
 
         if (get_parent_from_block(node_of_interest) != block)
         {
-            std::swap(get_left_from_block(block), get_left_from_block(node_of_interest));
-            std::swap(get_parent_from_block(block), get_parent_from_block(node_of_interest));
+			reset_parent_ptr(node_of_interest, get_left_from_block(node_of_interest));
+			if (get_left_from_block(node_of_interest) != nullptr)
+				get_parent_from_block(get_left_from_block(node_of_interest)) = get_parent_from_block(node_of_interest);
+			get_left_from_block(node_of_interest) = get_left_from_block(block);
+			get_parent_from_block(get_left_from_block(node_of_interest)) = node_of_interest;
         } else
         {
-            get_parent_from_block(node_of_interest) = get_parent_from_block(block);
-            get_parent_from_block(block) = node_of_interest;
             parent = node_of_interest;
         }
+		get_data_from_block(node_of_interest).color = get_data_from_block(block).color;
+		get_parent_from_block(node_of_interest) = get_parent_from_block(block);
 
     }
 
@@ -527,7 +595,8 @@ void allocator_red_black_tree::small_right_rotation(void *rotatable) noexcept
 
         get_right_from_block(node) = rotatable;
 
-        get_parent_from_block(get_left_from_block(rotatable)) = rotatable;
+		if (get_left_from_block(rotatable) != nullptr)
+        	get_parent_from_block(get_left_from_block(rotatable)) = rotatable;
     }
 }
 
@@ -546,7 +615,8 @@ void allocator_red_black_tree::small_left_rotation(void *rotatable) noexcept
 
         get_left_from_block(node) = rotatable;
 
-        get_parent_from_block(get_right_from_block(rotatable)) = rotatable;
+		if (get_right_from_block(rotatable) != nullptr)
+        	get_parent_from_block(get_right_from_block(rotatable)) = rotatable;
     }
 }
 
@@ -574,9 +644,11 @@ void allocator_red_black_tree::big_left_rotation(void *rotatable) noexcept
 
 void allocator_red_black_tree::rebalance_black_leaf(void *parent, void *deleted)
 {
+	debug_with_guard("Rebalance");
     if(parent == nullptr)
     {
-        get_data_from_block(deleted).color = block_color::BLACK;
+		if (deleted != nullptr)
+			get_data_from_block(deleted).color = block_color::BLACK;
     } else
     {
         bool from_left = is_left_subtree(deleted, parent);
@@ -604,7 +676,7 @@ void allocator_red_black_tree::rebalance_black_leaf(void *parent, void *deleted)
             if (far_nephew != nullptr && get_data_from_block(far_nephew).color == block_color::RED)
             {
                 if (from_left)
-                    small_right_rotation(parent);
+                    small_left_rotation(parent);
                 else
                     small_right_rotation(parent);
 
@@ -615,10 +687,10 @@ void allocator_red_black_tree::rebalance_black_leaf(void *parent, void *deleted)
             {
                 if (from_left)
                 {
-                    big_right_rotation(parent);
+                    big_left_rotation(parent);
                 } else
                 {
-                    big_left_rotation(parent);
+                    big_right_rotation(parent);
                 }
 
                 get_data_from_block(near_nephew).color = get_data_from_block(parent).color;
@@ -637,6 +709,9 @@ void allocator_red_black_tree::rebalance_black_leaf(void *parent, void *deleted)
             }
         }
     }
+
+//	check_ptr(parent);
+//	check_ptr(deleted);
 }
 
 bool allocator_red_black_tree::is_left_subtree(void* child, void* parent) noexcept
@@ -702,6 +777,22 @@ void *allocator_red_black_tree::get_worst(size_t size) const noexcept
     return prev;
 }
 
+void allocator_red_black_tree::print_tree(void *block, size_t depth)
+{
+	if (block != nullptr)
+	{
+		print_tree(get_right_from_block(block), depth + 1);
+		for (size_t i = 0; i < depth; ++i)
+		{
+			std::cout << '\t';
+		}
+
+		std::cout << get_block_size(block, _trusted_memory) << " " << (get_data_from_block(block).color == block_color::RED) << " " << get_data_from_block(block).occupied << std::endl;
+
+		print_tree(get_left_from_block(block), depth + 1);
+	}
+}
+
 bool allocator_red_black_tree::rb_iterator::operator==(const allocator_red_black_tree::rb_iterator &other) const noexcept
 {
     return _block_ptr == other._block_ptr;
@@ -715,6 +806,7 @@ bool allocator_red_black_tree::rb_iterator::operator!=(const allocator_red_black
 allocator_red_black_tree::rb_iterator &allocator_red_black_tree::rb_iterator::operator++() noexcept
 {
     _block_ptr = get_forward_from_block(_block_ptr);
+	return *this;
 }
 
 allocator_red_black_tree::rb_iterator allocator_red_black_tree::rb_iterator::operator++(int n)
