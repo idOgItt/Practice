@@ -18,7 +18,14 @@ struct greater_comparator
 
 int main()
 {
-    B_tree<int, std::string> c, b;
-    c = b;
+	std::pair<int, double> a, b;
+	a = b;
+
+	std::vector<std::pair<int, std::string>> v;
+    B_tree c(v.begin(), v.end());
+
+	auto it = c.begin();
+
+	auto d = it->first;
 
 }
