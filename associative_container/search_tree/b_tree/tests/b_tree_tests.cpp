@@ -18,6 +18,7 @@ struct greater_comparator
 
 int main()
 {
-
+    B_tree<int, std::string> c, b;
+    c = b;
 
 }
