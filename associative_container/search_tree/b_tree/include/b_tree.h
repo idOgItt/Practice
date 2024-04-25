@@ -386,46 +386,44 @@ private:
 
 	void rebalance_node(std::stack<std::pair<btree_node**, size_t>>& path, btree_node*& node, size_t& index);
 
-	void check_tree(btree_node* node, size_t depth = 0);
+//	void check_tree(btree_node* node, size_t depth = 0);
 };
 
-template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-void B_tree<tkey, tvalue, compare, t>::check_tree(B_tree::btree_node *node, size_t depth)
-{
-	if (node == nullptr)
-		return;
-	if (!is_terminate_node(node))
-	{
-		check_tree(node->pointers[0], depth + 1);
-	}
-	for (size_t j = 0; j < depth; ++j)
-	{
-		std::cout << '\t';
-	}
-	std::cout << std::to_string(node->keys[0].first) << std::endl;
-	for(size_t i = 1; i < node->size; ++i)
-	{
-		if (!compare_pairs(node->keys[i - 1], node->keys[i]))
-			throw std::logic_error("B");
-		if (!is_terminate_node(node))
-		{
-			check_tree(node->pointers[i], depth + 1);
-		}
-		for (size_t j = 0; j < depth; ++j)
-		{
-			std::cout << '\t';
-		}
-		std::cout << std::to_string(node->keys[i].first) << std::endl;
-	}
-
-	if (!is_terminate_node(node))
-	{
-		check_tree(node->pointers[node->size], depth + 1);
-	}
-
-	if (depth == 0)
-		std::cout << std::endl << std:: endl;
-}
+//template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
+//void B_tree<tkey, tvalue, compare, t>::check_tree(B_tree::btree_node *node, size_t depth)
+//{
+//	if (node == nullptr)
+//		return;
+//	if (!is_terminate_node(node))
+//	{
+//		check_tree(node->pointers[0], depth + 1);
+//	}
+//    std::string tab;
+//    tab.reserve(depth);
+//	for (size_t j = 0; j < depth; ++j)
+//	{
+//		tab += '\t';
+//	}
+//	std::cout << tab << std::to_string(node->keys[0].first) << std::endl;
+//	for(size_t i = 1; i < node->size; ++i)
+//	{
+//		if (!compare_pairs(node->keys[i - 1], node->keys[i]))
+//			throw std::logic_error("B");
+//		if (!is_terminate_node(node))
+//		{
+//			check_tree(node->pointers[i], depth + 1);
+//		}
+//		std::cout << tab << std::to_string(node->keys[i].first) << std::endl;
+//	}
+//
+//	if (!is_terminate_node(node))
+//	{
+//		check_tree(node->pointers[node->size], depth + 1);
+//	}
+//
+//	if (depth == 0)
+//		std::cout << std::endl << std:: endl;
+//}
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 void B_tree<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pair<btree_node **, size_t>> &path,
@@ -459,15 +457,12 @@ void B_tree<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pair<btree
 
 			if (brother->size > minimum_keys_in_node)
 			{
-				auto tmp = (*path.top().first)->keys[pair.second];
-				std::swap((*path.top().first)->keys[pair.second], brother->keys[brother->size - 1]);
+				auto tmp = (*path.top().first)->keys[pair.second - 1];
+				std::swap((*path.top().first)->keys[pair.second - 1], brother->keys[brother->size - 1]);
 
 				auto tmp_ptr = remove_array(brother, brother->size - 1, false);
 
-				if (!is_terminate_node(current_node))
-					std::swap(current_node->pointers[0], tmp_ptr);
-				else
-					tmp_ptr = nullptr;
+                std::swap(current_node->pointers[0], tmp_ptr);
 
 				insert_array(current_node, tmp_ptr, std::move(tmp), 0);
 
@@ -477,7 +472,7 @@ void B_tree<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pair<btree
 			}
 		}
 
-		if (need_key && pair.second < (*path.top().first)->size - 1)
+		if (need_key && pair.second < (*path.top().first)->size)
 		{
 			btree_node* brother = (*path.top().first)->pointers[pair.second + 1];
 
@@ -564,6 +559,8 @@ typename B_tree<tkey, tvalue, compare, t>::btree_iterator B_tree<tkey, tvalue, c
 		return end();
 	auto res = find_path(n->keys[index].first);
 
+//    check_tree(_root);
+
 	return btree_iterator(res.first, res.second);
 }
 
@@ -606,10 +603,10 @@ void B_tree<tkey, tvalue, compare, t>::split_node(std::stack<std::pair<btree_nod
 
 	insert_array(*path.top().first, new_node, std::move(node_ptr->keys[separator - 1]), pair.second);
 
-	new_node->pointers[0] = node_ptr->pointers[separator];
+	new_node->pointers[0] = is_terminate_node(node_ptr) ? nullptr : node_ptr->pointers[separator];
     new_node->size = node_ptr->size - separator;
 
-	for (size_t i = separator; i < (*pair.first)->size; ++i)
+	for (size_t i = separator; i < node_ptr->size; ++i)
 	{
 		allocator::construct(std::addressof(new_node->keys[i - separator]), std::move(node_ptr->keys[i]));
 		new_node->pointers[i - separator + 1] = node_ptr->pointers[i + 1];
@@ -661,6 +658,11 @@ typename B_tree<tkey, tvalue, compare, t>::btree_node* B_tree<tkey, tvalue, comp
 	btree_node* res = remove_left_ptr ? node->pointers[index] : node->pointers[index + 1];
 
 	bool is_left_terminate = is_terminate_node(node);
+
+    if (is_left_terminate && index == 0 && remove_left_ptr)
+    {
+        res = nullptr;
+    }
 
 	for(size_t i = index; i < node->size - 1; ++i)
 	{
@@ -720,6 +722,8 @@ typename B_tree<tkey, tvalue, compare, t>::btree_iterator B_tree<tkey, tvalue, c
 	}
 
     auto res = find_path(node->keys[ind].first);
+
+//    check_tree(_root);
 
 	return btree_iterator(res.first, res.second);
 }
@@ -1004,7 +1008,7 @@ bool B_tree<tkey, tvalue, compare, t>::exists(B_tree::btree_node *node, size_t i
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 bool B_tree<tkey, tvalue, compare, t>::is_terminate_node(B_tree::btree_node *node) noexcept
 {
-	return node == nullptr || node->size == 0 || node->pointers[0] == nullptr;
+	return node == nullptr || node->pointers[0] == nullptr;
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
@@ -1679,9 +1683,9 @@ template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 template<typename... Args>
 std::pair<typename B_tree<tkey, tvalue, compare, t>::btree_iterator, bool> B_tree<tkey, tvalue, compare, t>::emplace(Args &&... args)
 {
-	check_tree(_root);
     tree_data_type data(std::forward<Args>(args)...);
-	debug_with_guard("Insert " + std::to_string(data.first));
+//	debug_with_guard("Insert " + std::to_string(data.first));
+//    check_tree(_root);
 
     auto [stack, ind] = find_path(data.first);
 
@@ -1773,10 +1777,10 @@ size_t B_tree<tkey, tvalue, compare, t>::size() const noexcept
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 typename B_tree<tkey, tvalue, compare, t>::B_tree::btree_iterator B_tree<tkey, tvalue, compare, t>::erase(const tkey &key)
 {
-	check_tree(_root);
     auto [stack, ind] = find_path(key);
 
-	debug_with_guard("Insert " + std::to_string(key));
+//	debug_with_guard("Erase " + std::to_string(key));
+//    check_tree(_root);
 	if (!exists(*stack.top().first, ind))
 		return end();
     return erase_inner(stack, ind);
