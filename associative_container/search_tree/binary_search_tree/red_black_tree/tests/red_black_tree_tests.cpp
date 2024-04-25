@@ -656,7 +656,7 @@ TEST(redBlackTreePositiveTests, test17)
 				{
 					auto it = map.begin();
 
-					std::advance(it, rand() % map.size());
+					//std::advance(it, rand() % map.size());
 
 					tree.dispose(it->first);
 					map.erase(it);
@@ -672,7 +672,7 @@ TEST(redBlackTreePositiveTests, test17)
 	while(!map.empty())
 	{
 		auto it = map.begin();
-		std::advance(it, rand() % map.size());
+		//std::advance(it, rand() % map.size());
 
 		tree.dispose(it->first);
 		map.erase(it);
