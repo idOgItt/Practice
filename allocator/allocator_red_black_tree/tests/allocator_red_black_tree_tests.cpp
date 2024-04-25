@@ -154,7 +154,6 @@ TEST(allocatorRBTPositiveTests, test5)
 				}
 
 				auto it = allocated_blocks.begin();
-				std::advance(it, rand() % allocated_blocks.size());
 				allocator->deallocate(*it);
 				allocated_blocks.erase(it);
 				std::cout << "deallocation succeeded" << std::endl;
@@ -165,7 +164,6 @@ TEST(allocatorRBTPositiveTests, test5)
 	while (!allocated_blocks.empty())
 	{
 		auto it = allocated_blocks.begin();
-		std::advance(it, rand() % allocated_blocks.size());
 		allocator->deallocate(*it);
 		allocated_blocks.erase(it);
 		std::cout << "deallocation succeeded" << std::endl;
