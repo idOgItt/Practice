@@ -1,6 +1,7 @@
 //
 // Created by Des Caldnd on 4/12/2024.
 //
+#include "gtest/gtest.h"
 #include <b_tree.h>
 #include <string>
 #include <allocator_sorted_list.h>
@@ -16,16 +17,25 @@ struct greater_comparator
 	}
 };
 
-int main()
+TEST(BTreePositiveTests, test1)
 {
-	std::pair<int, double> a, b;
-	a = b;
+	B_tree<int, double, std::less<int>, 2> d;
 
-	std::vector<std::pair<int, std::string>> v;
-    B_tree c(v.begin(), v.end());
+	for (int i = 0; i < 20; ++i)
+	{
+		d.insert(std::make_pair(i, double(i)));
+	}
 
-	auto it = c.begin();
+	for (auto el : d)
+	{
+		std::cout << el.first << " " << el.second << std::endl;
+	}
+}
 
-	auto d = it->first;
+int main(int argc, char* argv[])
+{
+	testing::InitGoogleTest(&argc, argv);
+
+	return RUN_ALL_TESTS();
 
 }
