@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <big_integer.h>
+#include <big_int.h>
 #include <client_logger.h>
+#include <client_logger_builder.h>
 #include <operation_not_supported.h>
 
 logger *create_logger(
@@ -38,9 +39,9 @@ TEST(positive_tests, test1)
             },
         });
     
-    big_integer bigint_1("32850346459076457453464575686784654");
-    big_integer bigint_2("423534596495087569087908753095322");
-    big_integer result_of_sum = bigint_1 + bigint_2;
+    big_int bigint_1("32850346459076457453464575686784654");
+    big_int bigint_2("423534596495087569087908753095322");
+    big_int result_of_sum = bigint_1 + bigint_2;
     
     std::stringstream ss;
     ss << result_of_sum;
@@ -61,10 +62,10 @@ TEST(positive_tests, test2)
             },
         });
     
-    big_integer bigint_1("32850346459076457453464575686784654");
-    big_integer bigint_2("0000042353459649508756908790875309532245366457546765745645647567575");
+    big_int bigint_1("32850346459076457453464575686784654");
+    big_int bigint_2("0000042353459649508756908790875309532245366457546765745645647567575");
     
-    big_integer result_of_sub = bigint_1 - bigint_2;
+    big_int result_of_sub = bigint_1 - bigint_2;
     
     std::stringstream ss;
     ss << result_of_sub;
@@ -85,10 +86,10 @@ TEST(positive_tests, test3)
             },
         });
 
-    big_integer bigint_1("32850346459076457453464575686784654");
-    big_integer bigint_2("12342357553253");
+    big_int bigint_1("32850346459076457453464575686784654");
+    big_int bigint_2("12342357553253");
 
-    big_integer result_of_remainder = bigint_1 % bigint_2;
+    big_int result_of_remainder = bigint_1 % bigint_2;
 
     std::stringstream ss;
     ss << result_of_remainder;
@@ -109,8 +110,8 @@ TEST(positive_tests, test4)
             },
         });
     
-    big_integer bigint_1("-54357893745346457544353");
-    big_integer bigint_2("-54357893745346457544354");
+    big_int bigint_1("-54357893745346457544353");
+    big_int bigint_2("-54357893745346457544354");
     
     EXPECT_TRUE(bigint_1 > bigint_2);
     
@@ -127,8 +128,8 @@ TEST(positive_tests, test5)
             },
         });
     
-    big_integer bigint_1("423895435432");
-    big_integer bigint_2("423895435432");
+    big_int bigint_1("423895435432");
+    big_int bigint_2("423895435432");
     
     EXPECT_TRUE(bigint_1 >= bigint_2);
     
@@ -145,8 +146,8 @@ TEST(positive_tests, test6)
             },
         });
     
-    big_integer bigint_1("-423895435432312432534645756753");
-    big_integer bigint_2("0");
+    big_int bigint_1("-423895435432312432534645756753");
+    big_int bigint_2("0");
     
     EXPECT_TRUE(bigint_1 < bigint_2);
     
@@ -163,8 +164,8 @@ TEST(positive_tests, test7)
             },
         });
     
-    big_integer bigint_1("4238954354324222200000000");
-    big_integer bigint_2("4238954354324222222222234");
+    big_int bigint_1("4238954354324222200000000");
+    big_int bigint_2("4238954354324222222222234");
     
     EXPECT_TRUE(bigint_1 <= bigint_2);
     
@@ -181,8 +182,8 @@ TEST(positive_tests, test8)
             },
         });
     
-    big_integer bigint_1("4238954354321");
-    big_integer bigint_2("423895435432");
+    big_int bigint_1("4238954354321");
+    big_int bigint_2("423895435432");
     
     EXPECT_TRUE(bigint_1 != bigint_2);
     
@@ -199,8 +200,8 @@ TEST(positive_tests, test9)
             },
         });
     
-    big_integer bigint_1("-00000044234235347865897389456748953795739648996453238954354321");
-    big_integer bigint_2("-00000044234235347865897389456748953795739648996453238954354321");
+    big_int bigint_1("-00000044234235347865897389456748953795739648996453238954354321");
+    big_int bigint_2("-00000044234235347865897389456748953795739648996453238954354321");
     
     EXPECT_TRUE(bigint_1 == bigint_2);
     
