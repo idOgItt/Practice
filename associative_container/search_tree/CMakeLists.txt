@@ -3,6 +3,7 @@ project(mp_os_assctv_cntnr_srch_tr)
 
 add_subdirectory(binary_search_tree)
 add_subdirectory(b_tree)
+add_subdirectory(bp_tree)
 #add_subdirectory(indexing_tree)
 add_library(
         mp_os_assctv_cntnr_srch_tr

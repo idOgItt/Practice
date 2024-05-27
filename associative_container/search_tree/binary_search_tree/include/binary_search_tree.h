@@ -618,7 +618,6 @@ protected:
     disposal_of_nonexistent_key_attempt_strategy _disposal_strategy;
 
 public:
-    
     explicit binary_search_tree(
         std::function<int(tkey const &, tkey const &)> comparer,
         allocator *allocator = nullptr,

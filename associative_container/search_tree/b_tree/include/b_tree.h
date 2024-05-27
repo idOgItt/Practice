@@ -10,18 +10,10 @@
 #include <initializer_list>
 #include <allocator_guardant.h>
 #include <logger_guardant.h>
+#include <search_tree.h>
 
 #ifndef MP_OS_B_TREE_H
 #define MP_OS_B_TREE_H
-
-template<typename compare, typename tkey>
-concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
-{
-    {c(lhs, rhs)} -> std::same_as<bool>;
-} && std::copyable<compare> && std::default_initializable<compare>;
-
-template<typename f_iter, typename tkey, typename tval>
-concept input_iterator_for_pair = std::input_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, std::pair<tkey, tval>>;
 
 // TODO: memory resource instead of allocator - std::pmr::memory_resource, std::pmr::polymorphic_allocator
 
@@ -385,45 +377,7 @@ private:
 	void split_node(std::stack<std::pair<btree_node**, size_t>>& path, btree_node*& node, size_t& index);
 
 	void rebalance_node(std::stack<std::pair<btree_node**, size_t>>& path, btree_node*& node, size_t& index);
-
-//	void check_tree(btree_node* node, size_t depth = 0);
 };
-
-//template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-//void B_tree<tkey, tvalue, compare, t>::check_tree(B_tree::btree_node *node, size_t depth)
-//{
-//	if (node == nullptr)
-//		return;
-//	if (!is_terminate_node(node))
-//	{
-//		check_tree(node->pointers[0], depth + 1);
-//	}
-//    std::string tab;
-//    tab.reserve(depth);
-//	for (size_t j = 0; j < depth; ++j)
-//	{
-//		tab += '\t';
-//	}
-//	std::cout << tab << std::to_string(node->keys[0].first) << std::endl;
-//	for(size_t i = 1; i < node->size; ++i)
-//	{
-//		if (!compare_pairs(node->keys[i - 1], node->keys[i]))
-//			throw std::logic_error("B");
-//		if (!is_terminate_node(node))
-//		{
-//			check_tree(node->pointers[i], depth + 1);
-//		}
-//		std::cout << tab << std::to_string(node->keys[i].first) << std::endl;
-//	}
-//
-//	if (!is_terminate_node(node))
-//	{
-//		check_tree(node->pointers[node->size], depth + 1);
-//	}
-//
-//	if (depth == 0)
-//		std::cout << std::endl << std:: endl;
-//}
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 void B_tree<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pair<btree_node **, size_t>> &path,
@@ -949,10 +903,12 @@ typename B_tree<tkey, tvalue, compare, t>::btree_node *B_tree<tkey, tvalue, comp
 		throw;
 	}
 
-	new_node->parent = parent;
-
 	size_t i = 0;
 
+    if (is_terminate_node(copyable))
+    {
+        new_node->pointers[0] = nullptr;
+    } else
 	try
 	{
 		for (; i < copyable->size + 1; ++i)

@@ -62,9 +62,20 @@ TEST(BTreePositiveTests, test1)
 	}
 }
 
+struct comparer___
+{
+    bool operator()(int l, int r) const
+    {
+        return l > r;
+    }
+};
+
 TEST(BTreePositiveTests, test2)
 {
-	B_tree<int, int, std::less<int>, 2> tree;
+    std::vector<std::pair<int, std::string>> c;
+    B_tree a(c.begin(), c.end());
+    auto x = a.at(5);
+	B_tree<int, int, comparer___, 2> tree;
 	std::unordered_map<int, int> map;
 
 	size_t iterations = 100'000;
@@ -93,63 +104,37 @@ TEST(BTreePositiveTests, test2)
 				}
 				break;
 			}
-//			case 2:
-//			{
-//				if (!map.empty())
-//				{
-//					auto it = map.begin();
-//
-//					tree.erase(it->first);
-//					map.erase(it);
-//				} else
-//				{
-//					std::cout << "Empty" << std::endl;
-//				}
-//				break;
-//			}
+			case 2:
+			{
+				if (!map.empty())
+				{
+					auto it = map.begin();
+
+					tree.erase(it->first);
+					map.erase(it);
+				} else
+				{
+					std::cout << "Empty" << std::endl;
+				}
+				break;
+			}
 		}
 	}
 
-//	while(!map.empty())
-//	{
-//		auto it = map.begin();
-//
-//		tree.erase(it->first);
-//		map.erase(it);
-//	}
+	while(!map.empty())
+	{
+		auto it = map.begin();
+
+		tree.erase(it->first);
+		map.erase(it);
+	}
 }
 
 TEST(BTreePositiveTests, test3)
 {
-	logger *logger_instance = create_logger(std::vector<std::pair<std::string, logger::severity>>
-												{
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::information
-													},
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::debug
-													},
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::trace
-													},
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::critical
-													},
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::warning
-													},
-													{
-														"allocator_boundary_tags_tests_logs_false_positive_test_1.txt",
-														logger::severity::error
-													}
-												});
 
-	B_tree<int, int> tree(std::less<int>(), nullptr, logger_instance);
+	B_tree<int, int> tree;
+    auto tree2 = tree;
 	std::unordered_map<int, int> map;
 
 	size_t iterations = 100'000;
@@ -218,7 +203,6 @@ TEST(BTreePositiveTests, test3)
 	}
 
 	EXPECT_EQ(tree.size(), 0);
-	delete logger_instance;
 }
 
 TEST(BTreePositiveTests, test4)
