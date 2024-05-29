@@ -29,6 +29,29 @@ logger *create_logger(
     return built_logger;
 }
 
+TEST(my_test, t1)
+{
+    std::vector<unsigned int> vec1{0, 1, 2, 3, 4, 5};
+
+    big_int num1(vec1);
+
+    std::vector<unsigned int> vec2{3, 2, 1};
+
+    big_int num2(vec2);
+
+    auto res_div = num1 / num2;
+
+    std::string val_div = res_div.to_string();
+
+    auto res_mode = num1 % num2;
+
+    auto val_mod = res_mode.to_string();
+
+    EXPECT_EQ(val_div, "396140812460641223525462442003");
+
+    EXPECT_EQ(val_mod, "18446743914795761607");
+}
+
 TEST(positive_tests, test1)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
@@ -47,7 +70,7 @@ TEST(positive_tests, test1)
     ss << result_of_sum;
     std::string result_string = ss.str();
     
-    EXPECT_TRUE(result_string == "33273881055571545022552484439879976");
+    EXPECT_EQ(result_string, "33273881055571545022552484439879976");
     
     delete logger;
 }

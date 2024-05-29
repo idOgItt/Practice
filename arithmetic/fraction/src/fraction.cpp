@@ -1,45 +1,12 @@
 #include "../include/fraction.h"
 
-fraction::fraction(
-    big_integer &&numerator,
-    big_integer &&denominator):
-        _numerator(std::forward<big_integer>(numerator)),
-        _denominator(std::forward<big_integer>(denominator))
+constexpr fraction::fraction(
+    big_int &&numerator,
+    big_int &&denominator):
+        _numerator(std::forward<big_int>(numerator)),
+        _denominator(std::forward<big_int>(denominator))
 {
     throw not_implemented("fraction::fraction(big_integer &&, big_integer &&)", "your code should be here...");
-}
-
-fraction::~fraction()
-{
-    throw not_implemented("fraction::~fraction()", "your code should be here...");
-}
-
-fraction::fraction(
-    fraction const &other):
-        _numerator(other._numerator),
-        _denominator(other._denominator)
-{
-    throw not_implemented("fraction::fraction(fraction const &)", "your code should be here...");
-}
-
-fraction &fraction::operator=(
-    fraction const &other)
-{
-    throw not_implemented("fraction &fraction::operator=(fraction const &)", "your code should be here...");
-}
-
-fraction::fraction(
-    fraction &&other) noexcept:
-        _numerator(std::move(other._numerator)),
-        _denominator(std::move(other._denominator))
-{
-    throw not_implemented("fraction::fraction(fraction &&) noexcept", "your code should be here...");
-}
-
-fraction &fraction::operator=(
-    fraction &&other) noexcept
-{
-    throw not_implemented("fraction &fraction::operator=(fraction &&) noexcept", "your code should be here...");
 }
 
 fraction &fraction::operator+=(

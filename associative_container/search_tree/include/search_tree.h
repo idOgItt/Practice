@@ -5,6 +5,7 @@
 #include <functional>
 #include <stack>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 #include <allocator.h>
 #include <allocator_guardant.h>
@@ -12,6 +13,7 @@
 #include <logger.h>
 #include <logger_guardant.h>
 #include <not_implemented.h>
+#include <fstream>
 
 template<typename compare, typename tkey>
 concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
@@ -22,6 +24,15 @@ concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
 template<typename f_iter, typename tkey, typename tval>
 concept input_iterator_for_pair = std::input_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, std::pair<tkey, tval>>;
 
+template<typename T>
+concept serializable = requires (T t, std::fstream s, nlohmann::json j)
+{
+    {t.serialize(s)};
+    {T::deserialize(s)} -> std::same_as<T>;
+    {t.serializa_size()} -> std::same_as<size_t>;
+    {t.to_json()} -> std::same_as<nlohmann::json>;
+    {T::from_json(j)} -> std::same_as<T>;
+} && std::copyable<T>;
 
 template<
     typename tkey,

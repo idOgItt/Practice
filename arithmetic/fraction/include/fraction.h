@@ -1,37 +1,26 @@
 #ifndef MP_OS_FRACTION_H
 #define MP_OS_FRACTION_H
 
-#include <big_integer.h>
+#include <big_int.h>
+#include <not_implemented.h>
 
 class fraction final
 {
 
 private:
 
-    big_integer _numerator;
-    big_integer _denominator;
+    big_int _numerator;
+    big_int _denominator;
+
+    void optimise(); //сокращает дробь
 
 public:
 
-    fraction(
-        big_integer &&numerator,
-        big_integer &&denominator);
+    constexpr fraction(
+        big_int &&numerator,
+        big_int &&denominator);
 
-public:
-
-    ~fraction() noexcept;
-
-    fraction(
-        fraction const &other);
-
-    fraction &operator=(
-        fraction const &other);
-
-    fraction(
-        fraction &&other) noexcept;
-
-    fraction &operator=(
-        fraction &&other) noexcept;
+    constexpr fraction()
 
 public:
 
@@ -91,65 +80,67 @@ public:
         std::istream &stream,
         fraction &obj);
 
+    std::string to_string() const;
+
 public:
 
     fraction sin(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction cos(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction tg(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction ctg(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction sec(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction cosec(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arcsin(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arccos(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arctg(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arcctg(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arcsec(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction arccosec(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
 public:
 
     fraction pow(
-        size_t degree) const;
+        size_t degree = fraction(1_bi, 1000000_bi)) const;
 
 public:
 
     fraction root(
         size_t degree,
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
 public:
 
     fraction log2(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction ln(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
     fraction lg(
-        fraction const &epsilon) const;
+        fraction const &epsilon = fraction(1_bi, 1000000_bi)) const;
 
 };
 

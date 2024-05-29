@@ -44,7 +44,7 @@ logger *create_logger(
 
 TEST(BTreePositiveTests, test1)
 {
-	B_tree<int, double, std::less<int>, 2> d;
+	B_tree_memory<int, double, std::less<int>, 2> d;
 
 	for (int i = 0; i < 20; ++i)
 	{
@@ -73,9 +73,9 @@ struct comparer___
 TEST(BTreePositiveTests, test2)
 {
     std::vector<std::pair<int, std::string>> c;
-    B_tree a(c.begin(), c.end());
+    B_tree_memory a(c.begin(), c.end());
     auto x = a.at(5);
-	B_tree<int, int, comparer___, 2> tree;
+	B_tree_memory<int, int, comparer___, 2> tree;
 	std::unordered_map<int, int> map;
 
 	size_t iterations = 100'000;
@@ -133,7 +133,7 @@ TEST(BTreePositiveTests, test2)
 TEST(BTreePositiveTests, test3)
 {
 
-	B_tree<int, int> tree;
+	B_tree_memory<int, int> tree;
     auto tree2 = tree;
 	std::unordered_map<int, int> map;
 
@@ -207,7 +207,7 @@ TEST(BTreePositiveTests, test3)
 
 TEST(BTreePositiveTests, test4)
 {
-	B_tree<int, int, std::less<int>, 20> tree;
+	B_tree_memory<int, int, std::less<int>, 20> tree;
 	std::unordered_map<int, int> map;
 
 	size_t iterations = 100'000;

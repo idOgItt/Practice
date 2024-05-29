@@ -1,18 +1,28 @@
 cmake_minimum_required(VERSION 3.21)
 project(mp_os_assctv_cntnr_srch_tr)
 
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 add_subdirectory(binary_search_tree)
 add_subdirectory(b_tree)
 add_subdirectory(bp_tree)
+add_subdirectory(b_tree_memory)
 #add_subdirectory(indexing_tree)
 add_library(
         mp_os_assctv_cntnr_srch_tr
         include/search_tree.h
+        tree_interface/tree_interface.h
         src/hhh.cpp)
 target_include_directories(
         mp_os_assctv_cntnr_srch_tr
         PUBLIC
         ./include)
+target_include_directories(
+        mp_os_assctv_cntnr_srch_tr
+        PUBLIC
+        ./tree_interface)
 target_link_libraries(
         mp_os_assctv_cntnr_srch_tr
         PUBLIC
@@ -29,6 +39,10 @@ target_link_libraries(
         mp_os_assctv_cntnr_srch_tr
         PUBLIC
         mp_os_assctv_cntnr)
+target_link_libraries(
+        mp_os_assctv_cntnr_srch_tr
+        PUBLIC
+        nlohmann_json::nlohmann_json)
 set_target_properties(
         mp_os_assctv_cntnr_srch_tr PROPERTIES
         VERSION 1.0

@@ -2,8 +2,9 @@
 
 #include <sstream>
 
-#include <big_integer.h>
+#include <big_int.h>
 #include <client_logger.h>
+#include <client_logger_builder.h>
 
 logger *create_logger(
     std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
@@ -29,7 +30,7 @@ logger *create_logger(
     return built_logger;
 }
 
-TEST(positive_tests, test1)
+TEST(positive_tests_kar, test1)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -39,16 +40,16 @@ TEST(positive_tests, test1)
                                            },
                                        });
 
-    big_integer bigint_1("2423545763");
-    big_integer bigint_2("3657687978");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("2423545763");
+    big_int bigint_2("3657687978");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "8864574201457937214");
 
     delete logger;
 }
 
-TEST(positive_tests, test2)
+TEST(positive_tests_kar, test2)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -58,16 +59,16 @@ TEST(positive_tests, test2)
                                            },
                                        });
 
-    big_integer bigint_1("20944325634363");
-    big_integer bigint_2("0");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("20944325634363");
+    big_int bigint_2("0");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "0");
 
     delete logger;
 }
 
-TEST(positive_tests, test3)
+TEST(positive_tests_kar, test3)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -77,16 +78,16 @@ TEST(positive_tests, test3)
                                            },
                                        });
 
-    big_integer bigint_1("001123");
-    big_integer bigint_2("-0000001");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("001123");
+    big_int bigint_2("-0000001");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "-1123");
 
     delete logger;
 }
 
-TEST(positive_tests, test4)
+TEST(positive_tests_kar, test4)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -96,16 +97,16 @@ TEST(positive_tests, test4)
                                            },
                                        });
 
-    big_integer bigint_1("-28958888309635818");
-    big_integer bigint_2("-234567");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("-28958888309635818");
+    big_int bigint_2("-234567");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "6792799554126344920806");
 
     delete logger;
 }
 
-TEST(positive_tests, test5)
+TEST(positive_tests_kar, test5)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -117,17 +118,17 @@ TEST(positive_tests, test5)
 
     std::stringstream iss("8062112134235893450865580976575 5224253464575690753458936456445353");
 
-    big_integer bigint_1("0");
-    big_integer bigint_2("0");
+    big_int bigint_1("0");
+    big_int bigint_2("0");
     iss >> bigint_1 >> bigint_2;
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "42118517249079582762848120969952324453639154832768688602860605975");
 
     delete logger;
 }
 
-TEST(positive_tests, test6)
+TEST(positive_tests_kar, test6)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -137,16 +138,16 @@ TEST(positive_tests, test6)
                                            },
                                        });
 
-    big_integer bigint_1("123424353464389587244387927589346894576464343235445645674563532464675467425");
-    big_integer bigint_2("2354893245937465784937542389428935349086840957804985309763636567574564");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("123424353464389587244387927589346894576464343235445645674563532464675467425");
+    big_int bigint_2("2354893245937465784937542389428935349086840957804985309763636567574564");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "290651176357489495451049958587923972328418314663424320128873904703658883667429195585130334492391519870913575716570325570910803505581125240577700");
 
     delete logger;
 }
 
-TEST(positive_tests, test7)
+TEST(positive_tests_kar, test7)
 {
     logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
                                        {
@@ -156,9 +157,9 @@ TEST(positive_tests, test7)
                                            },
                                        });
 
-    big_integer bigint_1("999999999999999999999999999977777");
-    big_integer bigint_2("-0000000000000000000000000000000000000000000000000059");
-    big_integer::multiply(bigint_1, bigint_2, nullptr, big_integer::multiplication_rule::Karatsuba);
+    big_int bigint_1("999999999999999999999999999977777");
+    big_int bigint_2("-0000000000000000000000000000000000000000000000000059");
+    bigint_1 *= bigint_2;
 
     EXPECT_TRUE((std::ostringstream() << bigint_1).str() == "-58999999999999999999999999998688843");
 
