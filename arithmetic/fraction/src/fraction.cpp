@@ -1,10 +1,10 @@
 #include "../include/fraction.h"
 
-constexpr fraction::fraction(
+fraction::fraction(
     big_int &&numerator,
     big_int &&denominator):
-        _numerator(std::forward<big_int>(numerator)),
-        _denominator(std::forward<big_int>(denominator))
+        _numerator(numerator),
+        _denominator(denominator)
 {
     throw not_implemented("fraction::fraction(big_integer &&, big_integer &&)", "your code should be here...");
 }

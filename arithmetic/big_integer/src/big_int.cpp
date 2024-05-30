@@ -7,6 +7,8 @@
 #include <exception>
 #include <string>
 #include <sstream>
+#include <cmath>
+#include <algorithm>
 
 std::strong_ordering big_int::operator<=>(const big_int &other) const noexcept
 {
@@ -59,7 +61,7 @@ big_int::compare_no_sign(const std::vector<unsigned int> &lhs, const std::vector
     }
 }
 
-constexpr void big_int::optimise() noexcept
+void big_int::optimise() noexcept
 {
     while(!_digits.empty() && _digits.back() == 0)
         _digits.pop_back();
@@ -68,16 +70,16 @@ constexpr void big_int::optimise() noexcept
         _sign = true;
 }
 
-constexpr big_int::big_int(const std::vector<unsigned int> &digits, bool sign) : _digits(digits), _sign(sign) {}
+big_int::big_int(const std::vector<unsigned int> &digits, bool sign) : _digits(digits), _sign(sign) {}
 
-constexpr big_int::big_int(std::vector<unsigned int> &&digits, bool sign) : _digits(std::move(digits)), _sign(sign) {}
+big_int::big_int(std::vector<unsigned int> &&digits, bool sign) : _digits(std::move(digits)), _sign(sign) {}
 
 big_int::operator bool()
 {
     return !_digits.empty();
 }
 
-constexpr big_int::big_int() : _digits(), _sign(true) {}
+big_int::big_int() : _digits(), _sign(true) {}
 
 big_int &big_int::operator++()
 {
@@ -105,7 +107,7 @@ big_int big_int::operator--(int)
     return tmp;
 }
 
-constexpr big_int &big_int::operator+=(const big_int &other)
+big_int &big_int::operator+=(const big_int &other)
 {
     return plus_assign(other);
 }
@@ -163,13 +165,13 @@ big_int big_int::operator^(const big_int &other) const
     return tmp ^= other;
 }
 
-constexpr big_int big_int::operator<<(size_t shift) const
+big_int big_int::operator<<(size_t shift) const
 {
     auto tmp = *this;
     return tmp <<= shift;
 }
 
-constexpr big_int big_int::operator>>(size_t shift) const
+big_int big_int::operator>>(size_t shift) const
 {
     auto tmp = *this;
     return tmp >>= shift;
@@ -236,7 +238,7 @@ big_int &big_int::operator^=(const big_int &other)
     return *this;
 }
 
-constexpr big_int &big_int::operator<<=(size_t shift)
+big_int &big_int::operator<<=(size_t shift)
 {
     if (shift / (8 * sizeof(unsigned int)) > 0)
     {
@@ -244,7 +246,7 @@ constexpr big_int &big_int::operator<<=(size_t shift)
 
         std::vector<unsigned int> vec(n, 0);
 
-        _digits.insert_range(_digits.begin(), vec);
+        _digits.insert(_digits.begin(), vec.begin(), vec.end());
 
         shift %= 8 * sizeof(unsigned int);
     }
@@ -268,7 +270,7 @@ constexpr big_int &big_int::operator<<=(size_t shift)
     return *this;
 }
 
-constexpr big_int &big_int::operator>>=(size_t shift)
+big_int &big_int::operator>>=(size_t shift)
 {
     if (shift / (8 * sizeof(unsigned int)) > 0)
     {
@@ -303,7 +305,7 @@ constexpr big_int &big_int::operator>>=(size_t shift)
     return *this;
 }
 
-constexpr big_int &big_int::plus_assign(const big_int &other, size_t shift)
+big_int &big_int::plus_assign(const big_int &other, size_t shift)
 {
     if (_sign == other._sign)
     {
@@ -373,7 +375,7 @@ big_int &big_int::operator/=(const big_int &other)
     return *this;
 }
 
-constexpr void big_int::plus_assign_no_sign(std::vector<unsigned int> &lhs, const std::vector<unsigned int> &rhs, size_t shift)
+void big_int::plus_assign_no_sign(std::vector<unsigned int> &lhs, const std::vector<unsigned int> &rhs, size_t shift)
 {
     if (lhs.size() < rhs.size() + shift)
         lhs.resize(rhs.size() + shift, 0);
@@ -449,12 +451,12 @@ void big_int::minus_assign_no_sign_reverse(const std::vector<unsigned int> &lhs,
     }
 }
 
-bool big_int::need_karatsuba() const noexcept
+bool big_int::need_karatsuba(const std::vector<unsigned int>& other) const noexcept
 {
     return true;
 }
 
-bool big_int::need_newton() const noexcept
+bool big_int::need_newton(const std::vector<unsigned int>& other) const noexcept
 {
     return false;
 }
@@ -467,7 +469,7 @@ void big_int::multiply_assign_no_sign(std::vector<unsigned int> &lhs, const std:
         return;
     }
 
-    lhs = std::move(need_karatsuba() ? multiply_karatsuba(lhs, rhs) : multiply_common(lhs, rhs));
+    lhs = std::move(need_karatsuba(rhs) ? multiply_karatsuba(lhs, rhs) : multiply_common(lhs, rhs));
 }
 
 void big_int::divide_assign_no_sign(std::vector<unsigned int> &lhs, const std::vector<unsigned int> &rhs) const
@@ -484,7 +486,7 @@ void big_int::divide_assign_no_sign(std::vector<unsigned int> &lhs, const std::v
         return;
     }
 
-    lhs = std::move(need_newton() ? divide_newton(lhs, rhs) : divide_common(lhs, rhs));
+    lhs = std::move(need_newton(rhs) ? divide_newton(lhs, rhs) : divide_common(lhs, rhs));
 }
 
 std::vector<unsigned int>
@@ -574,7 +576,7 @@ big_int::divide_common(const std::vector<unsigned int> &lhs, const std::vector<u
     return res;
 }
 
-constexpr big_int::big_int(const std::string &num, unsigned int radix) : _sign(true), _digits()
+big_int::big_int(const std::string &num, unsigned int radix) : _sign(true), _digits()
 {
     if (radix > 36 || radix < 2)
         throw std::invalid_argument("Radix must be in interval [2, 36], but is " + std::to_string(radix));
@@ -862,7 +864,7 @@ std::vector<big_int> big_int::multiply_vectors(const std::vector<big_int> &lhs, 
 }
 
 template<std::integral Num>
-constexpr big_int::big_int(Num d) : _sign(true)
+big_int::big_int(Num d) : _sign(true)
 {
     if (d != 0)
     {

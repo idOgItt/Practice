@@ -16,11 +16,11 @@ private:
 
 public:
 
-    constexpr fraction(
+    fraction(
         big_int &&numerator,
         big_int &&denominator);
 
-    constexpr fraction()
+    fraction();
 
 public:
 
@@ -123,7 +123,7 @@ public:
 public:
 
     fraction pow(
-        size_t degree = fraction(1_bi, 1000000_bi)) const;
+        size_t degree) const;
 
 public:
 
