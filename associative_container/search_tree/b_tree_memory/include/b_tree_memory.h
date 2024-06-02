@@ -2,7 +2,7 @@
 // Created by Des Caldnd on 5/29/2024.
 //
 
-#ifndef MP_OS_B_TREE_MEMORY_H
+#ifndef MP_OS_B_TREE_DISK_H
 #define MP_OS_B_TREE_MEMORY_H
 
 #include <iterator>
@@ -19,7 +19,7 @@
 
 
 template <serializable tkey, serializable tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
-class B_tree_memory final : public logger_guardant, private compare, public tree_interface<tkey, tvalue, compare, t>
+class B_tree_disk final : public logger_guardant, private compare, public tree_interface<tkey, tvalue, compare, t>
 {
 public:
 
@@ -39,13 +39,13 @@ private:
 
     // endregion comparators declaration
 
-    struct btree_mem_node
+    struct btree_disk_node
     {
         size_t size;
         std::array<tree_data_type, maximum_keys_in_node + 1> keys;
         std::array<btree_mem_node*, maximum_keys_in_node + 2> pointers;
 
-        btree_mem_node() noexcept;
+        btree_disk_node() noexcept;
     };
 
     logger* _logger;
@@ -58,26 +58,26 @@ public:
 
     // region constructors declaration
 
-    explicit B_tree_memory(const std::string& file_path, const compare& cmp = compare(), logger* logger = nullptr);
+    explicit B_tree_disk(const std::string& file_path, const compare& cmp = compare(), logger* logger = nullptr);
 
 
     // endregion constructors declaration
 
     // region five declaration
 
-    B_tree_memory(B_tree_memory&& other) noexcept =default;
+    B_tree_disk(B_tree_memory&& other) noexcept =default;
     B_tree_memory& operator=(B_tree_memory&& other) noexcept =default;
 
-    B_tree_memory(const B_tree_memory& other) =delete;
+    B_tree_disk(const B_tree_memory& other) =delete;
     B_tree_memory& operator=(const B_tree_memory& other) =delete;
 
-    ~B_tree_memory() noexcept override =default;
+    ~B_tree_disk() noexcept override =default;
 
     // endregion five declaration
 
     // region iterators declaration
 
-    class btree_mem_const_iterator
+    class btree_const_iterator
     {
         std::stack<std::pair<size_t , size_t>> _path;
         size_t _index;
@@ -101,7 +101,7 @@ public:
         bool operator==(const self& other) const noexcept;
         bool operator!=(const self& other) const noexcept;
 
-        explicit btree_mem_const_iterator(const std::stack<std::pair<size_t, size_t>>& path = std::stack<std::pair<size_t, size_t>>(), size_t index = 0);
+        explicit btree_const_iterator(const std::stack<std::pair<size_t, size_t>>& path = std::stack<std::pair<size_t, size_t>>(), size_t index = 0);
     };
 
     friend class btree_mem_const_iterator;
@@ -198,4 +198,4 @@ bool B_tree_memory<tkey, tvalue, compare, t>::compare_keys(const tkey &lhs, cons
     return compare::operator()(lhs, rhs);
 }
 
-#endif //MP_OS_B_TREE_MEMORY_H
+#endif //MP_OS_B_TREE_DISK_H
