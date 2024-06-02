@@ -35,7 +35,7 @@ private:
     std::string _root;
 
     std::mutex _map_mut;
-    std::unordered_map<GUID, nlohmann::json> _request_result;
+    std::unordered_map<CW_GUID, nlohmann::json> _request_result;
 
     std::shared_mutex _history_mut;
     std::stack<std::pair<time_point_t, std::shared_ptr<in_disk_operation>>> _history;
@@ -47,22 +47,22 @@ private:
 
 public:
 
-    GUID add_pool(std::string pool_name) override;
-    GUID remove_pool(std::string pool_name) override;
+    CW_GUID add_pool(std::string pool_name) override;
+    CW_GUID remove_pool(std::string pool_name) override;
 
-    GUID add_scheme(std::string pool_name, std::string scheme_name) override;
-    GUID remove_scheme(std::string pool_name, std::string scheme_name) override;
+    CW_GUID add_scheme(std::string pool_name, std::string scheme_name) override;
+    CW_GUID remove_scheme(std::string pool_name, std::string scheme_name) override;
 
-    GUID add_collection(std::string pool_name, std::string scheme_name, std::string collection_name) override;
-    GUID remove_collection(std::string pool_name, std::string scheme_name, std::string collection_name) override;
+    CW_GUID add_collection(std::string pool_name, std::string scheme_name, std::string collection_name) override;
+    CW_GUID remove_collection(std::string pool_name, std::string scheme_name, std::string collection_name) override;
 
-    GUID insert(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, tvalue value) override; // insert if not exist
-    GUID read_value(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) override;
-    GUID read_range(std::string pool_name, std::string scheme_name, std::string collection_name, tkey lower, tkey upper, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) override;
-    GUID update(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) override; // updates if exist
-    GUID remove(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) override;
+    CW_GUID insert(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, tvalue value) override; // insert if not exist
+    CW_GUID read_value(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) override;
+    CW_GUID read_range(std::string pool_name, std::string scheme_name, std::string collection_name, tkey lower, tkey upper, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) override;
+    CW_GUID update(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) override; // updates if exist
+    CW_GUID remove(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) override;
 
-    std::optional<nlohmann::json> get(GUID id) override;
+    std::optional<nlohmann::json> get(CW_GUID id) override;
 
     virtual ~disk_controller() =default;
 

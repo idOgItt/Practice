@@ -11,24 +11,24 @@
 #include <unordered_map>
 #include <chrono>
 
-class GUID
+class CW_GUID
 {
-    GUID();
+    CW_GUID();
 
 public:
 
-    static GUID get_next();
-    //TODO: GUID
+    static CW_GUID get_next();
+    //TODO: CW_GUID
 
     nlohmann::json to_json() const;
-    GUID(nlohmann::json j);
+    CW_GUID(nlohmann::json j);
 
 };
 
 template<>
-struct std::hash<GUID>
+struct std::hash<CW_GUID>
 {
-    size_t operator()(const GUID&) const noexcept
+    size_t operator()(const CW_GUID&) const noexcept
     {
         // TODO: hash
         return 1;
@@ -65,22 +65,22 @@ public:
 
     using time_point_t = std::chrono::time_point<std::chrono::utc_clock>;
 
-    virtual GUID add_pool(std::string pool_name) =0;
-    virtual GUID remove_pool(std::string pool_name) =0;
+    virtual CW_GUID add_pool(std::string pool_name) =0;
+    virtual CW_GUID remove_pool(std::string pool_name) =0;
 
-    virtual GUID add_scheme(std::string pool_name, std::string scheme_name) =0;
-    virtual GUID remove_scheme(std::string pool_name, std::string scheme_name) =0;
+    virtual CW_GUID add_scheme(std::string pool_name, std::string scheme_name) =0;
+    virtual CW_GUID remove_scheme(std::string pool_name, std::string scheme_name) =0;
 
-    virtual GUID add_collection(std::string pool_name, std::string scheme_name, std::string collection_name) =0;
-    virtual GUID remove_collection(std::string pool_name, std::string scheme_name, std::string collection_name) =0;
+    virtual CW_GUID add_collection(std::string pool_name, std::string scheme_name, std::string collection_name) =0;
+    virtual CW_GUID remove_collection(std::string pool_name, std::string scheme_name, std::string collection_name) =0;
 
-    virtual GUID insert(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, tvalue value) =0; // insert if not exist
-    virtual GUID read_value(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) =0;
-    virtual GUID read_range(std::string pool_name, std::string scheme_name, std::string collection_name, tkey lower, tkey upper, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) =0;
-    virtual GUID update(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) =0; // updates if exist
-    virtual GUID remove(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) =0;
+    virtual CW_GUID insert(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, tvalue value) =0; // insert if not exist
+    virtual CW_GUID read_value(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) =0;
+    virtual CW_GUID read_range(std::string pool_name, std::string scheme_name, std::string collection_name, tkey lower, tkey upper, bool need_persist, time_point_t time = std::chrono::utc_clock::now()) =0;
+    virtual CW_GUID update(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) =0; // updates if exist
+    virtual CW_GUID remove(std::string pool_name, std::string scheme_name, std::string collection_name, tkey key) =0;
 
-    virtual std::optional<nlohmann::json> get(GUID id) =0;
+    virtual std::optional<nlohmann::json> get(CW_GUID id) =0;
 };
 
 #endif //MP_OS_CONTROLLER_INT_H
