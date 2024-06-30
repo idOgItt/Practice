@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include <red_black_tree.h>
-#include <associative_container.h>
 #include <logger_builder.h>
 #include <client_logger_builder.h>
 #include <iostream>
@@ -164,17 +163,17 @@ TEST(redBlackTreePositiveTests, test1)
     rb->emplace(14, "e");
     rb->emplace(1, "l");
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(2, 1, "l", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(1, 2, "b", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(2, 3, "d", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(0, 5, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(2, 14, "e", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "c", red_black_tree<int, std::string>::node_color::BLACK)
+            test_data<int, std::string>(2, 1, "l", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(1, 2, "b", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(2, 3, "d", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(0, 5, "a", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(2, 14, "e", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(1, 15, "c", red_black_tree<int, std::string>::node_color::BLACK)
         };
     
-    EXPECT_TRUE(infix_iterator_test(rb, expected_result));
+    EXPECT_TRUE(infix_iterator_test(*rb, expected_result));
     
     logger->trace("redBlackTreePositiveTests.test1 finished");
 }
@@ -191,7 +190,7 @@ TEST(redBlackTreePositiveTests, test2)
     
     logger->trace("redBlackTreePositiveTests.test2 started");
 
-    auto rb = std::make_unique<red_black_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
+    auto rb = std::make_unique<red_black_tree<int, int>>(std::less<int>(), nullptr, logger.get());
     
     rb->emplace(1, 5);
     rb->emplace(2, 12);
@@ -199,13 +198,13 @@ TEST(redBlackTreePositiveTests, test2)
     rb->emplace(3, 67);
     rb->emplace(4, 45);
     
-    std::vector<typename red_black_tree<int, int>::iterator_data> expected_result =
+    std::vector<test_data<int, int>> expected_result =
         {
-            red_black_tree<int, int>::iterator_data(0, 2, 12, red_black_tree<int, int>::node_color::BLACK),
-            red_black_tree<int, int>::iterator_data(1, 1, 5, red_black_tree<int, int>::node_color::BLACK),
-            red_black_tree<int, int>::iterator_data(1, 4, 45, red_black_tree<int, int>::node_color::BLACK),
-            red_black_tree<int, int>::iterator_data(2, 3, 67, red_black_tree<int, int>::node_color::RED),
-            red_black_tree<int, int>::iterator_data(2, 15, 1, red_black_tree<int, int>::node_color::RED)
+                test_data<int, int>(0, 2, 12, red_black_tree<int, int>::node_color::BLACK),
+                test_data<int, int>(1, 1, 5, red_black_tree<int, int>::node_color::BLACK),
+                test_data<int, int>(1, 4, 45, red_black_tree<int, int>::node_color::BLACK),
+                test_data<int, int>(2, 3, 67, red_black_tree<int, int>::node_color::RED),
+                test_data<int, int>(2, 15, 1, red_black_tree<int, int>::node_color::RED)
         };
     
     EXPECT_TRUE(prefix_iterator_test(*rb, expected_result));
@@ -225,7 +224,7 @@ TEST(redBlackTreePositiveTests, test3)
     
     logger->trace("redBlackTreePositiveTests.test3 started");
 
-    auto rb = std::make_unique<red_black_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
+    auto rb = std::make_unique<red_black_tree<std::string, int>>(std::less<std::string>(), nullptr, logger.get());
     
     rb->emplace("a", 1);
     rb->emplace("b", 2);
@@ -233,13 +232,13 @@ TEST(redBlackTreePositiveTests, test3)
     rb->emplace("d", 3);
     rb->emplace("e", 4);
     
-    std::vector<typename red_black_tree<std::string, int>::iterator_data> expected_result =
+    std::vector<test_data<std::string, int>> expected_result =
         {
-            red_black_tree<std::string, int>::iterator_data(1, "a", 1, red_black_tree<std::string, int>::node_color::BLACK),
-            red_black_tree<std::string, int>::iterator_data(2, "c", 15, red_black_tree<std::string, int>::node_color::RED),
-            red_black_tree<std::string, int>::iterator_data(2, "e", 4, red_black_tree<std::string, int>::node_color::RED),
-            red_black_tree<std::string, int>::iterator_data(1, "d", 3, red_black_tree<std::string, int>::node_color::BLACK),
-            red_black_tree<std::string, int>::iterator_data(0, "b", 2, red_black_tree<std::string, int>::node_color::BLACK)
+                test_data<std::string, int>(1, "a", 1, red_black_tree<std::string, int>::node_color::BLACK),
+                test_data<std::string, int>(2, "c", 15, red_black_tree<std::string, int>::node_color::RED),
+                test_data<std::string, int>(2, "e", 4, red_black_tree<std::string, int>::node_color::RED),
+                test_data<std::string, int>(1, "d", 3, red_black_tree<std::string, int>::node_color::BLACK),
+                test_data<std::string, int>(0, "b", 2, red_black_tree<std::string, int>::node_color::BLACK)
         };
     
     EXPECT_TRUE(postfix_iterator_test(*rb, expected_result));
@@ -268,14 +267,14 @@ TEST(redBlackTreePositiveTests, test4)
     rb1->emplace(1, "i");
     rb1->emplace(5, "b");
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
+            test_data<int, std::string>(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
         };
     
     red_black_tree<int, std::string> rb2(
@@ -307,14 +306,14 @@ TEST(redBlackTreePositiveTests, test5)
     rb1->emplace(1, "i");
     rb1->emplace(5, "b");
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
+            test_data<int, std::string>(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
         };
     
     red_black_tree<int, std::string> rb2 = std::move(*rb1);
@@ -347,13 +346,13 @@ TEST(redBlackTreePositiveTests, test6)
     
     rb1->erase(5);
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
+            test_data<int, std::string>(2, 1, "i", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
         };
     
     EXPECT_TRUE(infix_iterator_test(*rb1, expected_result));
@@ -385,14 +384,14 @@ TEST(redBlackTreePositiveTests, test7)
     
     rb1->erase(3);
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(2, 2, "l", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
+            test_data<int, std::string>(2, 2, "l", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 4, "j", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(3, 5, "b", red_black_tree<int, std::string>::node_color::RED),
+            test_data<int, std::string>(2, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(1, 15, "x", red_black_tree<int, std::string>::node_color::BLACK)
         };
     
     EXPECT_TRUE(infix_iterator_test(*rb1, expected_result));
@@ -425,15 +424,15 @@ TEST(redBlackTreePositiveTests, test8)
     
     rb1->erase(15);
     
-    std::vector<typename red_black_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(1, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(2, 11, "j", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 12, "l", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(3, 17, "b", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 18, "e", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(3, 19, "i", red_black_tree<int, std::string>::node_color::RED)
+                test_data<int, std::string>(1, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(2, 11, "j", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(1, 12, "l", red_black_tree<int, std::string>::node_color::RED),
+                test_data<int, std::string>(3, 17, "b", red_black_tree<int, std::string>::node_color::RED),
+                test_data<int, std::string>(2, 18, "e", red_black_tree<int, std::string>::node_color::BLACK),
+            test_data<int, std::string>(3, 19, "i", red_black_tree<int, std::string>::node_color::RED)
         };
     
     EXPECT_TRUE(infix_iterator_test(*rb1, expected_result));
@@ -468,13 +467,13 @@ TEST(redBlackTreePositiveTests, test9)
     
     std::vector<test_data<int, std::string>> expected_result =
         {
-            red_black_tree<int, std::string>::iterator_data(1, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(2, 12, "l", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(1, 15, "x", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(3, 17, "b", red_black_tree<int, std::string>::node_color::RED),
-            red_black_tree<int, std::string>::iterator_data(2, 18, "e", red_black_tree<int, std::string>::node_color::BLACK),
-            red_black_tree<int, std::string>::iterator_data(3, 19, "i", red_black_tree<int, std::string>::node_color::RED)
+                test_data<int, std::string>(1, 6, "a", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(0, 8, "c", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(2, 12, "l", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(1, 15, "x", red_black_tree<int, std::string>::node_color::RED),
+                test_data<int, std::string>(3, 17, "b", red_black_tree<int, std::string>::node_color::RED),
+                test_data<int, std::string>(2, 18, "e", red_black_tree<int, std::string>::node_color::BLACK),
+                test_data<int, std::string>(3, 19, "i", red_black_tree<int, std::string>::node_color::RED)
         };
     
     EXPECT_TRUE(infix_iterator_test(*rb1, expected_result));
