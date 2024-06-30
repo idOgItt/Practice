@@ -23,7 +23,7 @@ namespace __detail
     };
 }
 
-template<typename tkey,typename tvalue, compator<tkey> compare = std::less<tkey>()>
+template<typename tkey,typename tvalue, compator<tkey> compare = std::less<tkey>>
 class red_black_tree final: public binary_search_tree<tkey, tvalue, compare, __detail::RB_TAG>
 {
 
