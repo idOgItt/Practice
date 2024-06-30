@@ -5,88 +5,67 @@
 #include <client_logger_builder.h>
 #include <iostream>
 
+
 logger *create_logger(
-    std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
-    bool use_console_stream = true,
-    logger::severity console_stream_severity = logger::severity::debug)
+        std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
+        bool use_console_stream = true,
+        logger::severity console_stream_severity = logger::severity::debug)
 {
-    logger_builder *builder = new client_logger_builder();
-    
+    std::unique_ptr<logger_builder> builder(new client_logger_builder());
+
+    builder->set_format("[%d %t][%s] %m");
+
     if (use_console_stream)
     {
         builder->add_console_stream(console_stream_severity);
     }
-    
+
     for (auto &output_file_stream_setup: output_file_streams_setup)
     {
         builder->add_file_stream(output_file_stream_setup.first, output_file_stream_setup.second);
     }
-    
+
     logger *built_logger = builder->build();
-    
-    delete builder;
-    
+
+
     return built_logger;
 }
 
-class key_comparer final
-{
-
-public:
-    
-    int operator()(
-        int first,
-        int second) const
-    {
-        return first - second;
-    }
-    
-    int operator()(
-        std::string const &first,
-        std::string const &second) const
-    {
-        if (first > second)
-        {
-            return 1;
-        }
-        else if (first < second)
-        {
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-};
-
 bool compare_results(
-    std::vector<typename associative_container<int, std::string>::key_value_pair> &expected,
-    std::vector<typename associative_container<int, std::string>::key_value_pair> &actual)
+        std::vector<typename binary_search_tree<int, std::string>::value_type> &expected,
+        std::vector<typename binary_search_tree<int, std::string>::value_type> &actual)
 {
-    key_comparer comparer;
-    
+
     if (expected.size() != actual.size())
     {
         return false;
     }
-    
-    for (size_t i = 0; i < expected.size(); ++i)
+
+    for (auto&& val : std::views::zip(expected, actual))
     {
-        if (comparer(expected[i].key, actual[i].key))
+        if (val.first.first != val.second.first)
         {
             return false;
         }
-        
-        if (expected[i].value != actual[i].value)
+
+        if (val.first.second != val.second.second)
         {
             return false;
         }
     }
-    
+
     return true;
 }
+
+template<typename tkey, typename tvalue>
+struct test_data
+{
+    tkey key;
+    tvalue value;
+    size_t depth, height;
+
+    test_data(size_t dep, tkey k, tvalue v, size_t h) : depth(dep), key(k), value(v), height(h) {}
+};
 
 template<
     typename tkey,
@@ -102,7 +81,7 @@ bool infix_iterator_test(
     
     for (auto const &item: expected_result)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value)
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value)
         {
             return false;
         }
@@ -124,7 +103,7 @@ bool prefix_iterator_test(
     
     for (auto const &item: expected_result)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value)
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value)
         {
             return false;
         }
@@ -147,7 +126,7 @@ bool postfix_iterator_test(
     
     for (auto const &item: expected_result)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value)
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value)
         {
             return false;
         }
@@ -158,17 +137,17 @@ bool postfix_iterator_test(
 
 TEST(scapegoatTreePositiveTests, test1)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
         {
             {
                 "scapegoat_tree_tests_logs.txt",
                 logger::severity::trace
             },
-        });
+        }));
     
     logger->trace("scapegoatTreePositiveTests.test1 started");
     
-    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.7);
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
     sg->insert(5, "a");
     sg->insert(2, "b");
@@ -190,24 +169,21 @@ TEST(scapegoatTreePositiveTests, test1)
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test1 finished");
-    
-    delete sg;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test2)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test2 started");
-    
-    search_tree<int, int> *sg = new scapegoat_tree<int, int>(key_comparer(), nullptr, logger, 0.5);
+
+    auto sg = std::make_unique<scapegoat_tree<int, int>>(std::less<int>(), nullptr, logger.get(), 0.5);
     
     sg->insert(1, 5);
     sg->insert(2, 12);
@@ -227,24 +203,21 @@ TEST(scapegoatTreePositiveTests, test2)
     EXPECT_TRUE(prefix_iterator_test(*reinterpret_cast<scapegoat_tree<int, int> *>(sg), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test2 finished");
-    
-    delete sg;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test3)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test3 started");
-    
-    search_tree<std::string, int> *sg = new scapegoat_tree<std::string, int>(key_comparer(), nullptr, logger, 0.9);
+
+    auto sg = std::make_unique<scapegoat_tree<std::string, int>>(std::less<std::string>(), nullptr, logger.get(), 0.9);
     
     sg->insert("a", 1);
     sg->insert("b", 2);
@@ -264,24 +237,21 @@ TEST(scapegoatTreePositiveTests, test3)
     EXPECT_TRUE(postfix_iterator_test(*reinterpret_cast<scapegoat_tree<std::string, int> *>(sg), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test3 finished");
-    
-    delete sg;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test4)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test4 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.65);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -305,24 +275,21 @@ TEST(scapegoatTreePositiveTests, test4)
     EXPECT_TRUE(infix_iterator_test(sg2, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test4 finished");
-    
-    delete sg1;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test5)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test5 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.65);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -347,24 +314,21 @@ TEST(scapegoatTreePositiveTests, test5)
     EXPECT_TRUE(infix_iterator_test(sg2, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test5 finished");
-    
-    delete sg1;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test6)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test6 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.5);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.5);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -387,24 +351,21 @@ TEST(scapegoatTreePositiveTests, test6)
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test6 finished");
-    
-    delete sg1;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test7)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test7 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger, 0.7);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -429,25 +390,21 @@ TEST(scapegoatTreePositiveTests, test7)
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test7 finished");
-    
-    delete sg1;
-    delete logger;
-    
 }
 
 TEST(scapegoatTreePositiveTests, test8)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test8 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
     sg1->insert(6, "a");
     sg1->insert(8, "c");
@@ -474,24 +431,21 @@ TEST(scapegoatTreePositiveTests, test8)
     EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test8 finished");
-    
-    delete sg1;
-    delete logger;
 }
 
 TEST(scapegoatTreePositiveTests, test9)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test9 started");
-    
-    search_tree<int, std::string> *sg1 = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
     sg1->insert(6, "l");
     sg1->insert(8, "c");
@@ -520,25 +474,21 @@ TEST(scapegoatTreePositiveTests, test9)
     EXPECT_EQ(actual_result, "h e l l o ");
     
     logger->trace("scapegoatTreePositiveTests.test9 finished");
-    
-    delete sg1;
-    delete logger;
-    
 }
 
 TEST(scapegoatTreePositiveTests, test10)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "scapegoat_tree_tests_logs.txt",
-                logger::severity::trace
-            }
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "scapegoat_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("scapegoatTreePositiveTests.test10 started");
-    
-    search_tree<int, std::string> *sg = new scapegoat_tree<int, std::string>(key_comparer(), nullptr, logger);
+
+    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
     sg->insert(6, "l");
     sg->insert(8, "c");
@@ -563,9 +513,6 @@ TEST(scapegoatTreePositiveTests, test10)
     EXPECT_TRUE(compare_results(expected_result, actual_result));
     
     logger->trace("scapegoatTreePositiveTests.test10 finished");
-    
-    delete sg;
-    delete logger;
 }
 
 int main(
