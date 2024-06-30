@@ -3,11 +3,28 @@
 
 #include <binary_search_tree.h>
 
-template<
-    typename tkey,
-    typename tvalue>
-class red_black_tree final:
-    public binary_search_tree<tkey, tvalue>
+namespace __detail
+{
+    class RB_TAG;
+
+    template<typename tkey, typename tvalue, typename compare>
+    class bst_impl<tkey, tvalue, compare, RB_TAG>
+    {
+        template<class ...Args>
+        static binary_search_tree<tkey, tvalue, compare, RB_TAG>::node* create_node(binary_search_tree<tkey, tvalue, compare, RB_TAG>& cont, Args&& ...args);
+
+        //Does not invalidate node*, needed for splay tree
+        static void post_search(binary_search_tree<tkey, tvalue, compare, RB_TAG>::node**){}
+
+        //Does not invalidate node*
+        static void post_insert(binary_search_tree<tkey, tvalue, compare, RB_TAG>& cont, binary_search_tree<tkey, tvalue, compare, RB_TAG>::node**);
+
+        static void erase(binary_search_tree<tkey, tvalue, compare, RB_TAG>& cont, binary_search_tree<tkey, tvalue, compare, RB_TAG>::node**);
+    };
+}
+
+template<typename tkey,typename tvalue, compator<tkey> compare = std::less<tkey>()>
+class red_black_tree final: public binary_search_tree<tkey, tvalue, compare, __detail::RB_TAG>
 {
 
 public:
@@ -19,156 +36,406 @@ public:
     };
 
 private:
+
+    using parent = binary_search_tree<tkey, tvalue, compare, __detail::RB_TAG>;
     
     struct node final:
-        binary_search_tree<tkey, tvalue>::node
+        parent::node
     {
         node_color color;
 
-        node(tkey const &key_, tvalue &&value_);
-        node(tkey const &key_, const tvalue& value_);
+        template<class ...Args>
+        node(parent::node* par, Args&&... args);
 
         ~node() noexcept override =default;
     };
 
-public:
-    
-    struct iterator_data final:
-        public binary_search_tree<tkey, tvalue>::iterator_data
-    {
-    private:
-        void update(const typename binary_search_tree<tkey, tvalue>::node* n, unsigned int _depth) override;
-
-        typename binary_search_tree<tkey, tvalue>::iterator_data* clone() override;
-
-    public:
-        
-        node_color color;
-    
-    public:
-        
-        explicit iterator_data(
-            unsigned int depth = 0,
-            tkey const &key = tkey(),
-            tvalue const &value = tvalue(),
-            node_color _color = node_color::RED);
-        
-    };
 
 public:
-    
+
+    using value_type = parent::value_type;
+
     explicit red_black_tree(
-            std::function<int(tkey const &, tkey const &)> comparer = std::less<tkey>(),
-            allocator_dbg_helper *allocator = nullptr,
-            logger *logger = nullptr,
-            typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
-            typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy = binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy::throw_an_exception);
+            const compare& comp = compare(),
+            pp_allocator<value_type> alloc = pp_allocator<value_type>(),
+            logger *logger = nullptr);
+
+    template<input_iterator_for_pair<tkey, tvalue> iterator>
+    explicit red_black_tree(iterator begin, iterator end, const compare& cmp = compare(),
+            pp_allocator<value_type> alloc = pp_allocator<value_type>(),
+            logger* logger = nullptr);
+
+    template<std::ranges::input_range Range>
+    explicit red_black_tree(Range&& range, const compare& cmp = compare(),
+            pp_allocator<value_type> alloc = pp_allocator<value_type>(),
+            logger* logger = nullptr);
+
+
+    red_black_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(),
+            pp_allocator<value_type> alloc = pp_allocator<value_type>(),
+            logger* logger = nullptr);
 
 
     // region iterator definition
-    
-    class prefix_iterator : public binary_search_tree<tkey, tvalue>::prefix_iterator
+
+
+    class prefix_iterator : public parent::prefix_iterator
     {
     public:
 
-        explicit prefix_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::prefix_iterator(path, data) {}
+        using value_type = parent::prefix_iterator::value_type;
+        using difference_type = parent::prefix_iterator::difference_type;
+        using pointer = parent::prefix_iterator::pointer;
+        using reference = parent::prefix_iterator::reference;
+        using iterator_category = parent::prefix_iterator::iterator_category;
 
+        explicit prefix_iterator(parent::node* n = nullptr) noexcept;
+        prefix_iterator(parent::prefix_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        using parent::prefix_iterator::depth;
+        using parent::prefix_iterator::operator*;
+        using parent::prefix_iterator::operator==;
+        using parent::prefix_iterator::operator!=;
+        using parent::prefix_iterator::operator++;
+        using parent::prefix_iterator::operator--;
+        using parent::prefix_iterator::operator->;
     };
 
-    class prefix_const_iterator : public binary_search_tree<tkey, tvalue>::prefix_const_iterator
+    class prefix_const_iterator : public parent::prefix_const_iterator
     {
     public:
 
-        explicit prefix_const_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::prefix_const_iterator(path, data) {}
+        using value_type = parent::prefix_const_iterator::value_type;
+        using difference_type = parent::prefix_const_iterator::difference_type;
+        using pointer = parent::prefix_const_iterator::pointer;
+        using reference = parent::prefix_const_iterator::reference;
+        using iterator_category = parent::prefix_const_iterator::iterator_category;
 
+        explicit prefix_const_iterator(parent::node* n = nullptr) noexcept;
+        prefix_const_iterator(parent::prefix_const_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        prefix_const_iterator(prefix_iterator) noexcept;
+
+        using parent::prefix_const_iterator::depth;
+        using parent::prefix_const_iterator::operator*;
+        using parent::prefix_const_iterator::operator==;
+        using parent::prefix_const_iterator::operator!=;
+        using parent::prefix_const_iterator::operator++;
+        using parent::prefix_const_iterator::operator--;
+        using parent::prefix_const_iterator::operator->;
     };
 
-    class prefix_reverse_iterator : public binary_search_tree<tkey, tvalue>::prefix_reverse_iterator
+    class prefix_reverse_iterator : public parent::prefix_reverse_iterator
     {
     public:
 
-        explicit prefix_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::prefix_reverse_iterator(path, data) {}
+        using value_type = parent::prefix_reverse_iterator::value_type;
+        using difference_type = parent::prefix_reverse_iterator::difference_type;
+        using pointer = parent::prefix_reverse_iterator::pointer;
+        using reference = parent::prefix_reverse_iterator::reference;
+        using iterator_category = parent::prefix_reverse_iterator::iterator_category;
 
+        explicit prefix_reverse_iterator(parent::node* n = nullptr) noexcept;
+        prefix_reverse_iterator(parent::prefix_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        prefix_reverse_iterator(prefix_iterator) noexcept;
+        operator prefix_iterator() const noexcept;
+        prefix_iterator base() const noexcept;
+
+        using parent::prefix_reverse_iterator::depth;
+        using parent::prefix_reverse_iterator::operator*;
+        using parent::prefix_reverse_iterator::operator==;
+        using parent::prefix_reverse_iterator::operator!=;
+        using parent::prefix_reverse_iterator::operator++;
+        using parent::prefix_reverse_iterator::operator--;
+        using parent::prefix_reverse_iterator::operator->;
     };
 
-    class prefix_const_reverse_iterator : public binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator
+    class prefix_const_reverse_iterator : public parent::prefix_const_reverse_iterator
     {
     public:
 
-        explicit prefix_const_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::prefix_const_reverse_iterator(path, data) {}
+        using value_type = parent::prefix_const_reverse_iterator::value_type;
+        using difference_type = parent::prefix_const_reverse_iterator::difference_type;
+        using pointer = parent::prefix_const_reverse_iterator::pointer;
+        using reference = parent::prefix_const_reverse_iterator::reference;
+        using iterator_category = parent::prefix_const_reverse_iterator::iterator_category;
 
+        explicit prefix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
+        prefix_const_reverse_iterator(parent::prefix_const_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        prefix_const_reverse_iterator(prefix_const_iterator) noexcept;
+        operator prefix_const_iterator() const noexcept;
+        prefix_const_iterator base() const noexcept;
+
+        using parent::prefix_const_reverse_iterator::depth;
+        using parent::prefix_const_reverse_iterator::operator*;
+        using parent::prefix_const_reverse_iterator::operator==;
+        using parent::prefix_const_reverse_iterator::operator!=;
+        using parent::prefix_const_reverse_iterator::operator++;
+        using parent::prefix_const_reverse_iterator::operator--;
+        using parent::prefix_const_reverse_iterator::operator->;
     };
 
-    class infix_iterator : public binary_search_tree<tkey, tvalue>::infix_iterator
+    class infix_iterator : public parent::infix_iterator
     {
     public:
 
-        explicit infix_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::infix_iterator(path, data) {}
+        using value_type = parent::infix_iterator::value_type;
+        using difference_type = parent::infix_iterator::difference_type;
+        using pointer = parent::infix_iterator::pointer;
+        using reference = parent::infix_iterator::reference;
+        using iterator_category = parent::infix_iterator::iterator_category;
 
+        explicit infix_iterator(parent::node* n = nullptr) noexcept;
+        infix_iterator(parent::infix_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        using parent::infix_iterator::depth;
+        using parent::infix_iterator::operator*;
+        using parent::infix_iterator::operator==;
+        using parent::infix_iterator::operator!=;
+        using parent::infix_iterator::operator++;
+        using parent::infix_iterator::operator--;
+        using parent::infix_iterator::operator->;
     };
 
-    class infix_const_iterator : public binary_search_tree<tkey, tvalue>::infix_const_iterator
+    class infix_const_iterator : parent::infix_const_iterator
     {
     public:
 
-        explicit infix_const_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::infix_const_iterator(path, data) {}
+        using value_type = parent::infix_const_iterator::value_type;
+        using difference_type = parent::infix_const_iterator::difference_type;
+        using pointer = parent::infix_const_iterator::pointer;
+        using reference = parent::infix_const_iterator::reference;
+        using iterator_category = parent::infix_const_iterator::iterator_category;
 
+        explicit infix_const_iterator(parent::node* n = nullptr) noexcept;
+        infix_const_iterator(parent::infix_const_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        infix_const_iterator(infix_iterator) noexcept;
+
+        using parent::infix_const_iterator::depth;
+        using parent::infix_const_iterator::operator*;
+        using parent::infix_const_iterator::operator==;
+        using parent::infix_const_iterator::operator!=;
+        using parent::infix_const_iterator::operator++;
+        using parent::infix_const_iterator::operator--;
+        using parent::infix_const_iterator::operator->;
     };
 
-    class infix_reverse_iterator : public binary_search_tree<tkey, tvalue>::infix_reverse_iterator
+    class infix_reverse_iterator : public parent::infix_reverse_iterator
     {
     public:
 
-        explicit infix_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::infix_reverse_iterator(path, data) {}
+        using value_type = parent::infix_reverse_iterator::value_type;
+        using difference_type = parent::infix_reverse_iterator::difference_type;
+        using pointer = parent::infix_reverse_iterator::pointer;
+        using reference = parent::infix_reverse_iterator::reference;
+        using iterator_category = parent::infix_reverse_iterator::iterator_category;
 
+        explicit infix_reverse_iterator(parent::node* n = nullptr) noexcept;
+        infix_reverse_iterator(parent::infix_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        infix_reverse_iterator(infix_iterator) noexcept;
+        operator infix_iterator() const noexcept;
+        infix_iterator base() const noexcept;
+
+        using parent::infix_reverse_iterator::depth;
+        using parent::infix_reverse_iterator::operator*;
+        using parent::infix_reverse_iterator::operator==;
+        using parent::infix_reverse_iterator::operator!=;
+        using parent::infix_reverse_iterator::operator++;
+        using parent::infix_reverse_iterator::operator--;
+        using parent::infix_reverse_iterator::operator->;
     };
 
-    class infix_const_reverse_iterator : public binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator
+    class infix_const_reverse_iterator : public parent::infix_const_reverse_iterator
     {
     public:
 
-        explicit infix_const_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::infix_const_reverse_iterator(path, data) {}
+        using value_type = parent::infix_const_reverse_iterator::value_type;
+        using difference_type = parent::infix_const_reverse_iterator::difference_type;
+        using pointer = parent::infix_const_reverse_iterator::pointer;
+        using reference = parent::infix_const_reverse_iterator::reference;
+        using iterator_category = parent::infix_const_reverse_iterator::iterator_category;
 
+        explicit infix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
+        infix_const_reverse_iterator(parent::infix_const_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        infix_const_reverse_iterator(infix_const_iterator) noexcept;
+        operator infix_const_iterator() const noexcept;
+        infix_const_iterator base() const noexcept;
+
+        using parent::infix_const_reverse_iterator::depth;
+        using parent::infix_const_reverse_iterator::operator*;
+        using parent::infix_const_reverse_iterator::operator==;
+        using parent::infix_const_reverse_iterator::operator!=;
+        using parent::infix_const_reverse_iterator::operator++;
+        using parent::infix_const_reverse_iterator::operator--;
+        using parent::infix_const_reverse_iterator::operator->;
     };
 
-    class postfix_iterator : public binary_search_tree<tkey, tvalue>::postfix_iterator
+    class postfix_iterator : public parent::postfix_iterator
     {
     public:
 
-        explicit postfix_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::postfix_iterator(path, data) {}
+        using value_type = parent::postfix_iterator::value_type;
+        using difference_type = parent::postfix_iterator::difference_type;
+        using pointer = parent::postfix_iterator::pointer;
+        using reference = parent::postfix_iterator::reference;
+        using iterator_category = parent::postfix_iterator::iterator_category;
 
+        explicit postfix_iterator(parent::node* n = nullptr) noexcept;
+        postfix_iterator(parent::postfix_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        using parent::postfix_iterator::depth;
+        using parent::postfix_iterator::operator*;
+        using parent::postfix_iterator::operator==;
+        using parent::postfix_iterator::operator!=;
+        using parent::postfix_iterator::operator++;
+        using parent::postfix_iterator::operator--;
+        using parent::postfix_iterator::operator->;
     };
 
-    class postfix_const_iterator : public binary_search_tree<tkey, tvalue>::postfix_const_iterator
+    class postfix_const_iterator : public parent::postfix_const_iterator
     {
     public:
 
-        explicit postfix_const_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::postfix_const_iterator(path, data) {}
+        using value_type = parent::postfix_const_iterator::value_type;
+        using difference_type = parent::postfix_const_iterator::difference_type;
+        using pointer = parent::postfix_const_iterator::pointer;
+        using reference = parent::postfix_const_iterator::reference;
+        using iterator_category = parent::postfix_const_iterator::iterator_category;
 
+        explicit postfix_const_iterator(parent::node* n = nullptr) noexcept;
+        postfix_const_iterator(parent::postfix_const_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        postfix_const_iterator(postfix_iterator) noexcept;
+
+        using parent::postfix_const_iterator::depth;
+        using parent::postfix_const_iterator::operator*;
+        using parent::postfix_const_iterator::operator==;
+        using parent::postfix_const_iterator::operator!=;
+        using parent::postfix_const_iterator::operator++;
+        using parent::postfix_const_iterator::operator--;
+        using parent::postfix_const_iterator::operator->;
     };
 
-    class postfix_reverse_iterator : public binary_search_tree<tkey, tvalue>::postfix_reverse_iterator
+    class postfix_reverse_iterator : public parent::postfix_reverse_iterator
     {
     public:
 
-        explicit postfix_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::postfix_reverse_iterator(path, data) {}
+        using value_type = parent::postfix_reverse_iterator::value_type;
+        using difference_type = parent::postfix_reverse_iterator::difference_type;
+        using pointer = parent::postfix_reverse_iterator::pointer;
+        using reference = parent::postfix_reverse_iterator::reference;
+        using iterator_category = parent::postfix_reverse_iterator::iterator_category;
 
+        explicit postfix_reverse_iterator(parent::node* n = nullptr) noexcept;
+        postfix_reverse_iterator(parent::postfix_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        postfix_reverse_iterator(postfix_iterator) noexcept;
+        operator postfix_iterator() const noexcept;
+        postfix_iterator base() const noexcept;
+
+        using parent::postfix_reverse_iterator::depth;
+        using parent::postfix_reverse_iterator::operator*;
+        using parent::postfix_reverse_iterator::operator==;
+        using parent::postfix_reverse_iterator::operator!=;
+        using parent::postfix_reverse_iterator::operator++;
+        using parent::postfix_reverse_iterator::operator--;
+        using parent::postfix_reverse_iterator::operator->;
     };
 
-    class postfix_const_reverse_iterator : public binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator
+    class postfix_const_reverse_iterator : public parent::postfix_const_reverse_iterator
     {
     public:
 
-        explicit postfix_const_reverse_iterator(const std::stack<typename binary_search_tree<tkey, tvalue>::node**>& path = std::stack<typename binary_search_tree<tkey, tvalue>::node**>(), iterator_data* data = nullptr) : binary_search_tree<tkey, tvalue>::postfix_const_reverse_iterator(path, data) {}
+        using value_type = parent::postfix_const_reverse_iterator::value_type;
+        using difference_type = parent::postfix_const_reverse_iterator::difference_type;
+        using pointer = parent::postfix_const_reverse_iterator::pointer;
+        using reference = parent::postfix_const_reverse_iterator::reference;
+        using iterator_category = parent::postfix_const_reverse_iterator::iterator_category;
+
+        explicit postfix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
+        postfix_const_reverse_iterator(parent::postfix_const_reverse_iterator) noexcept;
+
+        node_color get_color() const noexcept;
+
+        postfix_const_reverse_iterator(postfix_const_iterator) noexcept;
+        operator postfix_const_iterator() const noexcept;
+        postfix_const_iterator base() const noexcept;
+
+        using parent::postfix_const_reverse_iterator::depth;
+        using parent::postfix_const_reverse_iterator::operator*;
+        using parent::postfix_const_reverse_iterator::operator==;
+        using parent::postfix_const_reverse_iterator::operator!=;
+        using parent::postfix_const_reverse_iterator::operator++;
+        using parent::postfix_const_reverse_iterator::operator--;
+        using parent::postfix_const_reverse_iterator::operator->;
 
     };
+
+
+
     // endregion iterator definition
     
     // region iterator requests declaration
 
+    infix_iterator begin() noexcept;
+
+    infix_iterator end() noexcept;
+
+    infix_const_iterator begin() const noexcept;
+
+    infix_const_iterator end() const noexcept;
+
+    infix_const_iterator cbegin() const noexcept;
+
+    infix_const_iterator cend() const noexcept;
+
+    infix_reverse_iterator rbegin() noexcept;
+
+    infix_reverse_iterator rend() noexcept;
+
+    infix_const_reverse_iterator rbegin() const noexcept;
+
+    infix_const_reverse_iterator rend() const noexcept;
+
+    infix_const_reverse_iterator crbegin() const noexcept;
+
+    infix_const_reverse_iterator crend() const noexcept;
+
+
     prefix_iterator begin_prefix() noexcept;
 
     prefix_iterator end_prefix() noexcept;
+
+    prefix_const_iterator begin_prefix() const noexcept;
+
+    prefix_const_iterator end_prefix() const noexcept;
 
     prefix_const_iterator cbegin_prefix() const noexcept;
 
@@ -178,13 +445,22 @@ public:
 
     prefix_reverse_iterator rend_prefix() noexcept;
 
+    prefix_const_reverse_iterator rbegin_prefix() const noexcept;
+
+    prefix_const_reverse_iterator rend_prefix() const noexcept;
+
     prefix_const_reverse_iterator crbegin_prefix() const noexcept;
 
     prefix_const_reverse_iterator crend_prefix() const noexcept;
 
+
     infix_iterator begin_infix() noexcept;
 
     infix_iterator end_infix() noexcept;
+
+    infix_const_iterator begin_infix() const noexcept;
+
+    infix_const_iterator end_infix() const noexcept;
 
     infix_const_iterator cbegin_infix() const noexcept;
 
@@ -194,13 +470,22 @@ public:
 
     infix_reverse_iterator rend_infix() noexcept;
 
+    infix_const_reverse_iterator rbegin_infix() const noexcept;
+
+    infix_const_reverse_iterator rend_infix() const noexcept;
+
     infix_const_reverse_iterator crbegin_infix() const noexcept;
 
     infix_const_reverse_iterator crend_infix() const noexcept;
 
+
     postfix_iterator begin_postfix() noexcept;
 
     postfix_iterator end_postfix() noexcept;
+
+    postfix_const_iterator begin_postfix() const noexcept;
+
+    postfix_const_iterator end_postfix() const noexcept;
 
     postfix_const_iterator cbegin_postfix() const noexcept;
 
@@ -210,6 +495,10 @@ public:
 
     postfix_reverse_iterator rend_postfix() noexcept;
 
+    postfix_const_reverse_iterator rbegin_postfix() const noexcept;
+
+    postfix_const_reverse_iterator rend_postfix() const noexcept;
+
     postfix_const_reverse_iterator crbegin_postfix() const noexcept;
 
     postfix_const_reverse_iterator crend_postfix() const noexcept;
@@ -218,650 +507,67 @@ public:
     
 public:
     
-    ~red_black_tree() noexcept final =default;
+    ~red_black_tree() noexcept final;
     
-    red_black_tree(
-        red_black_tree<tkey, tvalue> const &other) =default;
+    red_black_tree(red_black_tree const &other);
     
-    red_black_tree<tkey, tvalue> &operator=(
-        red_black_tree<tkey, tvalue> const &other) =default;
+    red_black_tree &operator=(red_black_tree const &other);
     
-    red_black_tree(
-        red_black_tree<tkey, tvalue> &&other) noexcept =default;
+    red_black_tree(red_black_tree &&other) noexcept;
     
-    red_black_tree<tkey, tvalue> &operator=(
-        red_black_tree<tkey, tvalue> &&other) noexcept =default;
+    red_black_tree &operator=(red_black_tree &&other) noexcept;
 
-private:
 
-    void copy_subtree(typename binary_search_tree<tkey, tvalue>::node** target, typename binary_search_tree<tkey, tvalue>::node* src) override;
+    void swap(parent& other) noexcept override;
 
-    tvalue dispose_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path) override;
 
-    void insert_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path, const tkey& key, tvalue&& val) override;
+    /** Only rebinds iterators
+     */
+    std::pair<infix_iterator, bool> insert(const value_type&);
+    std::pair<infix_iterator, bool> insert(value_type&&);
 
-    void insert_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path, const tkey& key, const tvalue& val) override;
+    template<class ...Args>
+    std::pair<infix_iterator, bool> emplace(Args&&...args);
 
-    template<typename tval_arg>
-    void insert_inner_t(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path, const tkey& key, tval_arg&& val);
+    infix_iterator insert_or_assign(const value_type&);
+    infix_iterator insert_or_assign(value_type&&);
 
-    void balance_black_leaf(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path);
+    template<class ...Args>
+    infix_iterator emplace_or_assign(Args&&...args);
+
+    infix_iterator find(const tkey&);
+    infix_const_iterator find(const tkey&) const;
+
+    infix_iterator lower_bound(const tkey&);
+    infix_const_iterator lower_bound(const tkey&) const;
+
+    infix_iterator upper_bound(const tkey&);
+    infix_const_iterator upper_bound(const tkey&) const;
+
+    infix_iterator erase(infix_iterator pos);
+    infix_iterator erase(infix_const_iterator pos);
+
+    infix_iterator erase(infix_iterator first, infix_iterator last);
+    infix_iterator erase(infix_const_iterator first, infix_const_iterator last);
+
+    using parent::erase;
+    using parent::insert;
+    using parent::insert_or_assign;
 };
 
-template<typename tkey, typename tvalue>
-void red_black_tree<tkey, tvalue>::balance_black_leaf(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path)
-{
-    if (node_path.size() == 1 && *node_path.top() != nullptr)
-    {
-        static_cast<node*>(*node_path.top())->color = node_color::BLACK;
-    } else if(node_path.size() > 1)
-    {
-        typename binary_search_tree<tkey, tvalue>::node* current_node = *node_path.top();
-        node_path.pop();
-
-        typename binary_search_tree<tkey, tvalue>::node* parent_node = *node_path.top();
-
-        bool from_left = binary_search_tree<tkey, tvalue>::is_left_subtree(current_node, parent_node);
-
-        typename binary_search_tree<tkey, tvalue>::node* brother_node = from_left ? parent_node->right_subtree : parent_node->left_subtree;
-
-        if (static_cast<node*>(brother_node)->color == node_color::RED)
-        {
-            if (from_left)
-            {
-                binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
-                node_path.push(&((*node_path.top())->left_subtree));
-                node_path.push(&((*node_path.top())->left_subtree));
-            } else
-            {
-                binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
-                node_path.push(&((*node_path.top())->right_subtree));
-                node_path.push(&((*node_path.top())->right_subtree));
-            }
-            static_cast<node*>(parent_node)->color = node_color::RED;
-            static_cast<node*>(brother_node)->color = node_color::BLACK;
-
-            balance_black_leaf(node_path);
-        } else
-        {
-            typename binary_search_tree<tkey, tvalue>::node* far_nephew = from_left ? brother_node->right_subtree : brother_node->left_subtree;
-            typename binary_search_tree<tkey, tvalue>::node* near_nephew = from_left ? brother_node->left_subtree : brother_node->right_subtree;
-
-            if (far_nephew != nullptr && static_cast<node*>(far_nephew)->color == node_color::RED)
-            {
-                if (from_left)
-                {
-                    binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
-                } else
-                {
-                    binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
-                }
-
-                static_cast<node*>(brother_node)->color = static_cast<node*>(parent_node)->color;
-                static_cast<node*>(parent_node)->color = node_color::BLACK;
-                static_cast<node*>(far_nephew)->color = node_color::BLACK;
-            } else if (near_nephew != nullptr && static_cast<node*>(near_nephew)->color == node_color::RED)
-            {
-                if (from_left)
-                {
-                    binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
-                } else
-                {
-                    binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
-                }
-
-                static_cast<node*>(near_nephew)->color = static_cast<node*>(parent_node)->color;
-                static_cast<node*>(parent_node)->color = node_color::BLACK;
-            } else
-            {
-                static_cast<node*>(brother_node)->color = node_color::RED;
-                
-                if (static_cast<node*>(parent_node)->color == node_color::RED)
-                {
-                    static_cast<node*>(parent_node)->color = node_color::BLACK;
-                } else
-                {
-                    balance_black_leaf(node_path);
-                }
-            }
-        }
-    }
-}
-
-template<typename tkey, typename tvalue>
-typename binary_search_tree<tkey, tvalue>::iterator_data *red_black_tree<tkey, tvalue>::iterator_data::clone()
-{
-    return new iterator_data(*this);
-}
-
-template<typename tkey, typename tvalue>
-void red_black_tree<tkey, tvalue>::iterator_data::update(const typename binary_search_tree<tkey, tvalue>::node *n,
-                                                         unsigned int _depth)
-{
-    binary_search_tree<tkey, tvalue>::iterator_data::key = n->key;
-    binary_search_tree<tkey, tvalue>::iterator_data::value = n->value;
-    binary_search_tree<tkey, tvalue>::iterator_data::depth = _depth;
-    color = static_cast<const node*>(n)->color;
-}
-
-template<typename tkey, typename tvalue>
-template<typename tval_arg>
-void red_black_tree<tkey, tvalue>::insert_inner_t(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path,
-                                                  const tkey &key, tval_arg &&val)
-{
-    *node_path.top() = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
-    try
-    {
-        allocator_dbg_helper::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
-    } catch(...)
-    {
-        allocator_guardant::deallocate_with_guard(static_cast<node*>(*node_path.top()));
-        *node_path.top() = nullptr;
-        throw;
-    }
-
-    bool need_continue = true;
-
-    while (need_continue)
-    {
-        need_continue = false;
-
-        if (node_path.size() == 1)
-        {
-            static_cast<node*>(*node_path.top())->color = node_color::BLACK;
-        } else if (node_path.size() >= 3 && static_cast<node*>(*node_path.top())->color == node_color::RED)
-        {
-            typename binary_search_tree<tkey, tvalue>::node *child_node = *node_path.top();
-            node_path.pop();
-
-            if (static_cast<node*>(*node_path.top())->color == node_color::RED)
-            {
-                typename binary_search_tree<tkey, tvalue>::node *parent_node = *node_path.top();
-                bool is_left_child = binary_search_tree<tkey, tvalue>::is_left_subtree(child_node, parent_node);
-
-                node_path.pop();
-
-                typename binary_search_tree<tkey, tvalue>::node *grandparent_node = *node_path.top();
-
-                bool is_left_parent = binary_search_tree<tkey, tvalue>::is_left_subtree(parent_node, grandparent_node);
-
-                typename binary_search_tree<tkey, tvalue>::node *uncle_node = is_left_parent ? (*node_path.top())->right_subtree : (*node_path.top())->left_subtree;
-
-                if (uncle_node == nullptr)
-                {
-                    if (is_left_parent)
-                    {
-                        if (is_left_child)
-                        {
-                            binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::RED;
-                            static_cast<node*>(parent_node)->color = node_color::BLACK;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        } else
-                        {
-                            binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::BLACK;
-                            static_cast<node*>(parent_node)->color = node_color::RED;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        }
-                    } else
-                    {
-                        if (!is_left_child)
-                        {
-                            binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::RED;
-                            static_cast<node*>(parent_node)->color = node_color::BLACK;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        } else
-                        {
-                            binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::BLACK;
-                            static_cast<node*>(parent_node)->color = node_color::RED;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        }
-                    }
-                } else if (static_cast<node*>(uncle_node)->color == node_color::RED)
-                {
-                    need_continue = true;
-
-                    static_cast<node*>(uncle_node)->color = node_color::BLACK;
-                    static_cast<node*>(parent_node)->color = node_color::BLACK;
-                    static_cast<node*>(grandparent_node)->color = node_color::RED;
-                } else
-                {
-                    if (is_left_parent)
-                    {
-                        if (is_left_child)
-                        {
-                            binary_search_tree<tkey, tvalue>::small_right_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::RED;
-                            static_cast<node*>(parent_node)->color = node_color::BLACK;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        } else
-                        {
-                            binary_search_tree<tkey, tvalue>::big_right_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::BLACK;
-                            static_cast<node*>(parent_node)->color = node_color::RED;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        }
-                    } else
-                    {
-                        if (!is_left_child)
-                        {
-                            binary_search_tree<tkey, tvalue>::small_left_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::RED;
-                            static_cast<node*>(parent_node)->color = node_color::BLACK;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        } else
-                        {
-                            binary_search_tree<tkey, tvalue>::big_left_rotation(*node_path.top());
-                            static_cast<node*>(child_node)->color = node_color::BLACK;
-                            static_cast<node*>(parent_node)->color = node_color::RED;
-                            static_cast<node*>(grandparent_node)->color = node_color::RED;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-template<typename tkey, typename tvalue>
-tvalue red_black_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node**>& node_path)
-{
-    tvalue res = (*node_path.top())->value;
-
-    typename binary_search_tree<tkey, tvalue>::node* current_node = *node_path.top();
-
-    bool was_black_list = false;
-
-    if (current_node->right_subtree == nullptr && current_node->left_subtree == nullptr)
-    {
-        was_black_list = static_cast<node*>(*node_path.top())->color == node_color::BLACK;
-        *node_path.top() = nullptr;
-    } else if (current_node->right_subtree == nullptr || current_node->left_subtree == nullptr)
-    {
-        typename binary_search_tree<tkey, tvalue>::node* node_of_interest = current_node->right_subtree != nullptr ? current_node->right_subtree : current_node->left_subtree;
-
-        node_color color = static_cast<node*>(*node_path.top())->color;
-
-        if (color == node_color::BLACK)
-        {
-            static_cast<node*>(node_of_interest)->color = node_color::BLACK;
-        }
-
-        *node_path.top() = node_of_interest;
-
-        node_path.pop();
-    } else
-    {
-        std::deque<typename binary_search_tree<tkey, tvalue>::node**> additional_path;
-        typename binary_search_tree<tkey, tvalue>::node** node_of_interest = &current_node->left_subtree;
-
-        while ((*node_of_interest)->right_subtree != nullptr)
-        {
-            node_of_interest = &((*node_of_interest)->right_subtree);
-            additional_path.push_back(node_of_interest);
-        }
-
-        typename binary_search_tree<tkey, tvalue>::node* tmp = *node_of_interest;
-
-        was_black_list = static_cast<node*>(tmp)->color == node_color::BLACK && tmp->left_subtree == nullptr && tmp->right_subtree == nullptr;
-
-        if (static_cast<node*>(tmp)->color == node_color::BLACK && tmp->left_subtree != nullptr)
-        {
-            typename binary_search_tree<tkey, tvalue>::node* bottom_node = tmp->left_subtree;
-
-			static_cast<node*>(bottom_node)->color = node_color::BLACK;
-
-        }
-
-        std::swap(static_cast<node*>(*node_of_interest)->color, static_cast<node*>(current_node)->color);
-        *node_of_interest = (*node_of_interest)->left_subtree;
-        *node_path.top() = tmp;
-
-        tmp->left_subtree = current_node->left_subtree == tmp ? tmp->left_subtree : current_node->left_subtree;
-        tmp->right_subtree = current_node->right_subtree;
-
-        node_path.push(&(*node_path.top())->left_subtree);
-
-        while (!additional_path.empty())
-        {
-            node_path.push(additional_path.front());
-            additional_path.pop_front();
-        }
-    }
-
-    allocator_dbg_helper::destruct(current_node);
-    allocator_guardant::deallocate_with_guard(current_node);
-
-    if (was_black_list)
-        balance_black_leaf(node_path);
-
-    return res;
-}
-
-template<typename tkey, typename tvalue>
-void red_black_tree<tkey, tvalue>::insert_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path, const tkey &key, tvalue &&val)
-{
-    insert_inner_t(node_path, key, std::move(val));
-}
-
-template<typename tkey, typename tvalue>
-void red_black_tree<tkey, tvalue>::insert_inner(std::stack<typename binary_search_tree<tkey, tvalue>::node **> &node_path, const tkey &key, const tvalue& val)
-{
-    insert_inner_t(node_path, key, val);
-}
-
-template<typename tkey, typename tvalue>
-void red_black_tree<tkey, tvalue>::copy_subtree(typename binary_search_tree<tkey, tvalue>::node **target,
-                                                typename binary_search_tree<tkey, tvalue>::node *src)
-{
-    if(src == nullptr)
-    {
-        *target = nullptr;
-        return;
-    }
-
-    *target = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
-    try
-    {
-        allocator_dbg_helper::construct(static_cast<node*>(*target), *static_cast<node*>(src));
-    } catch(...)
-    {
-        allocator_guardant::deallocate_with_guard(static_cast<node*>(*target));
-        *target = nullptr;
-        throw;
-    }
-
-    (*target)->right_subtree = nullptr;
-    (*target)->left_subtree = nullptr;
-
-    copy_subtree(&((*target)->left_subtree), src->left_subtree);
-    copy_subtree(&((*target)->right_subtree), src->right_subtree);
-}
-
-template<typename tkey, typename tvalue>
-red_black_tree<tkey, tvalue>::node::node(const tkey &key_, tvalue &&value_) : binary_search_tree<tkey, tvalue>::node(key_, std::move(value_)), color(node_color::RED) {}
-
-template<typename tkey, typename tvalue>
-red_black_tree<tkey, tvalue>::node::node(const tkey &key_, const tvalue& value_) : binary_search_tree<tkey, tvalue>::node(key_, value_), color(node_color::RED) {}
-
-template<typename tkey, typename tvalue>
-red_black_tree<tkey, tvalue>::iterator_data::iterator_data(
-    unsigned int depth,
-    tkey const &key,
-    tvalue const &value,
-    typename red_black_tree<tkey, tvalue>::node_color _color) :
-    binary_search_tree<tkey, tvalue>::iterator_data(depth, key, value), color(_color) {}
-
-template<typename tkey, typename tvalue>
-red_black_tree<tkey, tvalue>::red_black_tree(
-        std::function<int(tkey const &, tkey const &)> comparer,
-        allocator_dbg_helper *allocator,
-        logger *logger,
-        typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy,
-        typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) : binary_search_tree<tkey, tvalue>(comparer, allocator, logger, insertion_strategy, disposal_strategy) {}
-
-// region iterator requests definition
-
-template<typename tkey, typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_iterator red_black_tree<tkey, tvalue>::begin_prefix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    if (binary_search_tree<tkey, tvalue>::_root != nullptr)
-        stack.push(&(binary_search_tree<tkey, tvalue>::_root));
-
-    return prefix_iterator(stack, new iterator_data);
-}
-
-template<typename tkey, typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_iterator red_black_tree<tkey, tvalue>::end_prefix() noexcept
-{
-    return prefix_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_const_iterator red_black_tree<tkey, tvalue>::cbegin_prefix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    if (binary_search_tree<tkey, tvalue>::_root != nullptr)
-        stack.push(&(binary_search_tree<tkey, tvalue>::_root));
-
-    return prefix_const_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_const_iterator red_black_tree<tkey, tvalue>::cend_prefix() const noexcept
-{
-    return prefix_const_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_reverse_iterator red_black_tree<tkey, tvalue>::rbegin_prefix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    if (binary_search_tree<tkey, tvalue>::_root != nullptr)
-        stack.push(&(binary_search_tree<tkey, tvalue>::_root));
-
-    return prefix_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_reverse_iterator red_black_tree<tkey, tvalue>::rend_prefix() noexcept
-{
-    return prefix_reverse_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_const_reverse_iterator red_black_tree<tkey, tvalue>::crbegin_prefix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    if (binary_search_tree<tkey, tvalue>::_root != nullptr)
-        stack.push(&(binary_search_tree<tkey, tvalue>::_root));
-
-    return prefix_const_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::prefix_const_reverse_iterator red_black_tree<tkey, tvalue>::crend_prefix() const noexcept
-{
-    return prefix_const_reverse_iterator();
-}
-
-template<typename tkey, typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_iterator red_black_tree<tkey, tvalue>::begin_infix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = &((*current_node)->left_subtree);
-    }
-    return infix_iterator(stack, new iterator_data);
-}
-
-template<typename tkey, typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_iterator red_black_tree<tkey, tvalue>::end_infix() noexcept
-{
-    return infix_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_const_iterator red_black_tree<tkey, tvalue>::cbegin_infix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = &((*current_node)->left_subtree);
-    }
-    return infix_const_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_const_iterator red_black_tree<tkey, tvalue>::cend_infix() const noexcept
-{
-    return infix_const_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_reverse_iterator red_black_tree<tkey, tvalue>::rbegin_infix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = &((*current_node)->right_subtree);
-    }
-    return infix_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_reverse_iterator red_black_tree<tkey, tvalue>::rend_infix() noexcept
-{
-    return infix_reverse_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_const_reverse_iterator red_black_tree<tkey, tvalue>::crbegin_infix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = &((*current_node)->right_subtree);
-    }
-    return infix_const_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::infix_const_reverse_iterator red_black_tree<tkey, tvalue>::crend_infix() const noexcept
-{
-    return infix_const_reverse_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_iterator red_black_tree<tkey, tvalue>::begin_postfix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = (*current_node)->left_subtree != nullptr ? &((*current_node)->left_subtree) : &((*current_node)->right_subtree);
-    }
-    return postfix_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_iterator red_black_tree<tkey, tvalue>::end_postfix() noexcept
-{
-    return postfix_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_const_iterator red_black_tree<tkey, tvalue>::cbegin_postfix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = (*current_node)->left_subtree != nullptr ? &((*current_node)->left_subtree) : &((*current_node)->right_subtree);
-    }
-    return postfix_const_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_const_iterator red_black_tree<tkey, tvalue>::cend_postfix() const noexcept
-{
-    return postfix_const_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_reverse_iterator red_black_tree<tkey, tvalue>::rbegin_postfix() noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = (*current_node)->right_subtree != nullptr ? &((*current_node)->right_subtree) : &((*current_node)->left_subtree);
-    }
-    return postfix_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_reverse_iterator red_black_tree<tkey, tvalue>::rend_postfix() noexcept
-{
-    return postfix_reverse_iterator();
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_const_reverse_iterator red_black_tree<tkey, tvalue>::crbegin_postfix() const noexcept
-{
-    std::stack<typename binary_search_tree<tkey, tvalue>::node**> stack;
-    typename binary_search_tree<tkey, tvalue>::node** current_node = &(binary_search_tree<tkey, tvalue>::_root);
-    while(*current_node != nullptr)
-    {
-        stack.push(current_node);
-        current_node = (*current_node)->right_subtree != nullptr ? &((*current_node)->right_subtree) : &((*current_node)->left_subtree);
-    }
-    return postfix_const_reverse_iterator(stack, new iterator_data);
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-typename red_black_tree<tkey, tvalue>::postfix_const_reverse_iterator red_black_tree<tkey, tvalue>::crend_postfix() const noexcept
-{
-    return postfix_const_reverse_iterator();
-}
-
-// endregion iterator requests definition
-
+template<typename compare, typename U, typename iterator>
+explicit red_black_tree(iterator begin, iterator end, const compare& cmp = compare(),
+        pp_allocator<U> alloc = pp_allocator<U>(),
+        logger* logger = nullptr) -> red_black_tree<const typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare>;
+
+template<typename compare, typename U, std::ranges::forward_range Range>
+explicit red_black_tree(Range&& range, const compare& cmp = compare(),
+        pp_allocator<U> alloc = pp_allocator<U>(),
+        logger* logger = nullptr) -> red_black_tree<const typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::first_type, typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::second_type, compare> ;
+
+template<typename tkey, typename tvalue, typename compare, typename U>
+red_black_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(),
+        pp_allocator<U> alloc = pp_allocator<U>(),
+        logger* logger = nullptr) -> red_black_tree<tkey, tvalue, compare>;
 
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_RED_BLACK_TREE_H

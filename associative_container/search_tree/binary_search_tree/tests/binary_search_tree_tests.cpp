@@ -473,7 +473,7 @@ TEST(binarySearchTreePositiveTests, test9)
         }));
     logger->trace("binarySearchTreePositiveTests.test9 started");
     
-    auto bst1 = std::make_unique<binary_search_tree<int, std::string>>(std:less<int>(), nullptr, logger.get());
+    auto bst1 = std::make_unique<binary_search_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
     bst1->emplace(6, "a");
     bst1->emplace(8, "c");
@@ -515,22 +515,22 @@ TEST(binarySearchTreePositiveTests, test10)
     
     auto bst1 = std::make_unique<binary_search_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    bst1->insert(6, "l");
-    bst1->insert(8, "c");
-    bst1->insert(15, "l");
-    bst1->insert(11, "o");
-    bst1->insert(9, "h");
-    bst1->insert(2, "e");
-    bst1->insert(4, "b");
-    bst1->insert(18, "e");
+    bst1->emplace(6, "l");
+    bst1->emplace(8, "c");
+    bst1->emplace(15, "l");
+    bst1->emplace(11, "o");
+    bst1->emplace(9, "h");
+    bst1->emplace(2, "e");
+    bst1->emplace(4, "b");
+    bst1->emplace(18, "e");
     
     std::vector<std::string> vector;
     
-    vector.push_back(bst1->obtain(9));
-    vector.push_back(bst1->obtain(2));
-    vector.push_back(bst1->obtain(15));
-    vector.push_back(bst1->obtain(6));
-    vector.push_back(bst1->obtain(11));
+    vector.push_back(bst1->at(9));
+    vector.push_back(bst1->at(2));
+    vector.push_back(bst1->at(15));
+    vector.push_back(bst1->at(6));
+    vector.push_back(bst1->at(11));
     
     std::string actual_result;
     
@@ -544,47 +544,6 @@ TEST(binarySearchTreePositiveTests, test10)
     logger->trace("binarySearchTreePositiveTests.test10 finished");
 }
 
-TEST(binarySearchTreePositiveTests, test11)
-{
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "binary_search_tree_tests_logs.txt",
-                logger::severity::trace
-            }
-        });
-    
-    logger->trace("binarySearchTreePositiveTests.test11 started");
-    
-    search_tree<int, std::string> *bst1 = new binary_search_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
-    bst1->insert(6, "l");
-    bst1->insert(8, "c");
-    bst1->insert(15, "l");
-    bst1->insert(11, "o");
-    bst1->insert(9, "h");
-    bst1->insert(2, "e");
-    bst1->insert(4, "b");
-    bst1->insert(18, "e");
-    
-    std::vector<associative_container<int, std::string>::key_value_pair> actual_result = bst1->obtain_between(2, 10, true, false);
-    
-    std::vector<associative_container<int, std::string>::key_value_pair> expected_result =
-        {
-            { 2, "e" },
-            { 4, "b" },
-            { 6, "l" },
-            { 8, "c" },
-            { 9, "h" }
-        };
-    
-    EXPECT_TRUE(compare_results(expected_result, actual_result));
-    
-    logger->trace("binarySearchTreePositiveTests.test11 finished");
-    
-    delete bst1;
-    delete logger;
-}
 
 int main(
     int argc,

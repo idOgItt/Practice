@@ -5,555 +5,510 @@
 #include <iostream>
 
 logger *create_logger(
-    std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
-    bool use_console_stream = true,
-    logger::severity console_stream_severity = logger::severity::debug)
+        std::vector<std::pair<std::string, logger::severity>> const &output_file_streams_setup,
+        bool use_console_stream = true,
+        logger::severity console_stream_severity = logger::severity::debug)
 {
-    logger_builder *builder = new client_logger_builder();
-    
+    std::unique_ptr<logger_builder> builder(new client_logger_builder());
+
+    builder->set_format("[%d %t][%s] %m");
+
     if (use_console_stream)
     {
         builder->add_console_stream(console_stream_severity);
     }
-    
+
     for (auto &output_file_stream_setup: output_file_streams_setup)
     {
         builder->add_file_stream(output_file_stream_setup.first, output_file_stream_setup.second);
     }
-    
+
     logger *built_logger = builder->build();
-    
-    delete builder;
-    
+
+
     return built_logger;
 }
 
-class key_comparer final
-{
-
-public:
-    
-    int operator()(
-        int first,
-        int second) const
-    {
-        return first - second;
-    }
-    
-    int operator()(
-        std::string const &first,
-        std::string const &second) const
-    {
-        if (first > second)
-        {
-            return 1;
-        }
-        else if (first < second)
-        {
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-};
-
 bool compare_results(
-    std::vector<typename associative_container<int, std::string>::key_value_pair> &expected,
-    std::vector<typename associative_container<int, std::string>::key_value_pair> &actual)
+        std::vector<typename binary_search_tree<int, std::string>::value_type> &expected,
+        std::vector<typename binary_search_tree<int, std::string>::value_type> &actual)
 {
-    key_comparer comparer;
-    
+
     if (expected.size() != actual.size())
     {
         return false;
     }
-    
-    for (size_t i = 0; i < expected.size(); ++i)
+
+    for (auto&& val : std::views::zip(expected, actual))
     {
-        if (comparer(expected[i].key, actual[i].key))
+        if (val.first.first != val.second.first)
         {
             return false;
         }
-        
-        if (expected[i].value != actual[i].value)
+
+        if (val.first.second != val.second.second)
         {
             return false;
         }
     }
-    
+
     return true;
 }
 
-template<
-    typename tkey,
-    typename tvalue>
-bool infix_iterator_test(
-    AVL_tree<tkey, tvalue> const &tree,
-    std::vector<typename AVL_tree<tkey, tvalue>::iterator_data> &expected_result)
+template<typename tkey, typename tvalue>
+struct test_data
 {
-    std::string line;
+    tkey key;
+    tvalue value;
+    size_t depth, height;
+
+    test_data(size_t dep, tkey k, tvalue v, size_t h) : depth(dep), key(k), value(v), height(h) {}
+};
+
+template<typename tkey, typename tvalue>
+bool infix_iterator_test(
+        AVL_tree<tkey, tvalue> const &tree,
+        std::vector<test_data<tkey, tvalue>> &expected_result)
+{
     auto end_infix = tree.cend_infix();
     auto it = tree.cbegin_infix();
-    
-    for (auto const &item: expected_result)
+
+    auto vec_begin =  expected_result.begin(), vec_end = expected_result.end();
+
+    for (; vec_begin != vec_end; ++vec_begin)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value ||
-            reinterpret_cast<typename AVL_tree<tkey, tvalue>::iterator_data const *>(*it)->subtree_height != item.subtree_height)
+        auto& item = *vec_begin;
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value || it.get_height() != item.height)
         {
             return false;
         }
-        
+
         ++it;
     }
+
     return true;
 }
 
 template<
-    typename tkey,
-    typename tvalue>
+        typename tkey,
+        typename tvalue>
 bool prefix_iterator_test(
-    AVL_tree<tkey, tvalue> const &tree,
-    std::vector<typename AVL_tree<tkey, tvalue>::iterator_data> &expected_result)
+        AVL_tree<tkey, tvalue> const &tree,
+        std::vector<test_data<tkey, tvalue>> &expected_result)
 {
-    std::string line;
     auto end_prefix = tree.cend_prefix();
     auto it = tree.cbegin_prefix();
-    
+
     for (auto const &item: expected_result)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value ||
-            reinterpret_cast<typename AVL_tree<tkey, tvalue>::iterator_data const *>(*it)->subtree_height != item.subtree_height)
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value || it.get_height() != item.height)
         {
             return false;
         }
+
         ++it;
     }
+
     return true;
 }
 
 template<
-    typename tkey,
-    typename tvalue>
+        typename tkey,
+        typename tvalue>
 bool postfix_iterator_test(
-    AVL_tree<tkey, tvalue> const &tree,
-    std::vector<typename AVL_tree<tkey, tvalue>::iterator_data> &expected_result)
+        AVL_tree<tkey, tvalue> const &tree,
+        std::vector<test_data<tkey, tvalue>> &expected_result)
 {
     std::string line;
     auto end_postfix = tree.cend_postfix();
     auto it = tree.cbegin_postfix();
-    
-    for (auto const &item: expected_result)
+
+    for (auto& item : expected_result)
     {
-        if ((*it)->depth != item.depth || (*it)->key != item.key || (*it)->value != item.value ||
-            reinterpret_cast<typename AVL_tree<tkey, tvalue>::iterator_data const *>(*it)->subtree_height != item.subtree_height)
+        if (it.depth() != item.depth || it->first != item.key || it->second != item.value || it.get_height() != item.height)
         {
             return false;
         }
+
         ++it;
     }
+
     return true;
 }
 
 TEST(AVLTreePositiveTests, test1)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
         {
             {
                 "AVL_tree_tests_logs.txt",
                 logger::severity::trace
             },
-        });
+        }));
     
     logger->trace("AVLTreePositiveTests.test1 started");
     
-    search_tree<int, std::string> *avl = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    auto avl = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    avl->insert(5, "a");
-    avl->insert(2, "b");
-    avl->insert(15, "c");
-    avl->insert(3, "d");
-    avl->insert(14, "e");
-    avl->insert(1, "l");
+    avl->emplace(5, "a");
+    avl->emplace(2, "b");
+    avl->emplace(15, "c");
+    avl->emplace(3, "d");
+    avl->emplace(14, "e");
+    avl->emplace(1, "l");
     
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 1, "l", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 2, "b", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 3, "d", 1),
-            AVL_tree<int, std::string>::iterator_data(0, 5, "a", 3),
-            AVL_tree<int, std::string>::iterator_data(2, 14, "e", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 15, "c", 2)
+            test_data<int, std::string>(2, 1, "l", 1),
+            test_data<int, std::string>(1, 2, "b", 2),
+            test_data<int, std::string>(2, 3, "d", 1),
+            test_data<int, std::string>(0, 5, "a", 3),
+            test_data<int, std::string>(2, 14, "e", 1),
+            test_data<int, std::string>(1, 15, "c", 2)
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<AVL_tree<int, std::string> *>(avl), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*avl, expected_result));
     
     logger->trace("AVLTreePositiveTests.test1 finished");
-    
-    delete avl;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test2)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test2 started");
+
+    auto avl = std::make_unique<AVL_tree<int, int>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, int> *avl = new AVL_tree<int, int>(key_comparer(), nullptr, logger);
+    avl->emplace(1, 5);
+    avl->emplace(2, 12);
+    avl->emplace(15, 1);
+    avl->emplace(3, 67);
+    avl->emplace(4, 45);
     
-    avl->insert(1, 5);
-    avl->insert(2, 12);
-    avl->insert(15, 1);
-    avl->insert(3, 67);
-    avl->insert(4, 45);
-    
-    std::vector<typename AVL_tree<int, int>::iterator_data> expected_result =
+    std::vector<test_data<int, int>> expected_result =
         {
-            AVL_tree<int, int>::iterator_data(0, 2, 12, 3),
-            AVL_tree<int, int>::iterator_data(1, 1, 5, 1),
-            AVL_tree<int, int>::iterator_data(1, 4, 45, 2),
-            AVL_tree<int, int>::iterator_data(2, 3, 67, 1),
-            AVL_tree<int, int>::iterator_data(2, 15, 1, 1)
+                test_data<int, int>(0, 2, 12, 3),
+                test_data<int, int>(1, 1, 5, 1),
+                test_data<int, int>(1, 4, 45, 2),
+                test_data<int, int>(2, 3, 67, 1),
+                test_data<int, int>(2, 15, 1, 1)
         };
     
-    EXPECT_TRUE(prefix_iterator_test(*reinterpret_cast<AVL_tree<int, int> *>(avl), expected_result));
+    EXPECT_TRUE(prefix_iterator_test(*avl, expected_result));
     
     logger->trace("AVLTreePositiveTests.test2 finished");
-    
-    delete avl;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test3)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test3 started");
+
+    auto avl = std::make_unique<AVL_tree<std::string, int>>(std::less<std::string>(), nullptr, logger.get());
     
-    search_tree<std::string, int> *avl = new AVL_tree<std::string, int>(key_comparer(), nullptr, logger);
+    avl->emplace("a", 1);
+    avl->emplace("b", 2);
+    avl->emplace("c", 15);
+    avl->emplace("d", 3);
+    avl->emplace("e", 4);
     
-    avl->insert("a", 1);
-    avl->insert("b", 2);
-    avl->insert("c", 15);
-    avl->insert("d", 3);
-    avl->insert("e", 4);
-    
-    std::vector<typename AVL_tree<std::string, int>::iterator_data> expected_result =
+    std::vector<test_data<std::string, int>> expected_result =
         {
-            AVL_tree<std::string, int>::iterator_data(1, "a", 1, 1),
-            AVL_tree<std::string, int>::iterator_data(2, "c", 15, 1),
-            AVL_tree<std::string, int>::iterator_data(2, "e", 4, 1),
-            AVL_tree<std::string, int>::iterator_data(1, "d", 3, 2),
-            AVL_tree<std::string, int>::iterator_data(0, "b", 2, 3)
+                test_data<std::string, int>(1, "a", 1, 1),
+                test_data<std::string, int>(2, "c", 15, 1),
+                test_data<std::string, int>(2, "e", 4, 1),
+                test_data<std::string, int>(1, "d", 3, 2),
+                test_data<std::string, int>(0, "b", 2, 3)
         };
     
-    EXPECT_TRUE(postfix_iterator_test(*reinterpret_cast<AVL_tree<std::string, int> *>(avl), expected_result));
+    EXPECT_TRUE(postfix_iterator_test(*avl, expected_result));
     
     logger->trace("AVLTreePositiveTests.test3 finished");
-    
-    delete avl;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test4)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test4 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
+
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(4, "j");
+    avl1->emplace(1, "i");
+    avl1->emplace(5, "b");
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(4, "j");
-    avl1->insert(1, "i");
-    avl1->insert(5, "b");
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 1, "i", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 4, "j", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 5, "b", 1),
-            AVL_tree<int, std::string>::iterator_data(0, 6, "a", 3),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 15, "x", 1)
+            test_data<int, std::string>(2, 1, "i", 1),
+            test_data<int, std::string>(1, 4, "j", 2),
+            test_data<int, std::string>(2, 5, "b", 1),
+            test_data<int, std::string>(0, 6, "a", 3),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(2, 15, "x", 1)
         };
     
-    AVL_tree<int, std::string> avl2(std::move(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1)));
+    AVL_tree<int, std::string> avl2(std::move(*avl1));
     
     EXPECT_TRUE(infix_iterator_test(avl2, expected_result));
     
     logger->trace("AVLTreePositiveTests.test4 finished");
-    
-    delete avl1;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test5)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test5 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(4, "j");
+    avl1->emplace(1, "i");
+    avl1->emplace(5, "b");
     
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(4, "j");
-    avl1->insert(1, "i");
-    avl1->insert(5, "b");
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 1, "i", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 4, "j", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 5, "b", 1),
-            AVL_tree<int, std::string>::iterator_data(0, 6, "a", 3),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 15, "x", 1)
+            test_data<int, std::string>(2, 1, "i", 1),
+            test_data<int, std::string>(1, 4, "j", 2),
+            test_data<int, std::string>(2, 5, "b", 1),
+            test_data<int, std::string>(0, 6, "a", 3),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(2, 15, "x", 1)
         };
     
-    AVL_tree<int, std::string> avl2 = std::move(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1));
+    AVL_tree<int, std::string> avl2 = std::move(*avl1);
     
     EXPECT_TRUE(infix_iterator_test(avl2, expected_result));
     
     logger->trace("AVLTreePositiveTests.test5 finished");
-    
-    delete avl1;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test6)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test6 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(4, "j");
+    avl1->emplace(1, "i");
+    avl1->emplace(5, "b");
     
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(4, "j");
-    avl1->insert(1, "i");
-    avl1->insert(5, "b");
+    avl1->erase(5);
     
-    avl1->dispose(5);
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 1, "i", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 4, "j", 2),
-            AVL_tree<int, std::string>::iterator_data(0, 6, "a", 3),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 15, "x", 1)
+            test_data<int, std::string>(2, 1, "i", 1),
+            test_data<int, std::string>(1, 4, "j", 2),
+            test_data<int, std::string>(0, 6, "a", 3),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(2, 15, "x", 1)
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*avl1, expected_result));
     
     logger->trace("AVLTreePositiveTests.test6 finished");
-    
-    delete avl1;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test7)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test7 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(4, "j");
+    avl1->emplace(3, "i");
+    avl1->emplace(2, "l");
+    avl1->emplace(5, "b");
     
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(4, "j");
-    avl1->insert(3, "i");
-    avl1->insert(2, "l");
-    avl1->insert(5, "b");
+    avl1->erase(3);
     
-    avl1->dispose(3);
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 2, "l", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 4, "j", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 5, "b", 1),
-            AVL_tree<int, std::string>::iterator_data(0, 6, "a", 3),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 15, "x", 1)
+            test_data<int, std::string>(2, 2, "l", 1),
+            test_data<int, std::string>(1, 4, "j", 2),
+            test_data<int, std::string>(2, 5, "b", 1),
+            test_data<int, std::string>(0, 6, "a", 3),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(2, 15, "x", 1)
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*avl1, expected_result));
     
     logger->trace("AVLTreePositiveTests.test7 finished");
-    
-    delete avl1;
-    delete logger;
     
 }
 
 TEST(AVLTreePositiveTests, test8)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test8 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(11, "j");
+    avl1->emplace(19, "i");
+    avl1->emplace(12, "l");
+    avl1->emplace(17, "b");
+    avl1->emplace(18, "e");
     
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(11, "j");
-    avl1->insert(19, "i");
-    avl1->insert(12, "l");
-    avl1->insert(17, "b");
-    avl1->insert(18, "e");
+    avl1->erase(15);
     
-    avl1->dispose(15);
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 6, "a", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(0, 11, "j", 4),
-            AVL_tree<int, std::string>::iterator_data(2, 12, "l", 2),
-            AVL_tree<int, std::string>::iterator_data(3, 17, "b", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 18, "e", 3),
-            AVL_tree<int, std::string>::iterator_data(2, 19, "i", 1)
+            test_data<int, std::string>(2, 6, "a", 1),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(0, 11, "j", 4),
+            test_data<int, std::string>(2, 12, "l", 2),
+            test_data<int, std::string>(3, 17, "b", 1),
+            test_data<int, std::string>(1, 18, "e", 3),
+            test_data<int, std::string>(2, 19, "i", 1)
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*avl1, expected_result));
     
     logger->trace("AVLTreePositiveTests.test8 finished");
-    
-    delete avl1;
-    delete logger;
 }
 
 TEST(AVLTreePositiveTests, test9)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test9 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
+    avl1->emplace(6, "a");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "x");
+    avl1->emplace(11, "j");
+    avl1->emplace(19, "i");
+    avl1->emplace(12, "l");
+    avl1->emplace(17, "b");
+    avl1->emplace(18, "e");
     
-    avl1->insert(6, "a");
-    avl1->insert(8, "c");
-    avl1->insert(15, "x");
-    avl1->insert(11, "j");
-    avl1->insert(19, "i");
-    avl1->insert(12, "l");
-    avl1->insert(17, "b");
-    avl1->insert(18, "e");
+    avl1->erase(11);
     
-    avl1->dispose(11);
-    
-    std::vector<typename AVL_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            AVL_tree<int, std::string>::iterator_data(2, 6, "a", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 8, "c", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 12, "l", 1),
-            AVL_tree<int, std::string>::iterator_data(0, 15, "x", 3),
-            AVL_tree<int, std::string>::iterator_data(2, 17, "b", 1),
-            AVL_tree<int, std::string>::iterator_data(1, 18, "e", 2),
-            AVL_tree<int, std::string>::iterator_data(2, 19, "i", 1)
+            test_data<int, std::string>(2, 6, "a", 1),
+            test_data<int, std::string>(1, 8, "c", 2),
+            test_data<int, std::string>(2, 12, "l", 1),
+            test_data<int, std::string>(0, 15, "x", 3),
+            test_data<int, std::string>(2, 17, "b", 1),
+            test_data<int, std::string>(1, 18, "e", 2),
+            test_data<int, std::string>(2, 19, "i", 1)
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<AVL_tree<int, std::string> *>(avl1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*avl1, expected_result));
     
     logger->trace("AVLTreePositiveTests.test9 finished");
-    
-    delete avl1;
-    delete logger;
     
 }
 
 TEST(AVLTreePositiveTests, test10)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            },
-        });
+
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test10 started");
+
+    auto avl1 = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
     
-    search_tree<int, std::string> *avl1 = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
-    
-    avl1->insert(6, "l");
-    avl1->insert(8, "c");
-    avl1->insert(15, "l");
-    avl1->insert(11, "o");
-    avl1->insert(9, "h");
-    avl1->insert(2, "e");
-    avl1->insert(4, "b");
-    avl1->insert(18, "e");
+    avl1->emplace(6, "l");
+    avl1->emplace(8, "c");
+    avl1->emplace(15, "l");
+    avl1->emplace(11, "o");
+    avl1->emplace(9, "h");
+    avl1->emplace(2, "e");
+    avl1->emplace(4, "b");
+    avl1->emplace(18, "e");
     
     std::vector<std::string> vector;
     
-    vector.push_back(avl1->obtain(9));
-    vector.push_back(avl1->obtain(2));
-    vector.push_back(avl1->obtain(15));
-    vector.push_back(avl1->obtain(6));
-    vector.push_back(avl1->obtain(11));
+    vector.push_back(avl1->at(9));
+    vector.push_back(avl1->at(2));
+    vector.push_back(avl1->at(15));
+    vector.push_back(avl1->at(6));
+    vector.push_back(avl1->at(11));
     
     std::string actual_result;
     
@@ -566,39 +521,39 @@ TEST(AVLTreePositiveTests, test10)
     
     logger->trace("AVLTreePositiveTests.test10 finished");
     
-    delete avl1;
-    delete logger;
-    
 }
 
 TEST(AVLTreePositiveTests, test11)
 {
-    logger *logger = create_logger(std::vector<std::pair<std::string, logger::severity>>
-        {
-            {
-                "AVL_tree_tests_logs.txt",
-                logger::severity::trace
-            }
-        });
+
+    std::unique_ptr<logger> logger(create_logger(std::vector<std::pair<std::string, logger::severity>>
+                                                         {
+                                                                 {
+                                                                         "AVL_tree_tests_logs.txt",
+                                                                         logger::severity::trace
+                                                                 },
+                                                         }));
     
     logger->trace("AVLTreePositiveTests.test11 started");
-    
-    search_tree<int, std::string> *avl = new AVL_tree<int, std::string>(key_comparer(), nullptr, logger);
 
-    auto d = static_cast<AVL_tree<int, std::string>*>(avl)->begin_prefix();
+    auto avl = std::make_unique<AVL_tree<int, std::string>>(std::less<int>(), nullptr, logger.get());
 
-    avl->insert(6, "l");
-    avl->insert(8, "c");
-    avl->insert(15, "l");
-    avl->insert(11, "o");
-    avl->insert(9, "h");
-    avl->insert(2, "e");
-    avl->insert(4, "b");
-    avl->insert(18, "e");
+    auto d = avl->begin_prefix();
+
+    avl->emplace(6, "l");
+    avl->emplace(8, "c");
+    avl->emplace(15, "l");
+    avl->emplace(11, "o");
+    avl->emplace(9, "h");
+    avl->emplace(2, "e");
+    avl->emplace(4, "b");
+    avl->emplace(18, "e");
+
+    auto b = avl->lower_bound(2);
+    auto e = avl->upper_bound(10);
+    std::vector<std::pair<const int, std::string>> actual_result(b, e);
     
-    std::vector<associative_container<int, std::string>::key_value_pair> actual_result = avl->obtain_between(2, 10, true, false);
-    
-    std::vector<associative_container<int, std::string>::key_value_pair> expected_result =
+    std::vector<std::pair<const int, std::string>> expected_result =
         {
             { 2, "e" },
             { 4, "b" },
@@ -610,9 +565,6 @@ TEST(AVLTreePositiveTests, test11)
     EXPECT_TRUE(compare_results(expected_result, actual_result));
     
     logger->trace("AVLTreePositiveTests.test11 finished");
-    
-    delete avl;
-    delete logger;
 }
 
 int main(
@@ -620,6 +572,6 @@ int main(
     char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    
+
     return RUN_ALL_TESTS();
 }

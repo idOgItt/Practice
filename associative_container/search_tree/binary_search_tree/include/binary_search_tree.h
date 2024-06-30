@@ -100,7 +100,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -145,7 +145,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -192,7 +192,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -240,7 +240,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -294,7 +294,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -339,7 +339,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -386,7 +386,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -434,7 +434,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -488,7 +488,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -533,7 +533,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -580,7 +580,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -628,7 +628,7 @@ public:
     public:
 
         using value_type = binary_search_tree<tkey, tvalue, compare>::value_type;
-        using difference = ptrdiff_t;
+        using difference_type = ptrdiff_t;
         using reference = const value_type&;
         using pointer = value_type* const;
         using iterator_category = std::bidirectional_iterator_tag;

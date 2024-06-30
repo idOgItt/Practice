@@ -6,8 +6,8 @@
 namespace __detail
 {
     class AVL_TAG;
-    template<typename tkey, typename tvalue, typename compare>
 
+    template<typename tkey, typename tvalue, typename compare>
     class bst_impl<tkey, tvalue, compare, AVL_TAG>
     {
         template<class ...Args>
@@ -23,7 +23,7 @@ namespace __detail
     };
 }
 
-template<typename tkey, typename tvalue, compator<tkey> compare>
+template<typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>>
 class AVL_tree final:
     public binary_search_tree<tkey, tvalue, compare, __detail::AVL_TAG>
 {
@@ -57,16 +57,36 @@ public:
     {
     public:
 
+        using value_type = parent::prefix_iterator::value_type;
+        using difference_type = parent::prefix_iterator::difference_type;
+        using pointer = parent::prefix_iterator::pointer;
+        using reference = parent::prefix_iterator::reference;
+        using iterator_category = parent::prefix_iterator::iterator_category;
+
         explicit prefix_iterator(parent::node* n = nullptr) noexcept;
         prefix_iterator(parent::prefix_iterator) noexcept;
 
         size_t get_height() const noexcept;
         size_t get_balance() const noexcept;
+
+        using parent::prefix_iterator::depth;
+        using parent::prefix_iterator::operator*;
+        using parent::prefix_iterator::operator==;
+        using parent::prefix_iterator::operator!=;
+        using parent::prefix_iterator::operator++;
+        using parent::prefix_iterator::operator--;
+        using parent::prefix_iterator::operator->;
     };
 
     class prefix_const_iterator : public parent::prefix_const_iterator
     {
     public:
+
+        using value_type = parent::prefix_const_iterator::value_type;
+        using difference_type = parent::prefix_const_iterator::difference_type;
+        using pointer = parent::prefix_const_iterator::pointer;
+        using reference = parent::prefix_const_iterator::reference;
+        using iterator_category = parent::prefix_const_iterator::iterator_category;
 
         explicit prefix_const_iterator(parent::node* n = nullptr) noexcept;
         prefix_const_iterator(parent::prefix_const_iterator) noexcept;
@@ -75,11 +95,25 @@ public:
         size_t get_balance() const noexcept;
 
         prefix_const_iterator(prefix_iterator) noexcept;
+
+        using parent::prefix_const_iterator::depth;
+        using parent::prefix_const_iterator::operator*;
+        using parent::prefix_const_iterator::operator==;
+        using parent::prefix_const_iterator::operator!=;
+        using parent::prefix_const_iterator::operator++;
+        using parent::prefix_const_iterator::operator--;
+        using parent::prefix_const_iterator::operator->;
     };
 
     class prefix_reverse_iterator : public parent::prefix_reverse_iterator
     {
     public:
+
+        using value_type = parent::prefix_reverse_iterator::value_type;
+        using difference_type = parent::prefix_reverse_iterator::difference_type;
+        using pointer = parent::prefix_reverse_iterator::pointer;
+        using reference = parent::prefix_reverse_iterator::reference;
+        using iterator_category = parent::prefix_reverse_iterator::iterator_category;
 
         explicit prefix_reverse_iterator(parent::node* n = nullptr) noexcept;
         prefix_reverse_iterator(parent::prefix_reverse_iterator) noexcept;
@@ -90,11 +124,25 @@ public:
         prefix_reverse_iterator(prefix_iterator) noexcept;
         operator prefix_iterator() const noexcept;
         prefix_iterator base() const noexcept;
+
+        using parent::prefix_reverse_iterator::depth;
+        using parent::prefix_reverse_iterator::operator*;
+        using parent::prefix_reverse_iterator::operator==;
+        using parent::prefix_reverse_iterator::operator!=;
+        using parent::prefix_reverse_iterator::operator++;
+        using parent::prefix_reverse_iterator::operator--;
+        using parent::prefix_reverse_iterator::operator->;
     };
 
     class prefix_const_reverse_iterator : public parent::prefix_const_reverse_iterator
     {
     public:
+
+        using value_type = parent::prefix_const_reverse_iterator::value_type;
+        using difference_type = parent::prefix_const_reverse_iterator::difference_type;
+        using pointer = parent::prefix_const_reverse_iterator::pointer;
+        using reference = parent::prefix_const_reverse_iterator::reference;
+        using iterator_category = parent::prefix_const_reverse_iterator::iterator_category;
 
         explicit prefix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
         prefix_const_reverse_iterator(parent::prefix_const_reverse_iterator) noexcept;
@@ -105,22 +153,50 @@ public:
         prefix_const_reverse_iterator(prefix_const_iterator) noexcept;
         operator prefix_const_iterator() const noexcept;
         prefix_const_iterator base() const noexcept;
+
+        using parent::prefix_const_reverse_iterator::depth;
+        using parent::prefix_const_reverse_iterator::operator*;
+        using parent::prefix_const_reverse_iterator::operator==;
+        using parent::prefix_const_reverse_iterator::operator!=;
+        using parent::prefix_const_reverse_iterator::operator++;
+        using parent::prefix_const_reverse_iterator::operator--;
+        using parent::prefix_const_reverse_iterator::operator->;
     };
 
     class infix_iterator : public parent::infix_iterator
     {
     public:
 
+        using value_type = parent::infix_iterator::value_type;
+        using difference_type = parent::infix_iterator::difference_type;
+        using pointer = parent::infix_iterator::pointer;
+        using reference = parent::infix_iterator::reference;
+        using iterator_category = parent::infix_iterator::iterator_category;
+
         explicit infix_iterator(parent::node* n = nullptr) noexcept;
         infix_iterator(parent::infix_iterator) noexcept;
 
         size_t get_height() const noexcept;
         size_t get_balance() const noexcept;
+
+        using parent::infix_iterator::depth;
+        using parent::infix_iterator::operator*;
+        using parent::infix_iterator::operator==;
+        using parent::infix_iterator::operator!=;
+        using parent::infix_iterator::operator++;
+        using parent::infix_iterator::operator--;
+        using parent::infix_iterator::operator->;
     };
 
     class infix_const_iterator : parent::infix_const_iterator
     {
     public:
+
+        using value_type = parent::infix_const_iterator::value_type;
+        using difference_type = parent::infix_const_iterator::difference_type;
+        using pointer = parent::infix_const_iterator::pointer;
+        using reference = parent::infix_const_iterator::reference;
+        using iterator_category = parent::infix_const_iterator::iterator_category;
 
         explicit infix_const_iterator(parent::node* n = nullptr) noexcept;
         infix_const_iterator(parent::infix_const_iterator) noexcept;
@@ -129,11 +205,25 @@ public:
         size_t get_balance() const noexcept;
 
         infix_const_iterator(infix_iterator) noexcept;
+
+        using parent::infix_const_iterator::depth;
+        using parent::infix_const_iterator::operator*;
+        using parent::infix_const_iterator::operator==;
+        using parent::infix_const_iterator::operator!=;
+        using parent::infix_const_iterator::operator++;
+        using parent::infix_const_iterator::operator--;
+        using parent::infix_const_iterator::operator->;
     };
 
     class infix_reverse_iterator : public parent::infix_reverse_iterator
     {
     public:
+
+        using value_type = parent::infix_reverse_iterator::value_type;
+        using difference_type = parent::infix_reverse_iterator::difference_type;
+        using pointer = parent::infix_reverse_iterator::pointer;
+        using reference = parent::infix_reverse_iterator::reference;
+        using iterator_category = parent::infix_reverse_iterator::iterator_category;
 
         explicit infix_reverse_iterator(parent::node* n = nullptr) noexcept;
         infix_reverse_iterator(parent::infix_reverse_iterator) noexcept;
@@ -144,11 +234,25 @@ public:
         infix_reverse_iterator(infix_iterator) noexcept;
         operator infix_iterator() const noexcept;
         infix_iterator base() const noexcept;
+
+        using parent::infix_reverse_iterator::depth;
+        using parent::infix_reverse_iterator::operator*;
+        using parent::infix_reverse_iterator::operator==;
+        using parent::infix_reverse_iterator::operator!=;
+        using parent::infix_reverse_iterator::operator++;
+        using parent::infix_reverse_iterator::operator--;
+        using parent::infix_reverse_iterator::operator->;
     };
 
     class infix_const_reverse_iterator : public parent::infix_const_reverse_iterator
     {
     public:
+
+        using value_type = parent::infix_const_reverse_iterator::value_type;
+        using difference_type = parent::infix_const_reverse_iterator::difference_type;
+        using pointer = parent::infix_const_reverse_iterator::pointer;
+        using reference = parent::infix_const_reverse_iterator::reference;
+        using iterator_category = parent::infix_const_reverse_iterator::iterator_category;
 
         explicit infix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
         infix_const_reverse_iterator(parent::infix_const_reverse_iterator) noexcept;
@@ -159,22 +263,50 @@ public:
         infix_const_reverse_iterator(infix_const_iterator) noexcept;
         operator infix_const_iterator() const noexcept;
         infix_const_iterator base() const noexcept;
+
+        using parent::infix_const_reverse_iterator::depth;
+        using parent::infix_const_reverse_iterator::operator*;
+        using parent::infix_const_reverse_iterator::operator==;
+        using parent::infix_const_reverse_iterator::operator!=;
+        using parent::infix_const_reverse_iterator::operator++;
+        using parent::infix_const_reverse_iterator::operator--;
+        using parent::infix_const_reverse_iterator::operator->;
     };
 
     class postfix_iterator : public parent::postfix_iterator
     {
     public:
 
+        using value_type = parent::postfix_iterator::value_type;
+        using difference_type = parent::postfix_iterator::difference_type;
+        using pointer = parent::postfix_iterator::pointer;
+        using reference = parent::postfix_iterator::reference;
+        using iterator_category = parent::postfix_iterator::iterator_category;
+
         explicit postfix_iterator(parent::node* n = nullptr) noexcept;
         postfix_iterator(parent::postfix_iterator) noexcept;
 
         size_t get_height() const noexcept;
         size_t get_balance() const noexcept;
+
+        using parent::postfix_iterator::depth;
+        using parent::postfix_iterator::operator*;
+        using parent::postfix_iterator::operator==;
+        using parent::postfix_iterator::operator!=;
+        using parent::postfix_iterator::operator++;
+        using parent::postfix_iterator::operator--;
+        using parent::postfix_iterator::operator->;
     };
 
     class postfix_const_iterator : public parent::postfix_const_iterator
     {
     public:
+
+        using value_type = parent::postfix_const_iterator::value_type;
+        using difference_type = parent::postfix_const_iterator::difference_type;
+        using pointer = parent::postfix_const_iterator::pointer;
+        using reference = parent::postfix_const_iterator::reference;
+        using iterator_category = parent::postfix_const_iterator::iterator_category;
 
         explicit postfix_const_iterator(parent::node* n = nullptr) noexcept;
         postfix_const_iterator(parent::postfix_const_iterator) noexcept;
@@ -183,11 +315,25 @@ public:
         size_t get_balance() const noexcept;
 
         postfix_const_iterator(postfix_iterator) noexcept;
+
+        using parent::postfix_const_iterator::depth;
+        using parent::postfix_const_iterator::operator*;
+        using parent::postfix_const_iterator::operator==;
+        using parent::postfix_const_iterator::operator!=;
+        using parent::postfix_const_iterator::operator++;
+        using parent::postfix_const_iterator::operator--;
+        using parent::postfix_const_iterator::operator->;
     };
 
     class postfix_reverse_iterator : public parent::postfix_reverse_iterator
     {
     public:
+
+        using value_type = parent::postfix_reverse_iterator::value_type;
+        using difference_type = parent::postfix_reverse_iterator::difference_type;
+        using pointer = parent::postfix_reverse_iterator::pointer;
+        using reference = parent::postfix_reverse_iterator::reference;
+        using iterator_category = parent::postfix_reverse_iterator::iterator_category;
 
         explicit postfix_reverse_iterator(parent::node* n = nullptr) noexcept;
         postfix_reverse_iterator(parent::postfix_reverse_iterator) noexcept;
@@ -198,11 +344,25 @@ public:
         postfix_reverse_iterator(postfix_iterator) noexcept;
         operator postfix_iterator() const noexcept;
         postfix_iterator base() const noexcept;
+
+        using parent::postfix_reverse_iterator::depth;
+        using parent::postfix_reverse_iterator::operator*;
+        using parent::postfix_reverse_iterator::operator==;
+        using parent::postfix_reverse_iterator::operator!=;
+        using parent::postfix_reverse_iterator::operator++;
+        using parent::postfix_reverse_iterator::operator--;
+        using parent::postfix_reverse_iterator::operator->;
     };
 
     class postfix_const_reverse_iterator : public parent::postfix_const_reverse_iterator
     {
     public:
+
+        using value_type = parent::postfix_const_reverse_iterator::value_type;
+        using difference_type = parent::postfix_const_reverse_iterator::difference_type;
+        using pointer = parent::postfix_const_reverse_iterator::pointer;
+        using reference = parent::postfix_const_reverse_iterator::reference;
+        using iterator_category = parent::postfix_const_reverse_iterator::iterator_category;
 
         explicit postfix_const_reverse_iterator(parent::node* n = nullptr) noexcept;
         postfix_const_reverse_iterator(parent::postfix_const_reverse_iterator) noexcept;
@@ -213,6 +373,14 @@ public:
         postfix_const_reverse_iterator(postfix_const_iterator) noexcept;
         operator postfix_const_iterator() const noexcept;
         postfix_const_iterator base() const noexcept;
+
+        using parent::postfix_const_reverse_iterator::depth;
+        using parent::postfix_const_reverse_iterator::operator*;
+        using parent::postfix_const_reverse_iterator::operator==;
+        using parent::postfix_const_reverse_iterator::operator!=;
+        using parent::postfix_const_reverse_iterator::operator++;
+        using parent::postfix_const_reverse_iterator::operator--;
+        using parent::postfix_const_reverse_iterator::operator->;
 
     };
 
@@ -353,7 +521,7 @@ public:
     
     AVL_tree &operator=(AVL_tree &&other) noexcept =default;
 
-    void swap(AVL_tree& other) noexcept override;
+    void swap(parent& other) noexcept override;
 
 
     /** Only rebinds iterators
@@ -384,6 +552,10 @@ public:
 
     infix_iterator erase(infix_iterator first, infix_iterator last);
     infix_iterator erase(infix_const_iterator first, infix_const_iterator last);
+
+    using parent::erase;
+    using parent::insert;
+    using parent::insert_or_assign;
 };
 
 template<typename compare, typename U, typename iterator>
