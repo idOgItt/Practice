@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include <scapegoat_tree.h>
-#include <associative_container.h>
 #include <logger_builder.h>
 #include <client_logger_builder.h>
 #include <iostream>
@@ -62,9 +61,9 @@ struct test_data
 {
     tkey key;
     tvalue value;
-    size_t depth, height;
+    size_t depth;
 
-    test_data(size_t dep, tkey k, tvalue v, size_t h) : depth(dep), key(k), value(v), height(h) {}
+    test_data(size_t dep, tkey k, tvalue v) : depth(dep), key(k), value(v){}
 };
 
 template<
@@ -72,7 +71,7 @@ template<
     typename tvalue>
 bool infix_iterator_test(
     scapegoat_tree<tkey, tvalue> const &tree,
-    std::vector<typename scapegoat_tree<tkey, tvalue>::iterator_data> &expected_result)
+    std::vector<test_data<tkey, tvalue>> &expected_result)
 {
     
     std::string line;
@@ -95,7 +94,7 @@ template<
     typename tvalue>
 bool prefix_iterator_test(
     scapegoat_tree<tkey, tvalue> const &tree,
-    std::vector<typename scapegoat_tree<tkey, tvalue>::iterator_data> &expected_result)
+    std::vector<test_data<tkey, tvalue>> &expected_result)
 {
     std::string line;
     auto end_prefix = tree.cend_prefix();
@@ -117,7 +116,7 @@ template<
     typename tvalue>
 bool postfix_iterator_test(
     scapegoat_tree<tkey, tvalue> const &tree,
-    std::vector<typename scapegoat_tree<tkey, tvalue>::iterator_data> &expected_result)
+    std::vector<test_data<tkey, tvalue>> &expected_result)
 {
     
     std::string line;
@@ -149,24 +148,24 @@ TEST(scapegoatTreePositiveTests, test1)
     
     auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
-    sg->insert(5, "a");
-    sg->insert(2, "b");
-    sg->insert(15, "c");
-    sg->insert(3, "d");
-    sg->insert(14, "e");
-    sg->insert(1, "l");
+    sg->emplace(5, "a");
+    sg->emplace(2, "b");
+    sg->emplace(15, "c");
+    sg->emplace(3, "d");
+    sg->emplace(14, "e");
+    sg->emplace(1, "l");
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 1, "l"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 2, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 3, "d"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 5, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 14, "e"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 15, "c")
+            test_data<int, std::string>(2, 1, "l"),
+            test_data<int, std::string>(1, 2, "b"),
+            test_data<int, std::string>(2, 3, "d"),
+            test_data<int, std::string>(0, 5, "a"),
+            test_data<int, std::string>(2, 14, "e"),
+            test_data<int, std::string>(1, 15, "c")
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*sg, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test1 finished");
 }
@@ -185,22 +184,22 @@ TEST(scapegoatTreePositiveTests, test2)
 
     auto sg = std::make_unique<scapegoat_tree<int, int>>(std::less<int>(), nullptr, logger.get(), 0.5);
     
-    sg->insert(1, 5);
-    sg->insert(2, 12);
-    sg->insert(15, 1);
-    sg->insert(3, 67);
-    sg->insert(4, 45);
+    sg->emplace(1, 5);
+    sg->emplace(2, 12);
+    sg->emplace(15, 1);
+    sg->emplace(3, 67);
+    sg->emplace(4, 45);
     
-    std::vector<typename scapegoat_tree<int, int>::iterator_data> expected_result =
+    std::vector<test_data<int, int>> expected_result =
         {
-            scapegoat_tree<int, int>::iterator_data(0, 3, 67),
-            scapegoat_tree<int, int>::iterator_data(1, 2, 12),
-            scapegoat_tree<int, int>::iterator_data(2, 1, 5),
-            scapegoat_tree<int, int>::iterator_data(1, 15, 1),
-            scapegoat_tree<int, int>::iterator_data(2, 4, 45)
+                test_data<int, int>(0, 3, 67),
+                test_data<int, int>(1, 2, 12),
+                test_data<int, int>(2, 1, 5),
+                test_data<int, int>(1, 15, 1),
+                test_data<int, int>(2, 4, 45)
         };
     
-    EXPECT_TRUE(prefix_iterator_test(*reinterpret_cast<scapegoat_tree<int, int> *>(sg), expected_result));
+    EXPECT_TRUE(prefix_iterator_test(*sg, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test2 finished");
 }
@@ -219,22 +218,22 @@ TEST(scapegoatTreePositiveTests, test3)
 
     auto sg = std::make_unique<scapegoat_tree<std::string, int>>(std::less<std::string>(), nullptr, logger.get(), 0.9);
     
-    sg->insert("a", 1);
-    sg->insert("b", 2);
-    sg->insert("c", 15);
-    sg->insert("d", 3);
-    sg->insert("e", 4);
+    sg->emplace("a", 1);
+    sg->emplace("b", 2);
+    sg->emplace("c", 15);
+    sg->emplace("d", 3);
+    sg->emplace("e", 4);
     
-    std::vector<typename scapegoat_tree<std::string, int>::iterator_data> expected_result =
+    std::vector<test_data<std::string, int>> expected_result =
         {
-            scapegoat_tree<std::string, int>::iterator_data(4, "e", 4),
-            scapegoat_tree<std::string, int>::iterator_data(3, "d", 3),
-            scapegoat_tree<std::string, int>::iterator_data(2, "c", 15),
-            scapegoat_tree<std::string, int>::iterator_data(1, "b", 2),
-            scapegoat_tree<std::string, int>::iterator_data(0, "a", 1)
+                test_data<std::string, int>(4, "e", 4),
+                test_data<std::string, int>(3, "d", 3),
+                test_data<std::string, int>(2, "c", 15),
+                test_data<std::string, int>(1, "b", 2),
+                test_data<std::string, int>(0, "a", 1)
         };
     
-    EXPECT_TRUE(postfix_iterator_test(*reinterpret_cast<scapegoat_tree<std::string, int> *>(sg), expected_result));
+    EXPECT_TRUE(postfix_iterator_test(*sg, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test3 finished");
 }
@@ -251,26 +250,26 @@ TEST(scapegoatTreePositiveTests, test4)
     
     logger->trace("scapegoatTreePositiveTests.test4 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
     
-    sg1->insert(6, "a");
-    sg1->insert(8, "c");
-    sg1->insert(15, "x");
-    sg1->insert(4, "j");
-    sg1->insert(1, "i");
-    sg1->insert(5, "b");
+    sg1->emplace(6, "a");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "x");
+    sg1->emplace(4, "j");
+    sg1->emplace(1, "i");
+    sg1->emplace(5, "b");
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 1, "i"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 4, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 5, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 6, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 15, "x"),
+            test_data<int, std::string>(2, 1, "i"),
+            test_data<int, std::string>(1, 4, "j"),
+            test_data<int, std::string>(2, 5, "b"),
+            test_data<int, std::string>(0, 6, "a"),
+            test_data<int, std::string>(2, 8, "c"),
+            test_data<int, std::string>(1, 15, "x"),
         };
     
-    scapegoat_tree<int, std::string> sg2(std::move(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1)));
+    scapegoat_tree<int, std::string> sg2(std::move(*sg1));
     
     EXPECT_TRUE(infix_iterator_test(sg2, expected_result));
     
@@ -289,27 +288,27 @@ TEST(scapegoatTreePositiveTests, test5)
     
     logger->trace("scapegoatTreePositiveTests.test5 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.65);
     
-    sg1->insert(6, "a");
-    sg1->insert(8, "c");
-    sg1->insert(15, "x");
-    sg1->insert(4, "j");
-    sg1->insert(1, "i");
-    sg1->insert(5, "b");
+    sg1->emplace(6, "a");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "x");
+    sg1->emplace(4, "j");
+    sg1->emplace(1, "i");
+    sg1->emplace(5, "b");
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 1, "i"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 4, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 5, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 6, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 15, "x"),
+            test_data<int, std::string>(2, 1, "i"),
+            test_data<int, std::string>(1, 4, "j"),
+            test_data<int, std::string>(2, 5, "b"),
+            test_data<int, std::string>(0, 6, "a"),
+            test_data<int, std::string>(2, 8, "c"),
+            test_data<int, std::string>(1, 15, "x"),
         };
     
     scapegoat_tree<int, std::string> sg2 = std::move(
-        *reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1));
+        *sg1);
     
     EXPECT_TRUE(infix_iterator_test(sg2, expected_result));
     
@@ -328,27 +327,27 @@ TEST(scapegoatTreePositiveTests, test6)
     
     logger->trace("scapegoatTreePositiveTests.test6 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.5);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.5);
     
-    sg1->insert(6, "a");
-    sg1->insert(8, "c");
-    sg1->insert(15, "x");
-    sg1->insert(4, "j");
-    sg1->insert(1, "i");
-    sg1->insert(5, "b");
+    sg1->emplace(6, "a");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "x");
+    sg1->emplace(4, "j");
+    sg1->emplace(1, "i");
+    sg1->emplace(5, "b");
     
-    sg1->dispose(5);
+    sg1->erase(5);
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 1, "i"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 4, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 6, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 15, "x"),
+            test_data<int, std::string>(2, 1, "i"),
+            test_data<int, std::string>(1, 4, "j"),
+            test_data<int, std::string>(0, 6, "a"),
+            test_data<int, std::string>(2, 8, "c"),
+            test_data<int, std::string>(1, 15, "x"),
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*sg1, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test6 finished");
 }
@@ -365,29 +364,29 @@ TEST(scapegoatTreePositiveTests, test7)
     
     logger->trace("scapegoatTreePositiveTests.test7 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
-    sg1->insert(6, "a");
-    sg1->insert(8, "c");
-    sg1->insert(15, "x");
-    sg1->insert(4, "j");
-    sg1->insert(3, "i");
-    sg1->insert(2, "l");
-    sg1->insert(5, "b");
+    sg1->emplace(6, "a");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "x");
+    sg1->emplace(4, "j");
+    sg1->emplace(3, "i");
+    sg1->emplace(2, "l");
+    sg1->emplace(5, "b");
     
-    sg1->dispose(3);
+    sg1->erase(3);
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 2, "l"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 4, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 5, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 6, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 15, "x"),
+            test_data<int, std::string>(2, 2, "l"),
+            test_data<int, std::string>(1, 4, "j"),
+            test_data<int, std::string>(2, 5, "b"),
+            test_data<int, std::string>(0, 6, "a"),
+            test_data<int, std::string>(1, 8, "c"),
+            test_data<int, std::string>(2, 15, "x"),
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*sg1, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test7 finished");
 }
@@ -404,31 +403,31 @@ TEST(scapegoatTreePositiveTests, test8)
     
     logger->trace("scapegoatTreePositiveTests.test8 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
-    sg1->insert(6, "a");
-    sg1->insert(8, "c");
-    sg1->insert(15, "x");
-    sg1->insert(11, "j");
-    sg1->insert(19, "i");
-    sg1->insert(12, "l");
-    sg1->insert(17, "b");
-    sg1->insert(18, "e");
+    sg1->emplace(6, "a");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "x");
+    sg1->emplace(11, "j");
+    sg1->emplace(19, "i");
+    sg1->emplace(12, "l");
+    sg1->emplace(17, "b");
+    sg1->emplace(18, "e");
     
-    sg1->dispose(12);
-    sg1->dispose(15);
+    sg1->erase(12);
+    sg1->erase(15);
     
-    std::vector<typename scapegoat_tree<int, std::string>::iterator_data> expected_result =
+    std::vector<test_data<int, std::string>> expected_result =
         {
-            scapegoat_tree<int, std::string>::iterator_data(2, 6, "a"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 8, "c"),
-            scapegoat_tree<int, std::string>::iterator_data(0, 11, "j"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 17, "b"),
-            scapegoat_tree<int, std::string>::iterator_data(1, 18, "e"),
-            scapegoat_tree<int, std::string>::iterator_data(2, 19, "i"),
+            test_data<int, std::string>(2, 6, "a"),
+            test_data<int, std::string>(1, 8, "c"),
+            test_data<int, std::string>(0, 11, "j"),
+            test_data<int, std::string>(2, 17, "b"),
+            test_data<int, std::string>(1, 18, "e"),
+            test_data<int, std::string>(2, 19, "i"),
         };
     
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<scapegoat_tree<int, std::string> *>(sg1), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*sg1, expected_result));
     
     logger->trace("scapegoatTreePositiveTests.test8 finished");
 }
@@ -445,24 +444,24 @@ TEST(scapegoatTreePositiveTests, test9)
     
     logger->trace("scapegoatTreePositiveTests.test9 started");
 
-    auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
+    auto sg1 = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
-    sg1->insert(6, "l");
-    sg1->insert(8, "c");
-    sg1->insert(15, "l");
-    sg1->insert(11, "o");
-    sg1->insert(9, "h");
-    sg1->insert(2, "e");
-    sg1->insert(4, "b");
-    sg1->insert(18, "e");
+    sg1->emplace(6, "l");
+    sg1->emplace(8, "c");
+    sg1->emplace(15, "l");
+    sg1->emplace(11, "o");
+    sg1->emplace(9, "h");
+    sg1->emplace(2, "e");
+    sg1->emplace(4, "b");
+    sg1->emplace(18, "e");
     
     std::vector<std::string> vector;
     
-    vector.push_back(sg1->obtain(9));
-    vector.push_back(sg1->obtain(2));
-    vector.push_back(sg1->obtain(15));
-    vector.push_back(sg1->obtain(6));
-    vector.push_back(sg1->obtain(11));
+    vector.push_back(sg1->at(9));
+    vector.push_back(sg1->at(2));
+    vector.push_back(sg1->at(15));
+    vector.push_back(sg1->at(6));
+    vector.push_back(sg1->at(11));
     
     std::string actual_result;
     
@@ -490,18 +489,21 @@ TEST(scapegoatTreePositiveTests, test10)
 
     auto sg = std::make_unique<scapegoat_tree<int, std::string>>(std::less<int>(), nullptr, logger.get(), 0.7);
     
-    sg->insert(6, "l");
-    sg->insert(8, "c");
-    sg->insert(15, "l");
-    sg->insert(11, "o");
-    sg->insert(9, "h");
-    sg->insert(2, "e");
-    sg->insert(4, "b");
-    sg->insert(18, "e");
+    sg->emplace(6, "l");
+    sg->emplace(8, "c");
+    sg->emplace(15, "l");
+    sg->emplace(11, "o");
+    sg->emplace(9, "h");
+    sg->emplace(2, "e");
+    sg->emplace(4, "b");
+    sg->emplace(18, "e");
+
+
+    auto b = sg->lower_bound(2);
+    auto e = sg->upper_bound(10);
+    std::vector<typename scapegoat_tree<int, std::string>::value_type> actual_result(b, e);
     
-    std::vector<associative_container<int, std::string>::key_value_pair> actual_result = sg->obtain_between(2, 10, true, false);
-    
-    std::vector<associative_container<int, std::string>::key_value_pair> expected_result =
+    std::vector<typename scapegoat_tree<int, std::string>::value_type> expected_result =
         {
             { 2, "e" },
             { 4, "b" },

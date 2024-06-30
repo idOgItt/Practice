@@ -14,6 +14,8 @@ namespace __detail
         template<class ...Args>
         static binary_search_tree<tkey, tvalue, compare, SPG_TAG>::node* create_node(binary_search_tree<tkey, tvalue, compare, SPG_TAG>& cont, Args&& ...args);
 
+        static void delete_node(binary_search_tree<tkey, tvalue, compare, SPG_TAG>& cont);
+
         //Does not invalidate node*, needed for splay tree
         static void post_search(binary_search_tree<tkey, tvalue, compare, SPG_TAG>::node**){}
 
