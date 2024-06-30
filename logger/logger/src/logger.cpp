@@ -2,38 +2,38 @@
 #include <iomanip>
 #include <sstream>
 
-logger const *logger::trace(
-    std::string const &message) const noexcept
+const logger & logger::trace(
+    std::string const &message) const &
 {
     return log(message, logger::severity::trace);
 }
 
-logger const *logger::debug(
-    std::string const &message) const noexcept
+const logger &logger::debug(
+    std::string const &message) const &
 {
     return log(message, logger::severity::debug);
 }
 
-logger const *logger::information(
-    std::string const &message) const noexcept
+const logger &logger::information(
+    std::string const &message) const &
 {
     return log(message, logger::severity::information);
 }
 
-logger const *logger::warning(
-    std::string const &message) const noexcept
+const logger &logger::warning(
+    std::string const &message) const &
 {
     return log(message, logger::severity::warning);
 }
 
-logger const *logger::error(
-    std::string const &message) const noexcept
+const logger & logger::error(
+    std::string const &message) const &
 {
     return log(message, logger::severity::error);
 }
 
-logger const *logger::critical(
-    std::string const &message) const noexcept
+const logger &logger::critical(
+    std::string const &message) const &
 {
     return log(message, logger::severity::critical);
 }
@@ -60,7 +60,7 @@ std::string logger::severity_to_string(
     throw std::out_of_range("Invalid severity value");
 }
 
-std::string logger::current_datetime_to_string() noexcept
+std::string logger::current_datetime_to_string()
 {
     auto time = std::time(nullptr);
 
@@ -70,7 +70,7 @@ std::string logger::current_datetime_to_string() noexcept
     return result_stream.str();
 }
 
-std::string logger::current_date_to_string() noexcept
+std::string logger::current_date_to_string()
 {
     auto time = std::time(nullptr);
 
@@ -80,7 +80,7 @@ std::string logger::current_date_to_string() noexcept
     return result_stream.str();
 }
 
-std::string logger::current_time_to_string() noexcept
+std::string logger::current_time_to_string()
 {
     auto time = std::time(nullptr);
 

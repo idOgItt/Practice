@@ -63,7 +63,7 @@ private:
         std::pair<bptree_node_middle*, size_t> _parent;
     };
 
-    allocator* _allocator;
+    allocator_dbg_helper* _allocator;
     logger* _logger;
 
     mutable bptree_node* _root;
@@ -71,19 +71,19 @@ private:
     size_t _size;
 
     logger* get_logger() const noexcept override;
-    allocator* get_allocator() const noexcept override;
+    allocator_dbg_helper* get_allocator() const noexcept override;
 
 public:
 
     // region constructors declaration
 
-    explicit Bp_tree(const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit Bp_tree(const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
-    explicit Bp_tree(iterator begin, iterator end, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit Bp_tree(iterator begin, iterator end, const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
 
-    Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
     // endregion constructors declaration
 
@@ -290,7 +290,7 @@ typename Bp_tree<tkey, tvalue, compare, t>::bptree_node* Bp_tree<tkey, tvalue, c
 
         try
         {
-            allocator::construct(new_node, *static_cast<bptree_node_terminate*>(copyable));
+            allocator_dbg_helper::construct(new_node, *static_cast<bptree_node_terminate*>(copyable));
         } catch (...)
         {
             deallocate_with_guard(new_node);
@@ -487,8 +487,8 @@ Bp_tree<tkey, tvalue, compare, t>::Bp_tree(Bp_tree &&other) noexcept : compare(o
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 template<input_iterator_for_pair<tkey, tvalue> iterator>
-Bp_tree<tkey, tvalue, compare, t>::Bp_tree(iterator begin, iterator end, const compare &cmp, allocator *allocator,
-                                         logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
+Bp_tree<tkey, tvalue, compare, t>::Bp_tree(iterator begin, iterator end, const compare &cmp, allocator_dbg_helper *allocator,
+                                           logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
 {
     for (; begin != end; ++begin)
     {
@@ -497,7 +497,7 @@ Bp_tree<tkey, tvalue, compare, t>::Bp_tree(iterator begin, iterator end, const c
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-Bp_tree<tkey, tvalue, compare, t>::Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, allocator* allocator, logger* logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
+Bp_tree<tkey, tvalue, compare, t>::Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, allocator_dbg_helper* allocator, logger* logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
 {
     for (auto& val : data)
     {
@@ -506,7 +506,7 @@ Bp_tree<tkey, tvalue, compare, t>::Bp_tree(std::initializer_list<std::pair<tkey,
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-Bp_tree<tkey, tvalue, compare, t>::Bp_tree(const compare &cmp, allocator *allocator, logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0){}
+Bp_tree<tkey, tvalue, compare, t>::Bp_tree(const compare &cmp, allocator_dbg_helper *allocator, logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0){}
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 Bp_tree<tkey, tvalue, compare, t>::bptree_node_terminate::bptree_node_terminate() noexcept : bptree_node(true)
@@ -530,7 +530,7 @@ logger *Bp_tree<tkey, tvalue, compare, t>::get_logger() const noexcept
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-allocator *Bp_tree<tkey, tvalue, compare, t>::get_allocator() const noexcept
+allocator_dbg_helper *Bp_tree<tkey, tvalue, compare, t>::get_allocator() const noexcept
 {
     return _allocator;
 }
@@ -541,23 +541,23 @@ void Bp_tree<tkey, tvalue, compare, t>::destroy_node(Bp_tree::bptree_node *node)
     if (node->is_terminate)
     {
         auto tmp = static_cast<bptree_node_terminate*>(node);
-        allocator::destruct(tmp);
+        allocator_dbg_helper::destruct(tmp);
         deallocate_with_guard(tmp);
     } else
     {
         auto tmp = static_cast<bptree_node_middle*>(node);
-        allocator::destruct(tmp);
+        allocator_dbg_helper::destruct(tmp);
         deallocate_with_guard(tmp);
     }
 }
 
 template<std::input_iterator iterator, compator<typename std::iterator_traits<iterator>::value_type::first_type> compare = std::less<typename std::iterator_traits<iterator>::value_type::first_type>,
         std::size_t t = 5>
-Bp_tree(iterator begin, iterator end, const compare &cmp = compare(), allocator *allocator = nullptr,
+Bp_tree(iterator begin, iterator end, const compare &cmp = compare(), allocator_dbg_helper *allocator = nullptr,
         logger *logger = nullptr) -> Bp_tree<typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare, t>;
 
 template<typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
-Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare &cmp = compare(), allocator *allocator = nullptr,
+Bp_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare &cmp = compare(), allocator_dbg_helper *allocator = nullptr,
         logger *logger = nullptr) -> Bp_tree<tkey, tvalue, compare, t>;
 
 

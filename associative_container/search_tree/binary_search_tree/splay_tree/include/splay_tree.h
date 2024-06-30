@@ -12,11 +12,11 @@ class splay_tree final:
 public:
     
     explicit splay_tree(
-        std::function<int(tkey const &, tkey const &)> comparer,
-        allocator *allocator = nullptr,
-        logger *logger = nullptr,
-        typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
-        typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy = binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy::throw_an_exception);
+            std::function<int(tkey const &, tkey const &)> comparer,
+            allocator_dbg_helper *allocator = nullptr,
+            logger *logger = nullptr,
+            typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
+            typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy = binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy::throw_an_exception);
 
 public:
     
@@ -134,7 +134,7 @@ tvalue splay_tree<tkey, tvalue>::dispose_inner(std::stack<node * *> &node_path)
 
     binary_search_tree<tkey, tvalue>::_root->right_subtree = rhs;
 
-    allocator::destruct(r);
+    allocator_dbg_helper::destruct(r);
     allocator_guardant::deallocate_with_guard(r);
 
     return res;
@@ -160,7 +160,7 @@ void splay_tree<tkey, tvalue>::insert_inner(std::stack<node * *> &node_path, con
     *node_path.top() = reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
     try
     {
-        allocator::construct(*node_path.top(), key, std::move(val));
+        allocator_dbg_helper::construct(*node_path.top(), key, std::move(val));
     } catch(...)
     {
         allocator_guardant::deallocate_with_guard(*node_path.top());
@@ -177,7 +177,7 @@ void splay_tree<tkey, tvalue>::insert_inner(std::stack<node * *> &node_path, con
     *node_path.top() = reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node)));
     try
     {
-        allocator::construct(*node_path.top(), key, val);
+        allocator_dbg_helper::construct(*node_path.top(), key, val);
     } catch(...)
     {
         allocator_guardant::deallocate_with_guard(*node_path.top());
@@ -189,7 +189,7 @@ void splay_tree<tkey, tvalue>::insert_inner(std::stack<node * *> &node_path, con
 }
 
 template<typename tkey, typename tvalue>
-splay_tree<tkey, tvalue>::splay_tree(std::function<int(const tkey &, const tkey &)> comparer, allocator *allocator,
+splay_tree<tkey, tvalue>::splay_tree(std::function<int(const tkey &, const tkey &)> comparer, allocator_dbg_helper *allocator,
                                      logger *logger,
                                      binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy,
                                      binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy)

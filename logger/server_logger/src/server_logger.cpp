@@ -15,9 +15,9 @@ server_logger::~server_logger() noexcept
     _client.Get("/destroy", par, httplib::Headers());
 }
 
-logger const *server_logger::log(
+const logger& server_logger::log(
     const std::string &text,
-    logger::severity severity) const noexcept
+    logger::severity severity) const &
 {
     std::stringstream stringstream;
 
@@ -30,7 +30,7 @@ logger const *server_logger::log(
     par.emplace("message", stringstream.str());
 
     _client.Get("/log", par, httplib::Headers());
-    return this;
+    return *this;
 }
 
 server_logger::server_logger(const std::string& dest,

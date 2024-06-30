@@ -6,45 +6,17 @@
 
 std::unordered_map<std::string, std::pair<size_t, std::ofstream>> client_logger::refcounted_stream::_global_streams;
 
-//client_logger::client_logger(
-//    client_logger const &other)
-//{
-//    throw not_implemented("client_logger::client_logger(client_logger const &other)", "your code should be here...");
-//}
-//
-//client_logger &client_logger::operator=(
-//    client_logger const &other)
-//{
-//    throw not_implemented("client_logger &client_logger::operator=(client_logger const &other)", "your code should be here...");
-//}
-//
-//client_logger::client_logger(
-//    client_logger &&other) noexcept
-//{
-//    throw not_implemented("client_logger::client_logger(client_logger &&other) noexcept", "your code should be here...");
-//}
-//
-//client_logger &client_logger::operator=(
-//    client_logger &&other) noexcept
-//{
-//    throw not_implemented("client_logger &client_logger::operator=(client_logger &&other) noexcept", "your code should be here...");
-//}
-//
-//client_logger::~client_logger() noexcept
-//{
-//    throw not_implemented("client_logger::~client_logger() noexcept", "your code should be here...");
-//}
 
-logger const *client_logger::log(
+const logger& client_logger::log(
     const std::string &text,
-    logger::severity severity) const
+    logger::severity severity) const &
 {
     std::string output = make_format(text, severity);
 
     auto it = _output_streams.find(severity);
 
     if (it == _output_streams.end())
-        return this;
+        return *this;
 
     if (it->second.second)
     {
@@ -58,7 +30,7 @@ logger const *client_logger::log(
         return stream._stream.second;
     });
 
-    return this;
+    return *this;
 }
 
 std::string client_logger::make_format(const std::string &message, severity sev) const

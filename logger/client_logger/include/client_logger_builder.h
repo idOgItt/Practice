@@ -38,22 +38,22 @@ public:
 
 public:
 
-    logger_builder *add_file_stream(
+    logger_builder& add_file_stream(
         std::string const &stream_file_path,
-        logger::severity severity) override;
+        logger::severity severity) & override;
 
-    logger_builder *add_console_stream(
-        logger::severity severity) override;
+    logger_builder& add_console_stream(
+        logger::severity severity) & override;
 
-    logger_builder* transform_with_configuration(
+    logger_builder& transform_with_configuration(
         std::string const &configuration_file_path,
-        std::string const &configuration_path) override;
+        std::string const &configuration_path) & override;
 
-    logger_builder *set_format(const std::string& format) override;
+    logger_builder& set_format(const std::string& format) & override;
 
-    virtual logger_builder *set_destination(const std::string& format) override;
+    logger_builder& set_destination(const std::string& format) & override;
 
-    logger_builder *clear() override;
+    logger_builder& clear() & override;
 
     [[nodiscard]] logger *build() const override;
 

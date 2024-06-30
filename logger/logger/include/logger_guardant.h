@@ -12,27 +12,27 @@ public:
 
 public:
 
-    logger_guardant const *log_with_guard(
+    const logger_guardant & log_with_guard(
         std::string const &message,
-        logger::severity severity) const;
+        logger::severity severity) const &;
 
-    logger_guardant const *trace_with_guard(
-        std::string const &message) const;
+    const logger_guardant &trace_with_guard(
+        std::string const &message) const &;
 
-    logger_guardant const *debug_with_guard(
-        std::string const &message) const;
+    const logger_guardant &debug_with_guard(
+        std::string const &message) const &;
 
-    logger_guardant const *information_with_guard(
-        std::string const &message) const;
+    const logger_guardant &information_with_guard(
+        std::string const &message) const &;
 
-    logger_guardant const *warning_with_guard(
-        std::string const &message) const;
+    const logger_guardant &warning_with_guard(
+        std::string const &message) const &;
 
-    logger_guardant const *error_with_guard(
-        std::string const &message) const;
+    const logger_guardant &error_with_guard(
+        std::string const &message) const &;
 
-    logger_guardant const *critical_with_guard(
-        std::string const &message) const;
+    const logger_guardant &critical_with_guard(
+        std::string const &message) const &;
 
 protected:
 

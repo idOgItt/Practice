@@ -24,40 +24,40 @@ public:
 
 public:
 
-    virtual logger const *log(
+    virtual const logger& log(
         std::string const &message,
-        logger::severity severity) const = 0;
+        logger::severity severity) const & = 0;
 
 public:
 
-    logger const *trace(
-        std::string const &message) const noexcept;
+    const logger& trace(
+        std::string const &message) const &;
 
-    logger const *debug(
-        std::string const &message) const noexcept;
+    const logger& debug(
+        std::string const &message) const &;
 
-    logger const *information(
-        std::string const &message) const noexcept;
+    const logger& information(
+        std::string const &message) const &;
 
-    logger const *warning(
-        std::string const &message) const noexcept;
+    const logger& warning(
+        std::string const &message) const &;
 
-    logger const *error(
-        std::string const &message) const noexcept;
+    const logger& error(
+        std::string const &message) const &;
 
-    logger const *critical(
-        std::string const &message) const noexcept;
+    const logger& critical(
+        std::string const &message) const &;
 
 protected:
 
     static std::string severity_to_string(
         logger::severity severity);
 
-    static std::string current_datetime_to_string() noexcept;
+    static std::string current_datetime_to_string();
 
-    static std::string current_date_to_string() noexcept;
+    static std::string current_date_to_string();
 
-    static std::string current_time_to_string() noexcept;
+    static std::string current_time_to_string();
 
 };
 

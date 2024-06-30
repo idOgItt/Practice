@@ -29,10 +29,10 @@ private:
 public:
     
     explicit scapegoat_tree(
-        std::function<int(tkey const &, tkey const &)> comparer,
-        allocator *allocator = nullptr,
-        logger *logger = nullptr,
-        double alpha = 0.5);
+            std::function<int(tkey const &, tkey const &)> comparer,
+            allocator_dbg_helper *allocator = nullptr,
+            logger *logger = nullptr,
+            double alpha = 0.5);
 
 public:
     
@@ -124,7 +124,7 @@ tvalue scapegoat_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_se
         }
     }
 
-    allocator::destruct(current_node);
+    allocator_dbg_helper::destruct(current_node);
     allocator_guardant::deallocate_with_guard(current_node);
 
     typename binary_search_tree<tkey, tvalue>::node** scapegoat = nullptr;
@@ -156,7 +156,7 @@ void scapegoat_tree<tkey, tvalue>::insert_inner_t(std::stack<typename binary_sea
     *node_path.top() = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
     try
     {
-        allocator::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
+        allocator_dbg_helper::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
     } catch(...)
     {
         allocator_guardant::deallocate_with_guard(static_cast<node*>(*node_path.top()));
@@ -293,10 +293,10 @@ scapegoat_tree<tkey, tvalue>::node::node(const tkey &key_, tvalue &&value_): bin
 
 template<typename tkey, typename tvalue>
 scapegoat_tree<tkey, tvalue>::scapegoat_tree(
-    std::function<int(tkey const &, tkey const &)> comparer,
-    allocator *allocator,
-    logger *logger,
-    double alpha) : binary_search_tree<tkey, tvalue>(comparer, allocator, logger)
+        std::function<int(tkey const &, tkey const &)> comparer,
+        allocator_dbg_helper *allocator,
+        logger *logger,
+        double alpha) : binary_search_tree<tkey, tvalue>(comparer, allocator, logger)
 {
         if (alpha < 0.5)
             alpha = 0.5;

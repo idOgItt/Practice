@@ -7,8 +7,7 @@
 template<
     typename tkey,
     typename tvalue>
-class hash_table final:
-    public associative_container<tkey, tvalue>
+class hash_table final
 {
 
 public:

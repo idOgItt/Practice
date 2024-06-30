@@ -30,11 +30,12 @@ public:
     virtual ~allocator_test_utils() noexcept = default;
 
 public:
-    
+    //synchronized interface, delegates to _inner version
     virtual std::vector<block_info> get_blocks_info() const = 0;
 
 protected:
 
+    //without synchronization, real implementation
     virtual std::vector<block_info> get_blocks_info_inner() const = 0;
 
     std::string print_blocks() const;

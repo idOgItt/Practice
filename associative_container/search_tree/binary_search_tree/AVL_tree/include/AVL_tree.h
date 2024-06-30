@@ -207,11 +207,11 @@ public:
     // endregion iterator requests declaration
     
     explicit AVL_tree(
-        std::function<int(tkey const &, tkey const &)> comparer,
-        allocator *allocator = nullptr,
-        logger *logger = nullptr,
-        typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
-        typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy = binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy::throw_an_exception);
+            std::function<int(tkey const &, tkey const &)> comparer,
+            allocator_dbg_helper *allocator = nullptr,
+            logger *logger = nullptr,
+            typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy = binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy::throw_an_exception,
+            typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy = binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy::throw_an_exception);
 
 public:
     
@@ -332,7 +332,7 @@ tvalue AVL_tree<tkey, tvalue>::dispose_inner(std::stack<typename binary_search_t
         }
     }
 
-    allocator::destruct(current_node);
+    allocator_dbg_helper::destruct(current_node);
     allocator_guardant::deallocate_with_guard(current_node);
 
     while (!node_path.empty())
@@ -386,7 +386,7 @@ void AVL_tree<tkey, tvalue>::insert_inner_t(std::stack<typename binary_search_tr
     *node_path.top() = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
     try
     {
-        allocator::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
+        allocator_dbg_helper::construct(static_cast<node*>(*node_path.top()), key, std::forward<tval_arg>(val));
     } catch(...)
     {
         allocator_guardant::deallocate_with_guard(static_cast<node*>(*node_path.top()));
@@ -470,7 +470,7 @@ void AVL_tree<tkey, tvalue>::copy_subtree(typename binary_search_tree<tkey, tval
     *target = static_cast<typename binary_search_tree<tkey, tvalue>::node*>(reinterpret_cast<node*>(allocator_guardant::allocate_with_guard(sizeof(node))));
     try
     {
-        allocator::construct(static_cast<node*>(*target), *static_cast<node*>(src));
+        allocator_dbg_helper::construct(static_cast<node*>(*target), *static_cast<node*>(src));
     } catch(...)
     {
         allocator_guardant::deallocate_with_guard(static_cast<node*>(*target));
@@ -495,10 +495,10 @@ AVL_tree<tkey, tvalue>::iterator_data::iterator_data(
 
 template<typename tkey, typename tvalue>
 AVL_tree<tkey, tvalue>::AVL_tree(std::function<int(tkey const &, tkey const &)> comparer,
-    allocator *allocator,
-    logger *logger,
-    typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy,
-    typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) : binary_search_tree<tkey, tvalue>(comparer, allocator, logger, insertion_strategy, disposal_strategy) {}
+                                 allocator_dbg_helper *allocator,
+                                 logger *logger,
+                                 typename binary_search_tree<tkey, tvalue>::insertion_of_existent_key_attempt_strategy insertion_strategy,
+                                 typename binary_search_tree<tkey, tvalue>::disposal_of_nonexistent_key_attempt_strategy disposal_strategy) : binary_search_tree<tkey, tvalue>(comparer, allocator, logger, insertion_strategy, disposal_strategy) {}
 
 template<typename tkey, typename tvalue>
 AVL_tree<tkey, tvalue>::AVL_tree(AVL_tree<tkey, tvalue> const &other) : binary_search_tree<tkey, tvalue>(other) {}

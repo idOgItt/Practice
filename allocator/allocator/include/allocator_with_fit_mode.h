@@ -1,10 +1,10 @@
 #ifndef MATH_PRACTICE_AND_OPERATING_SYSTEMS_ALLOCATOR_WITH_FIT_MODE_H
 #define MATH_PRACTICE_AND_OPERATING_SYSTEMS_ALLOCATOR_WITH_FIT_MODE_H
 
-#include "allocator.h"
+#include "allocator_dbg_helper.h"
 
 class allocator_with_fit_mode:
-    public allocator
+    public allocator_dbg_helper
 {
 
 public:

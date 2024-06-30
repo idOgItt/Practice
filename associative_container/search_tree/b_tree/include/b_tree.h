@@ -15,7 +15,7 @@
 #ifndef MP_OS_B_TREE_H
 #define MP_OS_B_TREE_H
 
-// TODO: memory resource instead of allocator - std::pmr::memory_resource, std::pmr::polymorphic_allocator
+// TODO: memory resource instead of allocator_dbg_helper - std::pmr::memory_resource, std::pmr::polymorphic_allocator
 
 template <typename tkey, typename tvalue, compator<tkey> compare = std::less<tkey>, std::size_t t = 5>
 class B_tree_disk final : public allocator_guardant, public logger_guardant, private compare
@@ -47,7 +47,7 @@ private:
 		btree_disk_node() noexcept;
     };
 
-    allocator* _allocator;
+    allocator_dbg_helper* _allocator;
     logger* _logger;
 
     mutable btree_mem_node* _root;
@@ -55,19 +55,19 @@ private:
     size_t _size;
 
     logger* get_logger() const noexcept override;
-    allocator* get_allocator() const noexcept override;
+    allocator_dbg_helper* get_allocator() const noexcept override;
 
 public:
 
     // region constructors declaration
 
-    explicit B_tree_disk(const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit B_tree_disk(const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
-    explicit B_tree_disk(iterator begin, iterator end, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+    explicit B_tree_disk(iterator begin, iterator end, const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
 
-	B_tree_disk(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(), allocator* allocator = nullptr, logger* logger = nullptr);
+	B_tree_disk(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp = compare(), allocator_dbg_helper* allocator = nullptr, logger* logger = nullptr);
 
     // endregion constructors declaration
 
@@ -390,7 +390,7 @@ void B_tree_memory<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pai
 	{
 		if ((*path.top().first)->size == 0)
 		{
-			allocator::destruct(*path.top().first);
+			allocator_dbg_helper::destruct(*path.top().first);
 			deallocate_with_guard(*path.top().first);
 			*path.top().first = nullptr;
 			node = nullptr;
@@ -466,13 +466,13 @@ void B_tree_memory<tkey, tvalue, compare, t>::rebalance_node(std::stack<std::pai
 
 			remove_array(parent, parent_index, false);
 
-			allocator::destruct(right);
+			allocator_dbg_helper::destruct(right);
 			deallocate_with_guard(right);
 
 			if (path.size() == 1 && (*path.top().first)->size == 0)
 			{
 				path.pop();
-				allocator::destruct(parent);
+				allocator_dbg_helper::destruct(parent);
 				deallocate_with_guard(parent);
 				_root = left;
 			}
@@ -522,14 +522,14 @@ template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 void B_tree_memory<tkey, tvalue, compare, t>::split_node(std::stack<std::pair<btree_node * *, size_t>>& path, btree_mem_node*& node, size_t& index)
 {
 	auto new_node = reinterpret_cast<btree_mem_node*>(allocate_with_guard(sizeof(btree_mem_node)));
-	allocator::construct(new_node);
+	allocator_dbg_helper::construct(new_node);
 
 	if (path.size() == 1)
 	{
 		try
 		{
 			auto tmp = reinterpret_cast<btree_mem_node*>(allocate_with_guard(sizeof(btree_mem_node)));
-			allocator::construct(tmp);
+			allocator_dbg_helper::construct(tmp);
 
 
 			_root = std::exchange(tmp, _root);
@@ -543,7 +543,7 @@ void B_tree_memory<tkey, tvalue, compare, t>::split_node(std::stack<std::pair<bt
 
 		}catch (...)
 		{
-			allocator::destruct(new_node);
+			allocator_dbg_helper::destruct(new_node);
 			deallocate_with_guard(new_node);
 			throw;
 		}
@@ -562,7 +562,7 @@ void B_tree_memory<tkey, tvalue, compare, t>::split_node(std::stack<std::pair<bt
 
 	for (size_t i = separator; i < node_ptr->size; ++i)
 	{
-		allocator::construct(std::addressof(new_node->keys[i - separator]), std::move(node_ptr->keys[i]));
+		allocator_dbg_helper::construct(std::addressof(new_node->keys[i - separator]), std::move(node_ptr->keys[i]));
 		new_node->pointers[i - separator + 1] = node_ptr->pointers[i + 1];
 	}
 
@@ -596,12 +596,12 @@ void B_tree_memory<tkey, tvalue, compare, t>::insert_array(btree_mem_node* node,
 {
 	for (size_t i = node->size; i > index; --i)
 	{
-		allocator::construct(std::addressof(node->keys[i]), std::move(node->keys[i - 1]));
-		allocator::destruct(std::addressof(node->keys[i - 1]));
+		allocator_dbg_helper::construct(std::addressof(node->keys[i]), std::move(node->keys[i - 1]));
+		allocator_dbg_helper::destruct(std::addressof(node->keys[i - 1]));
 		node->pointers[i + 1] = node->pointers[i];
 	}
 
-	allocator::construct(std::addressof(node->keys[index]), std::move(data));
+	allocator_dbg_helper::construct(std::addressof(node->keys[index]), std::move(data));
 	node->pointers[index + 1] = right_node;
 	++node->size;
 }
@@ -632,7 +632,7 @@ typename B_tree_memory<tkey, tvalue, compare, t>::btree_mem_node* B_tree_memory<
 		node->pointers[node->size - 1] = node->pointers[node->size];
 	}
 
-	allocator::destruct(std::addressof(node->keys[node->size - 1]));
+	allocator_dbg_helper::destruct(std::addressof(node->keys[node->size - 1]));
 
 	--node->size;
 
@@ -651,7 +651,7 @@ typename B_tree_memory<tkey, tvalue, compare, t>::btree_iterator B_tree_memory<t
 	{
 		btree_mem_node* new_node = reinterpret_cast<btree_mem_node*>(allocate_with_guard(sizeof(btree_mem_node)));
 
-		allocator::construct(new_node);
+		allocator_dbg_helper::construct(new_node);
 
 		++new_node->size;
 		new_node->keys[0] = std::move(data);
@@ -882,7 +882,7 @@ void B_tree_memory<tkey, tvalue, compare, t>::destroy_subtree(B_tree_memory::btr
 			destroy_subtree(node->pointers[i]);
 		}
 
-	allocator::destruct(node);
+	allocator_dbg_helper::destruct(node);
 	deallocate_with_guard(node);
 }
 
@@ -896,7 +896,7 @@ typename B_tree_memory<tkey, tvalue, compare, t>::btree_mem_node *B_tree_memory<
 
 	try
 	{
-		allocator::construct(new_node, *copyable);
+		allocator_dbg_helper::construct(new_node, *copyable);
 	} catch (...)
 	{
 		deallocate_with_guard(new_node);
@@ -1831,8 +1831,8 @@ B_tree_memory<tkey, tvalue, compare, t>::B_tree(B_tree_memory &&other) noexcept 
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 template<input_iterator_for_pair<tkey, tvalue> iterator>
-B_tree_memory<tkey, tvalue, compare, t>::B_tree(iterator begin, iterator end, const compare &cmp, allocator *allocator,
-                                                logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
+B_tree_memory<tkey, tvalue, compare, t>::B_tree(iterator begin, iterator end, const compare &cmp, allocator *allocator_dbg_helper,
+                                                logger *logger) : compare(cmp), _allocator(allocator_dbg_helper), _logger(logger), _root(nullptr), _size(0)
 {
     for (; begin != end; ++begin)
     {
@@ -1841,7 +1841,7 @@ B_tree_memory<tkey, tvalue, compare, t>::B_tree(iterator begin, iterator end, co
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-B_tree_memory<tkey, tvalue, compare, t>::B_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, allocator* allocator, logger* logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0)
+B_tree_memory<tkey, tvalue, compare, t>::B_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, allocator* allocator_dbg_helper, logger* logger) : compare(cmp), _allocator(allocator_dbg_helper), _logger(logger), _root(nullptr), _size(0)
 {
     for (auto& val : data)
     {
@@ -1850,7 +1850,7 @@ B_tree_memory<tkey, tvalue, compare, t>::B_tree(std::initializer_list<std::pair<
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-B_tree_memory<tkey, tvalue, compare, t>::B_tree(const compare &cmp, allocator *allocator, logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0){}
+B_tree_memory<tkey, tvalue, compare, t>::B_tree(const compare &cmp, allocator_dbg_helper *allocator, logger *logger) : compare(cmp), _allocator(allocator), _logger(logger), _root(nullptr), _size(0){}
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 logger *B_tree_memory<tkey, tvalue, compare, t>::get_logger() const noexcept
@@ -1859,7 +1859,7 @@ logger *B_tree_memory<tkey, tvalue, compare, t>::get_logger() const noexcept
 }
 
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
-allocator *B_tree_memory<tkey, tvalue, compare, t>::get_allocator() const noexcept
+allocator_dbg_helper *B_tree_memory<tkey, tvalue, compare, t>::get_allocator() const noexcept
 {
     return _allocator;
 }

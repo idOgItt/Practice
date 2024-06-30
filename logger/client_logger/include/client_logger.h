@@ -34,6 +34,9 @@ private:
 
         refcounted_stream& operator=(refcounted_stream&& oth) noexcept;
 
+        //if ofstream* is nullptr initializes it with opened file from global map
+        void open();
+
         ~refcounted_stream();
     };
 
@@ -51,6 +54,7 @@ private:
 
 private:
 
+    //opens all streams
     client_logger(const std::unordered_map<logger::severity ,std::pair<std::forward_list<refcounted_stream>, bool>>& streams, std::string format);
 
     std::string make_format(const std::string& message, severity sev) const;
@@ -76,9 +80,9 @@ public:
 
 public:
 
-    [[nodiscard]] logger const *log(
+    [[nodiscard]] const logger& log(
         const std::string &message,
-        logger::severity severity) const  override;
+        logger::severity severity) const & override;
 
 };
 

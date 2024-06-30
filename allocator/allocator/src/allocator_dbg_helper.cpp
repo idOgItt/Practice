@@ -1,9 +1,9 @@
 //
 // Created by Des Caldnd on 4/1/2024.
 //
-#include "allocator.h"
+#include "allocator_dbg_helper.h"
 
-std::string allocator::get_dump(char *data, size_t size)
+std::string allocator_dbg_helper::get_dump(char *data, size_t size)
 {
     std::string res;
 
@@ -21,7 +21,7 @@ std::string allocator::get_dump(char *data, size_t size)
     return res;
 }
 
-std::string allocator::dump_byte(char byte)
+std::string allocator_dbg_helper::dump_byte(char byte)
 {
     std::string res;
 
@@ -33,7 +33,7 @@ std::string allocator::dump_byte(char byte)
     return res;
 }
 
-char allocator::int_to_char(int val)
+char allocator_dbg_helper::int_to_char(int val)
 {
     if (val < 10)
         return '0' + val;

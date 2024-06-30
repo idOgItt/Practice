@@ -5,9 +5,9 @@
 
 using namespace nlohmann;
 
-logger_builder *client_logger_builder::add_file_stream(
+logger_builder& client_logger_builder::add_file_stream(
     std::string const &stream_file_path,
-    logger::severity severity)
+    logger::severity severity) &
 {
     auto it = _output_streams.find(severity);
     if (it == _output_streams.end())
@@ -18,11 +18,11 @@ logger_builder *client_logger_builder::add_file_stream(
 
     it->second.first.emplace_front(std::filesystem::weakly_canonical(stream_file_path).string());
 
-    return this;
+    return *this;
 }
 
-logger_builder *client_logger_builder::add_console_stream(
-    logger::severity severity)
+logger_builder& client_logger_builder::add_console_stream(
+    logger::severity severity) &
 {
     auto it = _output_streams.find(severity);
     if (it == _output_streams.end())
@@ -33,12 +33,12 @@ logger_builder *client_logger_builder::add_console_stream(
 
     it->second.second = true;
 
-    return this;
+    return *this;
 }
 
-logger_builder* client_logger_builder::transform_with_configuration(
+logger_builder& client_logger_builder::transform_with_configuration(
     std::string const &configuration_file_path,
-    std::string const &configuration_path)
+    std::string const &configuration_path) &
 {
     std::ifstream file(configuration_file_path);
 
@@ -52,7 +52,7 @@ logger_builder* client_logger_builder::transform_with_configuration(
     auto it = data.find(configuration_path);
 
     if (it == data.end() || !it->is_object())
-        return this;
+        return *this;
 
     parse_severity(logger::severity::trace, (*it)["trace"]);
     parse_severity(logger::severity::debug, (*it)["debug"]);
@@ -68,15 +68,15 @@ logger_builder* client_logger_builder::transform_with_configuration(
         _format = format.value();
     }
 
-    return this;
+    return *this;
 }
 
-logger_builder *client_logger_builder::clear()
+logger_builder& client_logger_builder::clear() &
 {
     _output_streams.clear();
     _format = "%m";
 
-    return this;
+    return *this;
 }
 
 logger *client_logger_builder::build() const
@@ -84,10 +84,10 @@ logger *client_logger_builder::build() const
     return new client_logger(_output_streams, _format);
 }
 
-logger_builder *client_logger_builder::set_format(const std::string &format)
+logger_builder& client_logger_builder::set_format(const std::string &format) &
 {
     _format = format;
-    return this;
+    return *this;
 }
 
 void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json& j)
@@ -129,7 +129,7 @@ void client_logger_builder::parse_severity(logger::severity sev, nlohmann::json&
     }
 }
 
-logger_builder *client_logger_builder::set_destination(const std::string &format)
+logger_builder& client_logger_builder::set_destination(const std::string &format) &
 {
     throw not_implemented("logger_builder *client_logger_builder::set_destination(const std::string &format)", "invalid call");
 }

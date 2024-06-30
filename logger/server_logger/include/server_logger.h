@@ -35,9 +35,9 @@ public:
 
 public:
 
-    [[nodiscard]] logger const *log(
+    [[nodiscard]] const logger& log(
         const std::string &message,
-        logger::severity severity) const noexcept override;
+        logger::severity severity) const & override;
 
 };
 

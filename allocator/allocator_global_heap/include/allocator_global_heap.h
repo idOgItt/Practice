@@ -1,13 +1,15 @@
 #ifndef MATH_PRACTICE_AND_OPERATING_SYSTEMS_ALLOCATOR_ALLOCATOR_GLOBAL_HEAP_H
 #define MATH_PRACTICE_AND_OPERATING_SYSTEMS_ALLOCATOR_ALLOCATOR_GLOBAL_HEAP_H
 
-#include <allocator.h>
+#include <allocator_dbg_helper.h>
 #include <logger.h>
 #include <logger_guardant.h>
+#include <pp_allocator.h>
 #include <typename_holder.h>
 
 class allocator_global_heap final:
-    public allocator,
+    private allocator_dbg_helper,
+    public smart_mem_resource,
     private logger_guardant,
     private typename_holder
 {
@@ -26,10 +28,10 @@ public:
     ~allocator_global_heap() override;
     
     allocator_global_heap(
-        allocator_global_heap const &other) = delete;
+        allocator_global_heap const &other);
     
     allocator_global_heap &operator=(
-        allocator_global_heap const &other) = delete;
+        allocator_global_heap const &other);
     
     allocator_global_heap(
         allocator_global_heap &&other) noexcept;
@@ -39,12 +41,14 @@ public:
 
 public:
     
-    [[nodiscard]] void *allocate(
-        size_t value_size,
-        size_t values_count) override;
+    [[nodiscard]] void *do_allocate(
+        size_t size,
+        size_t alignment) override;
     
-    void deallocate(
+    void do_deallocate_sm(
         void *at) override;
+
+    bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override;
 
 private:
     
