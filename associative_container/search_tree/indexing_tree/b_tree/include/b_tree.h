@@ -82,7 +82,7 @@ public:
     class btree_const_iterator;
     class btree_const_reverse_iterator;
 
-    class btree_iterator
+    class btree_iterator final
     {
         std::stack<std::pair<btree_node**, size_t>> _path;
         size_t _index;
@@ -121,7 +121,7 @@ public:
 
     };
 
-    class btree_const_iterator
+    class btree_const_iterator final
     {
         std::stack<std::pair<btree_node**, size_t>> _path;
         size_t _index;
@@ -162,7 +162,7 @@ public:
         explicit btree_const_iterator(const std::stack<std::pair<const btree_node**, size_t>>& path = std::stack<std::pair<const btree_node**, size_t>>(), size_t index = 0);
     };
 
-    class btree_reverse_iterator
+    class btree_reverse_iterator final
     {
         std::stack<std::pair<btree_node**, size_t>> _path;
         size_t _index;
@@ -204,7 +204,7 @@ public:
         explicit btree_reverse_iterator(const std::stack<std::pair<btree_node**, size_t>>& path = std::stack<std::pair<btree_node**, size_t>>(), size_t index = 0);
     };
 
-    class btree_const_reverse_iterator
+    class btree_const_reverse_iterator final
     {
         std::stack<std::pair<btree_node**, size_t>> _path;
         size_t _index;

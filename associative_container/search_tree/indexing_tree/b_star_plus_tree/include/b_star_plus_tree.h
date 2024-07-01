@@ -97,7 +97,7 @@ public:
     class bsptree_iterator;
     class bsptree_const_iterator;
 
-    class bsptree_iterator
+    class bsptree_iterator final
     {
         bsptree_node_term* _node;
         size_t _index;
@@ -129,7 +129,7 @@ public:
 
     };
 
-    class bsptree_const_iterator
+    class bsptree_const_iterator final
     {
         bsptree_node_term* _node;
         size_t _index;

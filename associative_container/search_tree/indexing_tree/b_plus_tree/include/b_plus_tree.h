@@ -96,7 +96,7 @@ public:
     class bptree_iterator;
     class bptree_const_iterator;
 
-    class bptree_iterator
+    class bptree_iterator final
     {
         bptree_node_term* _node;
         size_t _index;
@@ -128,7 +128,7 @@ public:
 
     };
 
-    class bptree_const_iterator
+    class bptree_const_iterator final
     {
         bptree_node_term* _node;
         size_t _index;
