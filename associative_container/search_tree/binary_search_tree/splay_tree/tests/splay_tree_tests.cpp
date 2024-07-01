@@ -167,7 +167,7 @@ TEST(splayTreePositiveTests, test1)
             test_data<int, std::string>(2, 15, "c")
         };
 
-    EXPECT_TRUE(infix_iterator_test(*reinterpret_cast<splay_tree<int, std::string> *>(splay), expected_result));
+    EXPECT_TRUE(infix_iterator_test(*splay, expected_result));
 
     logger->trace("splayTreePositiveTests.test1 finished");
 }

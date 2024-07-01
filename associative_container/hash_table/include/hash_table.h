@@ -4,9 +4,7 @@
 #include <associative_container.h>
 #include <not_implemented.h>
 
-template<
-    typename tkey,
-    typename tvalue>
+template<typename tkey, typename tvalue>
 class hash_table final
 {
 

@@ -61,11 +61,13 @@ public:
             logger *logger = nullptr, double alpha = 0.7);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
+    requires std::constructible_from<value_type, typename std::iterator_traits<iterator>::value_type>
     explicit scapegoat_tree(iterator begin, iterator end, const compare& cmp = compare(),
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger* logger = nullptr, double alpha = 0.7);
 
     template<std::ranges::input_range Range>
+    requires std::constructible_from<value_type, typename std::ranges::range_value_t<Range>>
     explicit scapegoat_tree(Range&& range, const compare& cmp = compare(),
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger* logger = nullptr, double alpha = 0.7);

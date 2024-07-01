@@ -12,6 +12,7 @@
 #include <stack>
 #include <ranges>
 #include <pp_allocator.h>
+#include <concepts>
 
 namespace __detail
 {
@@ -705,11 +706,13 @@ public:
 
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
+    requires std::constructible_from<value_type, typename std::iterator_traits<iterator>::value_type>
     explicit binary_search_tree(iterator begin, iterator end, const compare& cmp = compare(), 
                                 pp_allocator<value_type> alloc = pp_allocator<value_type>(), 
                                 logger* logger = nullptr);
 
     template<std::ranges::input_range Range>
+    requires std::constructible_from<value_type, typename std::ranges::range_value_t<Range>>
     explicit binary_search_tree(Range&& range, const compare& cmp = compare(),
                                 pp_allocator<value_type> alloc = pp_allocator<value_type>(),
                                 logger* logger = nullptr);
@@ -755,6 +758,7 @@ public:
     void insert_range( R&& rg );
 
     template<class ...Args>
+    requires std::constructible_from<value_type, Args...>
     std::pair<infix_iterator, bool> emplace(Args&&...args);
 
     infix_iterator insert_or_assign(const value_type&);
@@ -765,6 +769,7 @@ public:
 
 
     template<class ...Args>
+            requires std::constructible_from<value_type, Args...>
     infix_iterator emplace_or_assign(Args&&...args);
 
     virtual void swap(binary_search_tree& other) noexcept;

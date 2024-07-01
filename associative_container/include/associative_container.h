@@ -5,39 +5,23 @@
 #include <vector>
 #include <operation_not_supported.h>
 
-template<
-    typename tkey,
-    typename tvalue>
-class associative_container
-{
+template<typename compare, typename tkey>
+concept compator = requires(const compare c, const tkey& lhs, const tkey& rhs)
+                   {
+                       {c(lhs, rhs)} -> std::same_as<bool>;
+                   } && std::copyable<compare> && std::default_initializable<compare>;
 
-public:
-    
-    using key_value_pair = std::pair<tkey, tvalue>;
+template<typename f_iter, typename tkey, typename tval>
+concept input_iterator_for_pair = std::input_iterator<f_iter> && std::same_as<typename std::iterator_traits<f_iter>::value_type, std::pair<tkey, tval>>;
 
-public:
-
-
-public:
-    
-    virtual ~associative_container() noexcept = default;
-
-public:
-    
-    virtual void insert(
-        tkey const &key,
-        tvalue const &value) = 0;
-
-    virtual void insert(
-        tkey const &key,
-        tvalue &&value) = 0;
-
-    virtual tvalue const &obtain(
-        tkey const &key) = 0;
-
-    virtual tvalue dispose(
-        tkey const &key) = 0;
-    
-};
+template<typename T>
+concept serializable = requires (T t, std::fstream s, nlohmann::json j)
+                       {
+                           {t.serialize(s)};
+                           {T::deserialize(s)} -> std::same_as<T>;
+                           {t.serializa_size()} -> std::same_as<size_t>;
+                           {t.to_json()} -> std::same_as<nlohmann::json>;
+                           {T::from_json(j)} -> std::same_as<T>;
+                       } && std::copyable<T>;
 
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_ASSOCIATIVE_CONTAINER_H
