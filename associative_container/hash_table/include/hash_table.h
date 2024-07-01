@@ -4,11 +4,17 @@
 #include <associative_container.h>
 #include <not_implemented.h>
 
-template<typename tkey, typename tvalue>
+// TODO: concept search_ds
+template<typename T>
+concept search_ds = true;
+
+template<typename tkey, typename tvalue, typename hash = std::hash<tkey>>
 class hash_table final
 {
 
 public:
+
+    using value_type = std::pair<const tkey, tvalue>;
 
     void insert(
         tkey const &key,
@@ -26,42 +32,6 @@ public:
 
 };
 
-template<
-    typename tkey,
-    typename tvalue>
-void hash_table<tkey, tvalue>::insert(
-    tkey const &key,
-    tvalue const &value)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> void hash_table<tkey, tvalue>::insert(tkey const &, tvalue const &)", "your code should be here...");
-}
 
-template<
-    typename tkey,
-    typename tvalue>
-void hash_table<tkey, tvalue>::insert(
-    tkey const &key,
-    tvalue &&value)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> void hash_table<tkey, tvalue>::insert(tkey const &, tvalue &&)", "your code should be here...");
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-tvalue const &hash_table<tkey, tvalue>::obtain(
-    tkey const &key)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> tvalue const &hash_table<tkey, tvalue>::obtain(tkey const &)", "your code should be here...");
-}
-
-template<
-    typename tkey,
-    typename tvalue>
-tvalue hash_table<tkey, tvalue>::dispose(
-    tkey const &key)
-{
-    throw not_implemented("template<typename tkey, typename tvalue> tvalue hash_table<tkey, tvalue>::dispose(tkey const &)", "your code should be here...");
-}
 
 #endif //MP_OS_WORKBENCH_HASH_TABLE_H

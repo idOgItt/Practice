@@ -6,13 +6,11 @@ FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download
 FetchContent_MakeAvailable(json)
 
 add_subdirectory(binary_search_tree)
-add_subdirectory(b_tree)
-add_subdirectory(bp_tree)
-#add_subdirectory(indexing_tree)
+add_subdirectory(indexing_tree)
+
 add_library(
         mp_os_assctv_cntnr_srch_tr
         include/search_tree.h
-        tree_interface/tree_interface.h
         src/hhh.cpp)
 target_include_directories(
         mp_os_assctv_cntnr_srch_tr
