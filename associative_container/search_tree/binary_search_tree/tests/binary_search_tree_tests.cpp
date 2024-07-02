@@ -42,12 +42,12 @@ bool compare_results(
     
     for (auto&& val : std::views::zip(expected, actual))
     {
-        if (val.first.first != val.second.first)
+        if (std::get<0>(val).first != std::get<1>(val).first)
         {
             return false;
         }
         
-        if (val.first.second != val.second.second)
+        if (std::get<0>(val).second != std::get<1>(val).second)
         {
             return false;
         }

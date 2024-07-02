@@ -83,7 +83,7 @@ public:
      *  *it == 4.
      *
      *  @example But reverse:
-     *  1 2 3 <- 4 5 6 7
+     *  1 2 3 \<- 4 5 6 7
      *  *rit == 3
      */
 
@@ -702,6 +702,11 @@ public:
     explicit binary_search_tree(
             const compare& comp = compare(),
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
+            logger *logger = nullptr);
+
+    explicit binary_search_tree(
+            pp_allocator<value_type> alloc,
+            const compare& comp = compare(),
             logger *logger = nullptr);
 
 

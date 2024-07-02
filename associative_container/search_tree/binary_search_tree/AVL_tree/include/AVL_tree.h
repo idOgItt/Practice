@@ -496,6 +496,11 @@ public:
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger *logger = nullptr);
 
+    explicit AVL_tree(
+            pp_allocator<value_type> alloc,
+            const compare& comp = compare(),
+            logger *logger = nullptr);
+
     template<input_iterator_for_pair<tkey, tvalue> iterator>
     requires std::constructible_from<value_type, typename std::iterator_traits<iterator>::value_type>
     explicit AVL_tree(iterator begin, iterator end, const compare& cmp = compare(),

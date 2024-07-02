@@ -37,7 +37,7 @@ private:
         std::vector<tree_data_type, pp_allocator<tree_data_type>> _keys;
         std::vector<btree_node*, pp_allocator<btree_node*>> _pointers;
 
-        btree_node(pp_allocator<btree_node*> al);
+        btree_node(pp_allocator<value_type> al);
     };
 
     pp_allocator<value_type> _allocator;
@@ -53,6 +53,8 @@ public:
     // region constructors declaration
 
     explicit B_tree(const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);
+
+    explicit B_tree(pp_allocator<value_type> alloc, const compare& comp = compare(), logger *logger = nullptr);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
     explicit B_tree(iterator begin, iterator end, const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);

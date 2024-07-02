@@ -9,6 +9,7 @@
 #include <utility>
 #include <iostream>
 #include <concepts>
+#include <pp_allocator.h>
 
 namespace __detail
 {
@@ -48,90 +49,79 @@ class big_int
 {
     // Call optimise after every operation!!!
     bool _sign; // 1 +  0 -
-    std::vector<unsigned int> _digits;
-
-    static const constexpr unsigned int mask = __detail::generate_half_mask();
-
-    static void plus_assign_no_sign(std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs, size_t shift = 0);
-
-    static void minus_assign_no_sign(std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs, size_t shift = 0);
-
-    void minus_assign_no_sign_reverse(const std::vector<unsigned int>& lhs, std::vector<unsigned int>& rhs, size_t shift = 0);
-
-    void multiply_assign_no_sign(std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    std::vector<unsigned int> multiply_common(const std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    std::vector<unsigned int> multiply_karatsuba(const std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    void divide_assign_no_sign(std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    std::vector<unsigned int> divide_common(const std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    std::vector<unsigned int> divide_newton(const std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs) const;
-
-    void optimise() noexcept; // erases leading zeros, if number equals 0 sets _sign to true
-
-    static std::strong_ordering compare_no_sign(const std::vector<unsigned int>& lhs, const std::vector<unsigned int>& rhs, size_t shift = 0) noexcept;
-
-    std::strong_ordering compare(const big_int& other, size_t shift = 0) const noexcept; // shifts other right by _digits(2^(8*sizeof(unsigned int)))
-
-    bool need_karatsuba(const std::vector<unsigned int>& other) const noexcept;
-
-    bool need_newton(const std::vector<unsigned int>& other) const noexcept;
-
-    static std::vector<unsigned int> summ_four(unsigned int a0b0, unsigned int a1b0, unsigned int a0b1, unsigned int a1b1);
-
-    static void move_caret(std::vector<unsigned int>& vec, unsigned int new_var);
-
-    unsigned int find_quolitent(const std::vector<unsigned int>& numerator, const std::vector<unsigned int>& denominator) const;
-
-    static std::vector<big_int> newton_transform(const std::vector<big_int>& f);
-
-    static std::vector<big_int> multiply_vectors(const std::vector<big_int>& lhs, const std::vector<big_int>& rhs);
-
-    static std::vector<big_int> multiply_vector(const std::vector<big_int>& lhs, size_t val);
-
-    static std::vector<big_int> plus_vectors(const std::vector<big_int>& lhs, const std::vector<big_int>& rhs);
-
-    static std::vector<big_int> minus_vectors(const std::vector<big_int>& lhs, const std::vector<big_int>& rhs);
-
-    static void modulo_vector(std::vector<big_int>& val, size_t power);
+    std::vector<unsigned int, pp_allocator<unsigned int>> _digits;
 
 public:
 
-    explicit big_int(const std::vector<unsigned int> &digits, bool sign = true);
-    explicit big_int(std::vector<unsigned int> &&digits, bool sign = true);
+    enum class multiplication_rule
+    {
+        trivial,
+        Karatsuba,
+        SchonhageStrassen
+    };
 
-    explicit big_int(const std::string& num, unsigned int radix = 10);
+    enum class division_rule
+    {
+        trivial,
+        Newton,
+        BurnikelZiegler
+    };
+
+private:
+
+    /** Decides type of mult/div that depends on size of lhs and rhs
+     */
+    multiplication_rule decide_mult(size_t rhs) const noexcept;
+    division_rule decide_div(size_t rhs) const noexcept;
+
+public:
+
+    using value_type = unsigned int;
+
+    template<class alloc>
+    explicit big_int(const std::vector<unsigned int, alloc> &digits, bool sign = true, pp_allocator<unsigned int> allocator = pp_allocator<unsigned int>());
+
+    explicit big_int(const std::vector<unsigned int, pp_allocator<unsigned int>> &digits, bool sign = true);
+
+    explicit big_int(std::vector<unsigned int, pp_allocator<unsigned int>> &&digits, bool sign = true) noexcept;
+
+    explicit big_int(const std::string& num, unsigned int radix = 10, pp_allocator<unsigned int> = pp_allocator<unsigned int>());
 
     template<std::integral Num>
-    big_int(Num d);
+    big_int(Num d, pp_allocator<unsigned int> = pp_allocator<unsigned int>());
 
-    big_int();
+    big_int(pp_allocator<unsigned int> = pp_allocator<unsigned int>());
 
-    explicit operator bool(); //false if 0 , else true
+    explicit operator bool() const noexcept; //false if 0 , else true
 
-    big_int& operator++();
+    big_int& operator++() &;
     big_int operator++(int);
 
-    big_int& operator--();
+    big_int& operator--() &;
     big_int operator--(int);
 
-    big_int& operator+=(const big_int& other);
+    big_int& operator+=(const big_int& other) &;
 
-    big_int& plus_assign(const big_int& other, size_t shift = 0);
+    big_int& plus_assign(const big_int& other, size_t shift = 0) &;
 
 
-    big_int& operator-=(const big_int& other);
+    big_int& operator-=(const big_int& other) &;
 
-    big_int& minus_assign(const big_int& other, size_t shift = 0);
+    big_int& minus_assign(const big_int& other, size_t shift = 0) &;
 
-    big_int& operator*=(const big_int& other);
+    /** Delegates to multiply_assign and calls decide_mult
+     */
+    big_int& operator*=(const big_int& other) &;
 
-    big_int& operator/=(const big_int& other);
+    big_int& multiply_assign(const big_int& other, multiplication_rule rule = multiplication_rule::trivial) &;
 
-    big_int& operator%=(const big_int& other);
+    big_int& operator/=(const big_int& other) &;
+
+    big_int& divide_assign(const big_int& other, division_rule rule = division_rule::trivial) &;
+
+    big_int& operator%=(const big_int& other) &;
+
+    big_int& modulo_assign(const big_int& other, division_rule rule = division_rule::trivial) &;
 
     big_int operator+(const big_int& other) const;
     big_int operator-(const big_int& other) const;
@@ -143,9 +133,9 @@ public:
 
     bool operator==(const big_int& other) const noexcept;
 
-    big_int& operator<<=(size_t shift);
+    big_int& operator<<=(size_t shift) &;
 
-    big_int& operator>>=(size_t shift);
+    big_int& operator>>=(size_t shift) &;
 
 
     big_int operator<<(size_t shift) const;
@@ -153,18 +143,18 @@ public:
 
     big_int operator~() const;
 
-    big_int& operator&=(const big_int& other);
+    big_int& operator&=(const big_int& other) &;
 
-    big_int& operator|=(const big_int& other);
+    big_int& operator|=(const big_int& other) &;
 
-    big_int& operator^=(const big_int& other);
+    big_int& operator^=(const big_int& other) &;
 
 
     big_int operator&(const big_int& other) const;
     big_int operator|(const big_int& other) const;
     big_int operator^(const big_int& other) const;
 
-    friend std::ostream &operator<<(std::ostream &stream, big_int const &value) noexcept;
+    friend std::ostream &operator<<(std::ostream &stream, big_int const &value);
 
     friend std::istream &operator>>(std::istream &stream, big_int &value);
 

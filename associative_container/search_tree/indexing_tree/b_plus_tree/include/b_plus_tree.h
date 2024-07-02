@@ -34,7 +34,7 @@ private:
 
     struct bptree_node_base
     {
-        bool _is_terminated;
+        bool _is_terminate;
 
         bptree_node_base() noexcept;
         virtual ~bptree_node_base() =default;
@@ -69,6 +69,8 @@ public:
     // region constructors declaration
 
     explicit BP_tree(const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);
+
+    explicit BP_tree(pp_allocator<value_type> alloc, const compare& comp = compare(), logger *logger = nullptr);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
     explicit BP_tree(iterator begin, iterator end, const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);

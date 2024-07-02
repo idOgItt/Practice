@@ -40,3 +40,5 @@ set_target_properties(
         CXX_EXTENSIONS OFF
         VERSION 1.0
         DESCRIPTION "bigint implementation library tests")
+
+target_compile_features(mp_os_arthmtc_bg_intgr_tests_bgnt PRIVATE cxx_std_23)

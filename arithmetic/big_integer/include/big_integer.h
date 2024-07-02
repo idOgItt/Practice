@@ -6,11 +6,9 @@
 #include <vector>
 
 #include <allocator_dbg_helper.h>
-#include <allocator_guardant.h>
 #include <not_implemented.h>
 
-class big_integer final:
-    allocator_guardant
+class big_integer final
 {
 
 public:
@@ -373,7 +371,7 @@ public:
 
 private:
 
-    [[nodiscard]] allocator_dbg_helper *get_allocator() const noexcept override;
+    [[nodiscard]] allocator_dbg_helper *get_allocator() const noexcept;
     
 };
 

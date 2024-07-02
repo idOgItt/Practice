@@ -642,7 +642,7 @@ std::string big_int::to_string() const
     return d;
 }
 
-std::ostream &operator<<(std::ostream &stream, const big_int &value) noexcept
+std::ostream &operator<<(std::ostream &stream, const big_int &value)
 {
     stream << value.to_string();
 

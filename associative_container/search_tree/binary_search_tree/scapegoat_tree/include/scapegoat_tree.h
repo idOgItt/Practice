@@ -60,6 +60,11 @@ public:
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger *logger = nullptr, double alpha = 0.7);
 
+    explicit scapegoat_tree(
+            pp_allocator<value_type> alloc,
+            const compare& comp = compare(),
+            logger *logger = nullptr, double alpha = 0.7);
+
     template<input_iterator_for_pair<tkey, tvalue> iterator>
     requires std::constructible_from<value_type, typename std::iterator_traits<iterator>::value_type>
     explicit scapegoat_tree(iterator begin, iterator end, const compare& cmp = compare(),

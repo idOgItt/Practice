@@ -71,6 +71,8 @@ public:
 
     explicit BSP_tree(const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);
 
+    explicit BSP_tree(pp_allocator<value_type> alloc, const compare& comp = compare(), logger *logger = nullptr);
+
     template<input_iterator_for_pair<tkey, tvalue> iterator>
     explicit BSP_tree(iterator begin, iterator end, const compare& cmp = compare(), pp_allocator<value_type> = pp_allocator<value_type>(), logger* logger = nullptr);
 

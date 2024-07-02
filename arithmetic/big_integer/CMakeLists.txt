@@ -28,3 +28,5 @@ set_target_properties(
         CXX_EXTENSIONS OFF
         VERSION 1.0
         DESCRIPTION "big integer implementation library")
+
+target_compile_features(mp_os_arthmtc_bg_intgr PRIVATE cxx_std_23)
