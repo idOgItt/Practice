@@ -4,19 +4,19 @@
 
 allocator_red_black_tree::~allocator_red_black_tree()
 {
+    throw not_implemented("allocator_red_black_tree::~allocator_red_black_tree()", "your code should be here...");
 }
 
 allocator_red_black_tree::allocator_red_black_tree(
     allocator_red_black_tree &&other) noexcept
 {
-    _trusted_memory = std::exchange(other._trusted_memory, nullptr);
+    throw not_implemented("allocator_red_black_tree::allocator_red_black_tree(allocator_red_black_tree &&) noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree &allocator_red_black_tree::operator=(
     allocator_red_black_tree &&other) noexcept
 {
-    std::swap(_trusted_memory, other._trusted_memory);
-    return *this;
+    throw not_implemented("allocator_red_black_tree &allocator_red_black_tree::operator=(allocator_red_black_tree &&) noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree::allocator_red_black_tree(
@@ -25,96 +25,97 @@ allocator_red_black_tree::allocator_red_black_tree(
         logger *logger,
         allocator_with_fit_mode::fit_mode allocate_fit_mode)
 {
-
+    throw not_implemented("allocator_red_black_tree::allocator_red_black_tree(size_t ,std::pmr::memory_resource *,logger *,allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 [[nodiscard]] void *allocator_red_black_tree::do_allocate(
     size_t size,
     size_t alignment)
 {
-
+    throw not_implemented("[[nodiscard]] void *allocator_red_black_tree::do_allocate(size_t,size_t)", "your code should be here...");
 }
 
 
 void allocator_red_black_tree::do_deallocate_sm(
     void *at)
 {
+    throw not_implemented("void allocator_red_black_tree::do_deallocate_sm(void *)", "your code should be here...");
 }
 
 void allocator_red_black_tree::set_fit_mode(allocator_with_fit_mode::fit_mode mode)
 {
-
+    throw not_implemented("void allocator_red_black_tree::set_fit_mode(allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 
 std::vector<allocator_test_utils::block_info> allocator_red_black_tree::get_blocks_info() const
 {
-
+    throw not_implemented("std::vector<allocator_test_utils::block_info> allocator_red_black_tree::get_blocks_info() const", "your code should be here...");
 }
 
 inline logger *allocator_red_black_tree::get_logger() const
 {
+    throw not_implemented("inline logger *allocator_red_black_tree::get_logger() const", "your code should be here...");
 }
 
 inline std::string allocator_red_black_tree::get_typename() const noexcept
 {
-    return "allocator_red_black_tree";
+    throw not_implemented("inline std::string allocator_red_black_tree::get_typename() const noexcept", "your code should be here...");
 }
 
 
 allocator_red_black_tree::rb_iterator allocator_red_black_tree::begin() const noexcept
 {
-    return {_trusted_memory};
+    throw not_implemented("allocator_red_black_tree::rb_iterator allocator_red_black_tree::begin() const noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree::rb_iterator allocator_red_black_tree::end() const noexcept
 {
-    return {};
+    throw not_implemented("allocator_red_black_tree::rb_iterator allocator_red_black_tree::end() const noexcept", "your code should be here...");
 }
 
 
 bool allocator_red_black_tree::rb_iterator::operator==(const allocator_red_black_tree::rb_iterator &other) const noexcept
 {
-    return _block_ptr == other._block_ptr;
+    throw not_implemented("bool allocator_red_black_tree::rb_iterator::operator==(const allocator_red_black_tree::rb_iterator &) const noexcept", "your code should be here...");
 }
 
 bool allocator_red_black_tree::rb_iterator::operator!=(const allocator_red_black_tree::rb_iterator &other) const noexcept
 {
-    return !(*this == other);
+    throw not_implemented("bool allocator_red_black_tree::rb_iterator::operator!=(const allocator_red_black_tree::rb_iterator &) const noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree::rb_iterator &allocator_red_black_tree::rb_iterator::operator++() & noexcept
 {
+    throw not_implemented("allocator_red_black_tree::rb_iterator &allocator_red_black_tree::rb_iterator::operator++() & noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree::rb_iterator allocator_red_black_tree::rb_iterator::operator++(int n)
 {
-    auto tmp = *this;
-    ++(*this);
-    return tmp;
+    throw not_implemented("allocator_red_black_tree::rb_iterator allocator_red_black_tree::rb_iterator::operator++(int)", "your code should be here...");
 }
 
 size_t allocator_red_black_tree::rb_iterator::size() const noexcept
 {
+    throw not_implemented("size_t allocator_red_black_tree::rb_iterator::size() const noexcept", "your code should be here...");
 }
 
 void *allocator_red_black_tree::rb_iterator::operator*() const noexcept
 {
-    return _block_ptr;
+    throw not_implemented("void *allocator_red_black_tree::rb_iterator::operator*() const noexcept", "your code should be here...");
 }
 
 allocator_red_black_tree::rb_iterator::rb_iterator()
 {
-    _block_ptr = nullptr;
-    _trusted = nullptr;
+    throw not_implemented("allocator_red_black_tree::rb_iterator::rb_iterator()", "your code should be here...");
 }
 
 allocator_red_black_tree::rb_iterator::rb_iterator(void *trusted)
 {
-    _block_ptr = reinterpret_cast<std::byte*>(trusted) + allocator_metadata_size;
-    _trusted = trusted;
+    throw not_implemented("allocator_red_black_tree::rb_iterator::rb_iterator(void *)", "your code should be here...");
 }
 
 bool allocator_red_black_tree::rb_iterator::occupied() const noexcept
 {
+    throw not_implemented("bool allocator_red_black_tree::rb_iterator::occupied() const noexcept", "your code should be here...");
 }
