@@ -28,6 +28,21 @@ allocator_red_black_tree::allocator_red_black_tree(
     throw not_implemented("allocator_red_black_tree::allocator_red_black_tree(size_t ,std::pmr::memory_resource *,logger *,allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
+allocator_red_black_tree::allocator_red_black_tree(const allocator_red_black_tree &other)
+{
+    throw not_implemented("allocator_red_black_tree::allocator_red_black_tree(const allocator_red_black_tree &other)", "your code should be here...");
+}
+
+allocator_red_black_tree &allocator_red_black_tree::operator=(const allocator_red_black_tree &other)
+{
+    throw not_implemented("allocator_red_black_tree &allocator_red_black_tree::operator=(const allocator_red_black_tree &other)", "your code should be here...");
+}
+
+bool allocator_red_black_tree::do_is_equal(const std::pmr::memory_resource &other) const noexcept
+{
+    throw not_implemented("bool allocator_red_black_tree::do_is_equal(const std::pmr::memory_resource &other) const noexcept", "your code should be here...");
+}
+
 [[nodiscard]] void *allocator_red_black_tree::do_allocate(
     size_t size,
     size_t alignment)
