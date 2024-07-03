@@ -247,5 +247,417 @@ public:
     // endregion hash policy
 };
 
+// region constructors implementation
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::hash_table(pp_allocator<value_type> allocator, logger* logger)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+template<input_iterator_for_pair<tkey, tvalue> iterator>
+hash_table<tkey, tvalue, sds, hash>::hash_table(iterator begin, iterator end, pp_allocator<value_type> allocator, logger* logger)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::hash_table(std::initializer_list<std::pair<tkey, tvalue>> data, pp_allocator<value_type> allocator, logger* logger)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion constructors implementation
+
+// region five implementation
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::hash_table(const hash_table& other)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::hash_table(hash_table&& other) noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>& hash_table<tkey, tvalue, sds, hash>::operator=(const hash_table& other)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>& hash_table<tkey, tvalue, sds, hash>::operator=(hash_table&& other) noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::~hash_table() noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion five implementation
+
+// region iterator implementation
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator& hash_table<tkey, tvalue, sds, hash>::iterator::operator++()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::iterator::operator++(int)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator::reference hash_table<tkey, tvalue, sds, hash>::iterator::operator*() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator::pointer hash_table<tkey, tvalue, sds, hash>::iterator::operator->() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::iterator::operator==(const iterator& other) const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::iterator::operator!=(const iterator& other) const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// const iterator methods
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator& hash_table<tkey, tvalue, sds, hash>::const_iterator::operator++()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::const_iterator::operator++(int)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator::reference hash_table<tkey, tvalue, sds, hash>::const_iterator::operator*() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator::pointer hash_table<tkey, tvalue, sds, hash>::const_iterator::operator->() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::const_iterator::operator==(const const_iterator& other) const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::const_iterator::operator!=(const const_iterator& other) const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// constructors iterators
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::iterator::iterator(vector::iterator begin, vector::iterator end)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::iterator::iterator(vector::iterator begin, vector::iterator end, sds_it data_beg)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::const_iterator::const_iterator(vector::const_iterator begin, vector::const_iterator end)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::const_iterator::const_iterator(vector::const_iterator begin, vector::const_iterator end, sds_cit data_beg)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+hash_table<tkey, tvalue, sds, hash>::const_iterator::const_iterator(const iterator& other)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion iterator implementation
+
+// region element access implementation
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+tvalue& hash_table<tkey, tvalue, sds, hash>::at(const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+const tvalue& hash_table<tkey, tvalue, sds, hash>::at(const tkey& key) const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+tvalue& hash_table<tkey, tvalue, sds, hash>::operator[](const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+tvalue& hash_table<tkey, tvalue, sds, hash>::operator[](tkey&& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion element access implementation
+
+// region iterator begins implementation
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::begin()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::end()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::begin() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::end() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::cbegin() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::cend() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::cbegin()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::cend()
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion iterator begins implementation
+
+// region lookup implementation
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+size_t hash_table<tkey, tvalue, sds, hash>::size() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::empty() const noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::find(const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::find(const tkey& key) const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::lower_bound(const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::lower_bound(const tkey& key) const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::upper_bound(const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::const_iterator hash_table<tkey, tvalue, sds, hash>::upper_bound(const tkey& key) const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+bool hash_table<tkey, tvalue, sds, hash>::contains(const tkey& key) const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion lookup implementation
+
+// region modifiers implementation
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+void hash_table<tkey, tvalue, sds, hash>::clear() noexcept
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+std::pair<typename hash_table<tkey, tvalue, sds, hash>::iterator, bool> hash_table<tkey, tvalue, sds, hash>::insert(const value_type& data)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+std::pair<typename hash_table<tkey, tvalue, sds, hash>::iterator, bool> hash_table<tkey, tvalue, sds, hash>::insert(value_type&& data)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+template<typename ...Args>
+std::pair<typename hash_table<tkey, tvalue, sds, hash>::iterator, bool> hash_table<tkey, tvalue, sds, hash>::emplace(Args&&... args)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::insert_or_assign(const value_type & data)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::insert_or_assign(value_type && data)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+template<typename ...Args>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::emplace_or_assign(Args&&... args)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::erase(iterator pos)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::erase(const_iterator pos)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::erase(iterator beg, iterator en)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::erase(const_iterator beg, const_iterator en)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+typename hash_table<tkey, tvalue, sds, hash>::iterator hash_table<tkey, tvalue, sds, hash>::erase(const tkey& key)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion modifiers implementation
+
+// region hash policy implementation
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+double hash_table<tkey, tvalue, sds, hash>::max_load_factor() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+void hash_table<tkey, tvalue, sds, hash>::max_load_factor(double ml)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+double hash_table<tkey, tvalue, sds, hash>::load_factor() const
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+void hash_table<tkey, tvalue, sds, hash>::rehash(size_t count)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, search_ds_for<tkey, tvalue> sds, typename hash>
+void hash_table<tkey, tvalue, sds, hash>::reserve(size_t count)
+{
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
+}
+
+// endregion hash policy implementation
 
 #endif //MP_OS_WORKBENCH_HASH_TABLE_H
