@@ -19,17 +19,13 @@ class server_logger final:
     static int inner_getpid();
 public:
 
-    server_logger(
-        server_logger const &other)=delete;
+    server_logger(server_logger const &other);
 
-    server_logger &operator=(
-        server_logger const &other)=delete;
+    server_logger &operator=(server_logger const &other);
 
-    server_logger(
-        server_logger &&other) noexcept =default;
+    server_logger(server_logger &&other) noexcept;
 
-    server_logger &operator=(
-        server_logger &&other) noexcept =delete;
+    server_logger &operator=(server_logger &&other) noexcept;
 
     ~server_logger() noexcept final;
 

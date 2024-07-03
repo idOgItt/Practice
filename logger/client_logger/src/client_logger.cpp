@@ -32,9 +32,34 @@ client_logger::flag client_logger::char_to_flag(char c) noexcept
     throw not_implemented("client_logger::flag client_logger::char_to_flag(char) noexcept", "your code should be here...");
 }
 
+client_logger::client_logger(const client_logger &other)
+{
+    throw not_implemented("client_logger::client_logger(const client_logger &other)", "your code should be here...");
+}
+
+client_logger &client_logger::operator=(const client_logger &other)
+{
+    throw not_implemented("client_logger::flag client_logger::char_to_flag(char) noexcept", "your code should be here...");
+}
+
+client_logger::client_logger(client_logger &&other) noexcept
+{
+    throw not_implemented("client_logger &client_logger::operator=(const client_logger &other)", "your code should be here...");
+}
+
+client_logger &client_logger::operator=(client_logger &&other) noexcept
+{
+    throw not_implemented("client_logger &client_logger::operator=(client_logger &&other) noexcept", "your code should be here...");
+}
+
+client_logger::~client_logger() noexcept
+{
+    throw not_implemented("client_logger::~client_logger() noexcept", "your code should be here...");
+}
+
 client_logger::refcounted_stream::refcounted_stream(const std::string &path)
 {
-    throw not_implemented("client_logger::refcounted_stream::refcounted_stream(const std::string &) ", "your code should be here...");
+    throw not_implemented("client_logger::refcounted_stream::refcounted_stream(const std::string &path)", "your code should be here...");
 }
 
 client_logger::refcounted_stream::refcounted_stream(const client_logger::refcounted_stream &oth)

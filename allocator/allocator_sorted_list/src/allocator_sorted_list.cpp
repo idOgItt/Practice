@@ -34,6 +34,21 @@ allocator_sorted_list::allocator_sorted_list(
     throw not_implemented("[[nodiscard]] void *allocator_sorted_list::do_allocate(size_t, size_t )", "your code should be here...");
 }
 
+allocator_sorted_list::allocator_sorted_list(const allocator_sorted_list &other)
+{
+    throw not_implemented("allocator_sorted_list::allocator_sorted_list(const allocator_sorted_list &other)", "your code should be here...");
+}
+
+allocator_sorted_list &allocator_sorted_list::operator=(const allocator_sorted_list &other)
+{
+    throw not_implemented("allocator_sorted_list &allocator_sorted_list::operator=(const allocator_sorted_list &other)", "your code should be here...");
+}
+
+bool allocator_sorted_list::do_is_equal(const std::pmr::memory_resource &other) const noexcept
+{
+    throw not_implemented("bool allocator_sorted_list::do_is_equal(const std::pmr::memory_resource &other) const noexcept", "your code should be here...");
+}
+
 void allocator_sorted_list::do_deallocate_sm(
     void *at)
 {

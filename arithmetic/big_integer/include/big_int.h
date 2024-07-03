@@ -102,6 +102,10 @@ public:
 
     big_int& operator+=(const big_int& other) &;
 
+    /** Shift will be needed for multiplication implementation
+     *  @example Shift = 0: 111 + 222 = 333
+     *  @example Shift = 1: 111 + 222 = 2331
+     */
     big_int& plus_assign(const big_int& other, size_t shift = 0) &;
 
 

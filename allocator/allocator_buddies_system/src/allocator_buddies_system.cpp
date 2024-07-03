@@ -40,6 +40,21 @@ void allocator_buddies_system::do_deallocate_sm(void *at)
     throw not_implemented("void allocator_buddies_system::do_deallocate_sm(void *)", "your code should be here...");
 }
 
+allocator_buddies_system::allocator_buddies_system(const allocator_buddies_system &other)
+{
+    throw not_implemented("allocator_buddies_system::allocator_buddies_system(const allocator_buddies_system &other)", "your code should be here...");
+}
+
+allocator_buddies_system &allocator_buddies_system::operator=(const allocator_buddies_system &other)
+{
+    throw not_implemented("allocator_buddies_system &allocator_buddies_system::operator=(const allocator_buddies_system &other)", "your code should be here...");
+}
+
+bool allocator_buddies_system::do_is_equal(const std::pmr::memory_resource &other) const noexcept
+{
+    throw not_implemented("bool allocator_buddies_system::do_is_equal(const std::pmr::memory_resource &other) const noexcept", "your code should be here...");
+}
+
 inline void allocator_buddies_system::set_fit_mode(
     allocator_with_fit_mode::fit_mode mode)
 {

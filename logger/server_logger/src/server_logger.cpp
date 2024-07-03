@@ -34,3 +34,23 @@ int server_logger::inner_getpid()
     return getpid();
 #endif
 }
+
+server_logger::server_logger(const server_logger &other)
+{
+    throw not_implemented("server_logger::server_logger(const server_logger &other)", "your code should be here...");
+}
+
+server_logger &server_logger::operator=(const server_logger &other)
+{
+    throw not_implemented("server_logger &server_logger::operator=(const server_logger &other)", "your code should be here...");
+}
+
+server_logger::server_logger(server_logger &&other) noexcept
+{
+    throw not_implemented("server_logger::server_logger(server_logger &&other) noexcept", "your code should be here...");
+}
+
+server_logger &server_logger::operator=(server_logger &&other) noexcept
+{
+    throw not_implemented("server_logger &server_logger::operator=(server_logger &&other) noexcept", "your code should be here...");
+}

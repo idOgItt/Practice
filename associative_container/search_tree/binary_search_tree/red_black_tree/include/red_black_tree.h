@@ -68,13 +68,11 @@ public:
             logger *logger = nullptr);
 
     template<input_iterator_for_pair<tkey, tvalue> iterator>
-    requires std::constructible_from<value_type, typename std::iterator_traits<iterator>::value_type>
     explicit red_black_tree(iterator begin, iterator end, const compare& cmp = compare(),
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger* logger = nullptr);
 
     template<std::ranges::input_range Range>
-    requires std::constructible_from<value_type, typename std::ranges::range_value_t<Range>>
     explicit red_black_tree(Range&& range, const compare& cmp = compare(),
             pp_allocator<value_type> alloc = pp_allocator<value_type>(),
             logger* logger = nullptr);
@@ -536,14 +534,12 @@ public:
     std::pair<infix_iterator, bool> insert(value_type&&);
 
     template<class ...Args>
-    requires std::constructible_from<value_type, Args...>
     std::pair<infix_iterator, bool> emplace(Args&&...args);
 
     infix_iterator insert_or_assign(const value_type&);
     infix_iterator insert_or_assign(value_type&&);
 
     template<class ...Args>
-    requires std::constructible_from<value_type, Args...>
     infix_iterator emplace_or_assign(Args&&...args);
 
     infix_iterator find(const tkey&);
