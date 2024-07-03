@@ -4,17 +4,19 @@
 
 allocator_buddies_system::~allocator_buddies_system()
 {
+    throw not_implemented("allocator_buddies_system::~allocator_buddies_system()", "your code should be here...");
 }
 
 allocator_buddies_system::allocator_buddies_system(
     allocator_buddies_system &&other) noexcept
 {
+    throw not_implemented("allocator_buddies_system::allocator_buddies_system(allocator_buddies_system &&) noexcept", "your code should be here...");
 }
 
 allocator_buddies_system &allocator_buddies_system::operator=(
     allocator_buddies_system &&other) noexcept
 {
-    return *this;
+    throw not_implemented("allocator_buddies_system &allocator_buddies_system::operator=(allocator_buddies_system &&) noexcept", "your code should be here...");
 }
 
 allocator_buddies_system::allocator_buddies_system(
@@ -23,90 +25,99 @@ allocator_buddies_system::allocator_buddies_system(
         logger *logger,
         allocator_with_fit_mode::fit_mode allocate_fit_mode)
 {
+    throw not_implemented("allocator_buddies_system::allocator_buddies_system(size_t,std::pmr::memory_resource *,logger *,allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 [[nodiscard]] void *allocator_buddies_system::do_allocate(
     size_t size,
     size_t alignment)
 {
-
+    throw not_implemented("[[nodiscard]] void *allocator_buddies_system::do_allocate(size_t, size_t)", "your code should be here...");
 }
 
 void allocator_buddies_system::do_deallocate_sm(void *at)
 {
-
+    throw not_implemented("void allocator_buddies_system::do_deallocate_sm(void *)", "your code should be here...");
 }
 
 inline void allocator_buddies_system::set_fit_mode(
     allocator_with_fit_mode::fit_mode mode)
 {
+    throw not_implemented("inline void allocator_buddies_system::set_fit_mode(allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 
 std::vector<allocator_test_utils::block_info> allocator_buddies_system::get_blocks_info() const noexcept
 {
+    throw not_implemented("std::vector<allocator_test_utils::block_info> allocator_buddies_system::get_blocks_info() const noexcept", "your code should be here...");
 }
 
 inline logger *allocator_buddies_system::get_logger() const
 {
-    return *reinterpret_cast<logger**>(_trusted_memory);
+    throw not_implemented("inline logger *allocator_buddies_system::get_logger() const", "your code should be here...");
 }
 
 inline std::string allocator_buddies_system::get_typename() const
 {
-    return "allocator_buddies_system";
+    throw not_implemented("inline std::string allocator_buddies_system::get_typename() const", "your code should be here...");
 }
 
 std::vector<allocator_test_utils::block_info> allocator_buddies_system::get_blocks_info_inner() const
 {
-
+    throw not_implemented("std::vector<allocator_test_utils::block_info> allocator_buddies_system::get_blocks_info_inner() const", "your code should be here...");
 }
 
 allocator_buddies_system::buddy_iterator allocator_buddies_system::begin() const noexcept
 {
-    return {reinterpret_cast<std::byte*>(_trusted_memory) + allocator_metadata_size};
+    throw not_implemented("allocator_buddies_system::buddy_iterator allocator_buddies_system::begin() const noexcept", "your code should be here...");
 }
 
 allocator_buddies_system::buddy_iterator allocator_buddies_system::end() const noexcept
 {
+    throw not_implemented("allocator_buddies_system::buddy_iterator allocator_buddies_system::end() const noexcept", "your code should be here...");
 }
 
 bool allocator_buddies_system::buddy_iterator::operator==(const allocator_buddies_system::buddy_iterator &other) const noexcept
 {
-    return _block == other._block;
+    throw not_implemented("bool allocator_buddies_system::buddy_iterator::operator==(const allocator_buddies_system::buddy_iterator &) const noexcept", "your code should be here...");
 }
 
 bool allocator_buddies_system::buddy_iterator::operator!=(const allocator_buddies_system::buddy_iterator &other) const noexcept
 {
-    return !(*this == other);
+    throw not_implemented("bool allocator_buddies_system::buddy_iterator::operator!=(const allocator_buddies_system::buddy_iterator &) const noexcept", "your code should be here...");
 }
 
 allocator_buddies_system::buddy_iterator &allocator_buddies_system::buddy_iterator::operator++() & noexcept
 {
-
-    return *this;
+    throw not_implemented("allocator_buddies_system::buddy_iterator &allocator_buddies_system::buddy_iterator::operator++() & noexcept", "your code should be here...");
 }
 
 allocator_buddies_system::buddy_iterator allocator_buddies_system::buddy_iterator::operator++(int n)
 {
-    auto tmp = *this;
-    ++(*this);
-    return tmp;
+    throw not_implemented("allocator_buddies_system::buddy_iterator allocator_buddies_system::buddy_iterator::operator++(int)", "your code should be here...");
 }
 
 size_t allocator_buddies_system::buddy_iterator::size() const noexcept
 {
+    throw not_implemented("size_t allocator_buddies_system::buddy_iterator::size() const noexcept", "your code should be here...");
 }
 
 bool allocator_buddies_system::buddy_iterator::occupied() const noexcept
 {
+    throw not_implemented("bool allocator_buddies_system::buddy_iterator::occupied() const noexcept", "your code should be here...");
 }
 
 void *allocator_buddies_system::buddy_iterator::operator*() const noexcept
 {
-    return _block;
+    throw not_implemented("void *allocator_buddies_system::buddy_iterator::operator*() const noexcept", "your code should be here...");
 }
 
-allocator_buddies_system::buddy_iterator::buddy_iterator(void *start) : _block(start){}
+allocator_buddies_system::buddy_iterator::buddy_iterator(void *start)
+{
+    throw not_implemented("allocator_buddies_system::buddy_iterator::buddy_iterator(void *)", "your code should be here...");
+}
 
-allocator_buddies_system::buddy_iterator::buddy_iterator() : _block(nullptr){}
+allocator_buddies_system::buddy_iterator::buddy_iterator()
+{
+    throw not_implemented("allocator_buddies_system::buddy_iterator::buddy_iterator()", "your code should be here...");
+}

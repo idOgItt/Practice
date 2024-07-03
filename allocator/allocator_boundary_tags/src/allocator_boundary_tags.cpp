@@ -3,16 +3,19 @@
 
 allocator_boundary_tags::~allocator_boundary_tags()
 {
+    throw not_implemented("allocator_boundary_tags::~allocator_boundary_tags()", "your code should be here...");
 }
 
 allocator_boundary_tags::allocator_boundary_tags(
     allocator_boundary_tags &&other) noexcept
 {
+    throw not_implemented("allocator_boundary_tags::allocator_boundary_tags(allocator_boundary_tags &&) noexcept", "your code should be here...");
 }
 
 allocator_boundary_tags &allocator_boundary_tags::operator=(
     allocator_boundary_tags &&other) noexcept
 {
+    throw not_implemented("allocator_boundary_tags &allocator_boundary_tags::operator=(allocator_boundary_tags &&) noexcept", "your code should be here...");
 }
 
 
@@ -24,122 +27,118 @@ allocator_boundary_tags::allocator_boundary_tags(
         logger *logger,
         allocator_with_fit_mode::fit_mode allocate_fit_mode)
 {
+    throw not_implemented("allocator_boundary_tags::allocator_boundary_tags(size_t,std::pmr::memory_resource *,logger *,allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 [[nodiscard]] void *allocator_boundary_tags::do_allocate(
     size_t size,
     size_t alignment)
 {
+    throw not_implemented("[[nodiscard]] void *allocator_boundary_tags::do_allocate(size_t, size_t)", "your code should be here...");
 }
 
 void allocator_boundary_tags::do_deallocate_sm(
     void *at)
 {
-
+    throw not_implemented("void allocator_boundary_tags::do_deallocate_sm(void *)", "your code should be here...");
 }
 
 inline void allocator_boundary_tags::set_fit_mode(
     allocator_with_fit_mode::fit_mode mode)
 {
+    throw not_implemented("inline void allocator_boundary_tags::set_fit_mode(allocator_with_fit_mode::fit_mode)", "your code should be here...");
 }
 
 
 std::vector<allocator_test_utils::block_info> allocator_boundary_tags::get_blocks_info() const
 {
+    throw not_implemented("std::vector<allocator_test_utils::block_info> allocator_boundary_tags::get_blocks_info() const", "your code should be here...");
 }
 
 inline logger *allocator_boundary_tags::get_logger() const
 {
+    throw not_implemented("inline logger *allocator_boundary_tags::get_logger() const", "your code should be here...");
 }
 
 inline std::string allocator_boundary_tags::get_typename() const noexcept
 {
+    throw not_implemented("inline std::string allocator_boundary_tags::get_typename() const noexcept", "your code should be here...");
 }
 
 
 allocator_boundary_tags::boundary_iterator allocator_boundary_tags::begin() const noexcept
 {
-    return {_trusted_memory};
+    throw not_implemented("allocator_boundary_tags::boundary_iterator allocator_boundary_tags::begin() const noexcept", "your code should be here...");
 }
 
 allocator_boundary_tags::boundary_iterator allocator_boundary_tags::end() const noexcept
 {
-    return {};
+    throw not_implemented("allocator_boundary_tags::boundary_iterator allocator_boundary_tags::end() const noexcept", "your code should be here...");
 }
 
 std::vector<allocator_test_utils::block_info> allocator_boundary_tags::get_blocks_info_inner() const
 {
-    std::vector<allocator_test_utils::block_info> res;
-
-    std::back_insert_iterator<std::vector<allocator_test_utils::block_info>> inserter(res);
-
-    for(auto it = begin(), sent = end(); it != sent; ++it)
-    {
-        inserter = {it.size(), it.occupied()};
-    }
-
-    return res;
+    throw not_implemented("std::vector<allocator_test_utils::block_info> allocator_boundary_tags::get_blocks_info_inner() const", "your code should be here...");
 }
 
 bool allocator_boundary_tags::boundary_iterator::operator==(
         const allocator_boundary_tags::boundary_iterator &other) const noexcept
 {
-    return _occupied_ptr == other._occupied_ptr && ((_occupied == other._occupied) || _occupied_ptr == nullptr || other._occupied_ptr ==
-                                                                                                                          nullptr);
+    throw not_implemented("bool allocator_boundary_tags::boundary_iterator::operator==(const allocator_boundary_tags::boundary_iterator &) const noexcept", "your code should be here...");
 }
 
 bool allocator_boundary_tags::boundary_iterator::operator!=(
         const allocator_boundary_tags::boundary_iterator & other) const noexcept
 {
-    return !(*this == other);
+    throw not_implemented("bool allocator_boundary_tags::boundary_iterator::operator!=(const allocator_boundary_tags::boundary_iterator &) const noexcept", "your code should be here...");
 }
 
 allocator_boundary_tags::boundary_iterator &allocator_boundary_tags::boundary_iterator::operator++() & noexcept
 {
-
-    return *this;
+    throw not_implemented("allocator_boundary_tags::boundary_iterator &allocator_boundary_tags::boundary_iterator::operator++() & noexcept", "your code should be here...");
 }
 
 allocator_boundary_tags::boundary_iterator &allocator_boundary_tags::boundary_iterator::operator--() & noexcept
 {
-
-    return *this;
+    throw not_implemented("allocator_boundary_tags::boundary_iterator &allocator_boundary_tags::boundary_iterator::operator--() & noexcept", "your code should be here...");
 }
 
 allocator_boundary_tags::boundary_iterator allocator_boundary_tags::boundary_iterator::operator++(int n)
 {
-    auto tmp = *this;
-    ++(*this);
-    return tmp;
+    throw not_implemented("allocator_boundary_tags::boundary_iterator allocator_boundary_tags::boundary_iterator::operator++(int n)", "your code should be here...");
 }
 
 allocator_boundary_tags::boundary_iterator allocator_boundary_tags::boundary_iterator::operator--(int n)
 {
-    auto tmp = *this;
-    --(*this);
-    return tmp;
+    throw not_implemented("allocator_boundary_tags::boundary_iterator allocator_boundary_tags::boundary_iterator::operator--(int n)", "your code should be here...");
 }
 
 size_t allocator_boundary_tags::boundary_iterator::size() const noexcept
 {
+    throw not_implemented("size_t allocator_boundary_tags::boundary_iterator::size() const noexcept", "your code should be here...");
 }
 
 bool allocator_boundary_tags::boundary_iterator::occupied() const noexcept
 {
-    return _occupied;
+    throw not_implemented("bool allocator_boundary_tags::boundary_iterator::occupied() const noexcept", "your code should be here...");
 }
 
 void* allocator_boundary_tags::boundary_iterator::operator*() const noexcept
 {
+    throw not_implemented("void* allocator_boundary_tags::boundary_iterator::operator*() const noexcept", "your code should be here...");
 }
 
-allocator_boundary_tags::boundary_iterator::boundary_iterator() : _trusted_memory(nullptr), _occupied_ptr(nullptr), _occupied(false){}
-
-allocator_boundary_tags::boundary_iterator::boundary_iterator(void *trusted) : _trusted_memory(trusted), _occupied_ptr(trusted), _occupied(true)
+allocator_boundary_tags::boundary_iterator::boundary_iterator()
 {
+    throw not_implemented("allocator_boundary_tags::boundary_iterator::boundary_iterator()", "your code should be here...");
+}
+
+allocator_boundary_tags::boundary_iterator::boundary_iterator(void *trusted)
+{
+    throw not_implemented("allocator_boundary_tags::boundary_iterator::boundary_iterator(void *)", "your code should be here...");
 }
 
 void *allocator_boundary_tags::boundary_iterator::get_ptr() const noexcept
 {
-    return _occupied_ptr;
+    throw not_implemented("void *allocator_boundary_tags::boundary_iterator::get_ptr() const noexcept", "your code should be here...");
 }
