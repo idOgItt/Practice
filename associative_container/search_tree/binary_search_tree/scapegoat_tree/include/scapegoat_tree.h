@@ -116,4 +116,146 @@ scapegoat_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compar
         pp_allocator<U> alloc = pp_allocator<U>(),
         logger* logger = nullptr, double alpha = 0.7) -> scapegoat_tree<tkey, tvalue, compare>;
 
+// region implementation
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::node::node(tkey const &key_, tvalue &&value_)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::node::node(tkey const &key_, tvalue &&value_)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::node::node(tkey const &key_, const tvalue& value_)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::node::node(tkey const &key_, const tvalue& value_)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+template<class ...Args>
+scapegoat_tree<tkey, tvalue, compare>::node::node(parent::node* par, Args&&... args)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> template<class ...Args> scapegoat_tree<tkey, tvalue, compare>::node::node(parent::node* par, Args&&... args)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+void scapegoat_tree<tkey, tvalue, compare>::node::recalculate_size() noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> void scapegoat_tree<tkey, tvalue, compare>::node::recalculate_size() noexcept ", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+bool scapegoat_tree<tkey, tvalue, compare>::node::is_disbalanced(double alpha) noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> bool scapegoat_tree<tkey, tvalue, compare>::node::is_disbalanced(double alpha) noexcept ", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(
+        const compare& comp,
+        pp_allocator<value_type> alloc,
+        logger *logger,
+        double alpha)
+{
+    throw not_implemented("emplate<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(const compare& comp, pp_allocator<value_type> alloc, logger *logger, double alpha)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(
+        pp_allocator<value_type> alloc,
+        const compare& comp,
+        logger *logger,
+        double alpha)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(pp_allocator<value_type> alloc, const compare& comp, logger *logger, double alpha)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+template<input_iterator_for_pair<tkey, tvalue> iterator>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(
+        iterator begin,
+        iterator end,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger,
+        double alpha)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> template<input_iterator_for_pair<tkey, tvalue> iterator> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(iterator begin, iterator end, const compare& cmp, pp_allocator<value_type> alloc, logger* logger,double alpha)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+template<std::ranges::input_range Range>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(
+        Range&& range,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger,
+        double alpha)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> template<std::ranges::input_range Range>scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(Range&& range, const compare& cmp, pp_allocator<value_type> alloc, logger* logger, double alpha)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(
+        std::initializer_list<std::pair<tkey, tvalue>> data,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger,
+        double alpha)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<value_type> alloc, logger* logger, double alpha)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(scapegoat_tree const &other)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(scapegoat_tree const &other)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare> &scapegoat_tree<tkey, tvalue, compare>::operator=(scapegoat_tree const &other)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare> &scapegoat_tree<tkey, tvalue, compare>::operator=(scapegoat_tree const &other) ", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(scapegoat_tree &&other) noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare>::scapegoat_tree(scapegoat_tree &&other) noexcept", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+scapegoat_tree<tkey, tvalue, compare> &scapegoat_tree<tkey, tvalue, compare>::operator=(scapegoat_tree &&other) noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> scapegoat_tree<tkey, tvalue, compare> &scapegoat_tree<tkey, tvalue, compare>::operator=(scapegoat_tree &&other) noexcept", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+void scapegoat_tree<tkey, tvalue, compare>::setup_alpha(double alpha)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> void scapegoat_tree<tkey, tvalue, compare>::setup_alpha(double alpha)", "your code should be here...");
+}
+
+template<typename compare, typename U, typename iterator>
+scapegoat_tree(iterator begin, iterator end, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha)
+-> scapegoat_tree<const typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare>
+{
+    throw not_implemented("template<typename compare, typename U, typename iterator> scapegoat_tree(iterator begin, iterator end, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha) -> scapegoat_tree<const typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare> ", "your code should be here...");
+}
+
+template<typename compare, typename U, std::ranges::forward_range Range>
+scapegoat_tree(Range&& range, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha)
+-> scapegoat_tree<const typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::first_type, typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::second_type, compare>
+{
+    throw not_implemented("template<typename compare, typename U, std::ranges::forward_range Range> scapegoat_tree(Range&& range, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha)-> scapegoat_tree<const typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::first_type, typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::second_type, compare> ", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare, typename U>
+scapegoat_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha)
+-> scapegoat_tree<tkey, tvalue, compare>
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare, typename U> scapegoat_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<U> alloc, logger* logger, double alpha)-> scapegoat_tree<tkey, tvalue, compare> ", "your code should be here...");
+}
+
+// endregion implementation
+
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_SCAPEGOAT_TREE_H
