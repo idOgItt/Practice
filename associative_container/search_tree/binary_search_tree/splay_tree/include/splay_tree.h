@@ -88,4 +88,104 @@ splay_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& c
         pp_allocator<U> alloc = pp_allocator<U>(),
         logger* logger = nullptr) -> splay_tree<tkey, tvalue, compare>;
 
+// region implementation
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare>::splay_tree(
+        const compare& comp,
+        pp_allocator<value_type> alloc,
+        logger *logger)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare>::splay_tree(const compare& comp, pp_allocator<value_type> alloc, logger *logger)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare>::splay_tree(
+        pp_allocator<value_type> alloc,
+        const compare& comp,
+        logger *logger)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare>::splay_tree(pp_allocator<value_type> alloc, const compare& comp, logger *logger)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+template<input_iterator_for_pair<tkey, tvalue> iterator>
+splay_tree<tkey, tvalue, compare>::splay_tree(
+        iterator begin,
+        iterator end,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> template<input_iterator_for_pair<tkey, tvalue> iterator>splay_tree<tkey, tvalue, compare>::splay_tree(iterator begin,iterator end,const compare& cmp,pp_allocator<value_type> alloc,logger* logger)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+template<std::ranges::input_range Range>
+splay_tree<tkey, tvalue, compare>::splay_tree(
+        Range&& range,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> template<std::ranges::input_range Range> splay_tree<tkey, tvalue, compare>::splay_tree(Range&& range, const compare& cmp, pp_allocator<value_type> alloc, logger* logger)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare>::splay_tree(
+        std::initializer_list<std::pair<tkey, tvalue>> data,
+        const compare& cmp,
+        pp_allocator<value_type> alloc,
+        logger* logger)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare>::splay_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<value_type> alloc, logger* logger)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare>::splay_tree(splay_tree const &other)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare>::splay_tree(splay_tree const &other)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare> &splay_tree<tkey, tvalue, compare>::operator=(splay_tree const &other)
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare> &splay_tree<tkey, tvalue, compare>::operator=(splay_tree const &other)", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare>::splay_tree(splay_tree &&other) noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare>::splay_tree(splay_tree &&other) noexcept", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare>
+splay_tree<tkey, tvalue, compare> &splay_tree<tkey, tvalue, compare>::operator=(splay_tree &&other) noexcept
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare> splay_tree<tkey, tvalue, compare> &splay_tree<tkey, tvalue, compare>::operator=(splay_tree &&other) noexcept", "your code should be here...");
+}
+
+template<typename compare, typename U, typename iterator>
+splay_tree(iterator begin, iterator end, const compare& cmp, pp_allocator<U> alloc, logger* logger)
+-> splay_tree<const typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare>
+{
+    throw not_implemented("template<typename compare, typename U, typename iterator> splay_tree(iterator begin, iterator end, const compare& cmp, pp_allocator<U> alloc, logger* logger) -> splay_tree<const typename std::iterator_traits<iterator>::value_type::first_type, typename std::iterator_traits<iterator>::value_type::second_type, compare>", "your code should be here...");
+}
+
+template<typename compare, typename U, std::ranges::forward_range Range>
+splay_tree(Range&& range, const compare& cmp, pp_allocator<U> alloc, logger* logger)
+-> splay_tree<const typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::first_type, typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::second_type, compare>
+{
+    throw not_implemented("template<typename compare, typename U, std::ranges::forward_range Range> splay_tree(Range&& range, const compare& cmp, pp_allocator<U> alloc, logger* logger) -> splay_tree<const typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::first_type, typename std::iterator_traits<typename std::ranges::iterator_t<Range>>::value_type::second_type, compare>", "your code should be here...");
+}
+
+template<typename tkey, typename tvalue, typename compare, typename U>
+splay_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<U> alloc, logger* logger)
+-> splay_tree<tkey, tvalue, compare>
+{
+    throw not_implemented("template<typename tkey, typename tvalue, typename compare, typename U> splay_tree(std::initializer_list<std::pair<tkey, tvalue>> data, const compare& cmp, pp_allocator<U> alloc, logger* logger) -> splay_tree<tkey, tvalue, compare>", "your code should be here...");
+}
+
+// endregion implementation
+
 #endif //MATH_PRACTICE_AND_OPERATING_SYSTEMS_SPLAY_TREE_H
