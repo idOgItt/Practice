@@ -1201,7 +1201,7 @@ bool compare_pairs(const typename B_tree<tkey, tvalue, compare, t>::tree_data_ty
 template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>
 bool compare_keys(const tkey &lhs, const tkey &rhs)
 {
-    throw not_implemented("template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t t>\n"
+    throw not_implemented("template<typename tkey, typename tvalue, compator<tkey> compare, std::size_t >\n"
                           "bool compare_keys(const tkey &lhs, const tkey &rhs)", "your code should be here...");
 }
 
